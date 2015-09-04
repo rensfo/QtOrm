@@ -13,10 +13,17 @@ TEMPLATE = lib
 
 DEFINES += QTORM_LIBRARY
 
-SOURCES += QtOrm.cpp
+SOURCES += QtOrm.cpp \
+    PropertyMap.cpp \
+    ClassMap.cpp \
+    ConfigurateMap.cpp
 
 HEADERS += QtOrm.h\
-        qtorm_global.h
+        qtorm_global.h \
+    PropertyMap.h \
+    ClassMap.h \
+    ConfigurateMap.h \
+    configurate.h
 
 unix {
     target.path = /usr/lib
