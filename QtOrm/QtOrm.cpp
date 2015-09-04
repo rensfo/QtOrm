@@ -1,6 +1,6 @@
 #include "QtOrm.h"
 
 
-QtOrm::QtOrm()
-{
+QtOrm::QtOrm(){
+
 }

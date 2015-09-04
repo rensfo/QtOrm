@@ -7,29 +7,24 @@
 #include <QMap>
 #include <QDebug>
 
-#include "PropertyMap.h"
+#include "ClassMapBase.h"
 
-namespace QtOrm
-{
-    namespace Mapping
-    {
-        class ClassMap
-        {
+namespace QtOrm{
+    namespace Mapping{
+
+        template<class T>
+        class ClassMap : public ClassMapBase{
         public:
-            ClassMap(QString className);
-            PropertyMap& id(QString property);
-            PropertyMap& map(QString property);
-            const QMap<QString, PropertyMap> getProperties() const;
-            void setTable(const QString &table);
-            const QString getTable() const;
-            const QString getClassName() const;
+            ClassMap();
 
-        private:
-            QString idProperty;
-            QString className;
-            QMap<QString, PropertyMap> properties;
-            QString table;
         };
+
+        template<class T>
+        ClassMap<T>::ClassMap() : ClassMapBase()
+        {
+            (void)static_cast<QObject*>((T*)0);
+            setMetaObject(T::staticMetaObject);
+        }
     }
 }
 

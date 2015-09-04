@@ -1,13 +1,11 @@
 #ifndef CONFIGURATE
 #define CONFIGURATE
 
-#include "ClassMap.h"
+#include "ClassMapBase.h"
 
-namespace QtOrm
-{
-    namespace Config
-    {
-        QMap<QString, QtOrm::Mapping::ClassMap*> mappedClass;
+namespace QtOrm{
+    namespace Config{
+        QMap<QString, QtOrm::Mapping::ClassMapBase*> mappedClass;
     }
 }
 

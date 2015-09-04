@@ -1,19 +1,20 @@
 #include "ConfigurateMap.h"
 
-namespace QtOrm
-{
-    namespace Config
-    {
+namespace QtOrm{
+    namespace Config{
         using namespace QtOrm::Mapping;
-        extern QMap<QString, ClassMap*> mappedClass;
 
-        ConfigurateMap::ConfigurateMap()
-        {
+        extern QMap<QString, ClassMapBase*> mappedClass;
 
+        ConfigurateMap::ConfigurateMap(){
         }
 
-        const ClassMap* getMappedClass(QString className)
+        void ConfigurateMap::writeRegisteredClassesToDebug()
         {
+            qDebug() << mappedClass;
+        }
+
+        const ClassMapBase* getMappedClass(QString className){
             return mappedClass.value(className);
         }
     }

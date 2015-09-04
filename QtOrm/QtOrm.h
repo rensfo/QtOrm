@@ -3,8 +3,7 @@
 
 #include "qtorm_global.h"
 
-class QTORMSHARED_EXPORT QtOrm
-{
+class QTORMSHARED_EXPORT QtOrm{
 
 public:
     QtOrm();

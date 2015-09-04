@@ -3,22 +3,18 @@
 
 #include <QString>
 
-namespace QtOrm
-{
-    namespace Mapping
-    {
+namespace QtOrm{
+    namespace Mapping{
 
-        class PropertyMap
-        {
-
+        class PropertyMap{
         public:
             PropertyMap();
             PropertyMap(QString name);
             PropertyMap(QString name, QString column);
             PropertyMap& setName(QString name);
-            QString getName();
+            QString getName() const;
             PropertyMap& setColumn(QString column);
-            QString getColumn();
+            QString getColumn() const;
             PropertyMap& setIsId(bool isId);
             bool getIsId();
 
