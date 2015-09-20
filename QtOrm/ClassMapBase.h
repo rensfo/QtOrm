@@ -7,6 +7,7 @@
 #include <QDebug>
 
 #include "PropertyMap.h"
+#include "Exception.h"
 
 namespace QtOrm{
     namespace Mapping{

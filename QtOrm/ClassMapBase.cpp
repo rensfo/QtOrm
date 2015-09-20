@@ -40,10 +40,12 @@ namespace QtOrm{
         PropertyMap &ClassMapBase::createProperty(QString propertyName){
             int propertyIndex = metaObject.indexOfProperty(propertyName.toStdString().data());
             if(propertyIndex == -1)
-             qDebug() << QString("In class %1 Property %2 not found")
-                            .arg(metaObject.className())
-                            .arg(propertyName);
-
+            {
+                QString message = QString("In class %1 Property %2 not found")
+                        .arg(metaObject.className())
+                        .arg(propertyName);
+                throw new Exception::Exception(message);
+            }
 
             PropertyMap *propertyMap = new PropertyMap(propertyName);
             properties.insert(propertyName, propertyMap);
