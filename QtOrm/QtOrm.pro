@@ -27,11 +27,11 @@ HEADERS += QtOrm.h\
     PropertyMap.h \
     ClassMap.h \
     ConfigurateMap.h \
-    configurate.h \
     ClassMapBase.h \
     Exception.h \
     Session.h \
-    SqlManagerBase.h
+    SqlManagerBase.h \
+    Configurate.h
 
 CONFIG += c++11
 

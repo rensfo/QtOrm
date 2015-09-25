@@ -1,8 +1,8 @@
 #include "Session.h"
 
-namespace QtOrm {
-    Session::Session(QObject *parent) : QObject(parent){
-
+namespace QtOrm { 
+    Session::Session(const QSqlDatabase &database, QObject *parent)
+        : QObject(parent), database(database){
     }
 
     void Session::insertObject(const QObject &object){
@@ -16,5 +16,16 @@ namespace QtOrm {
     void Session::deleteObject(const QObject &object){
 
     }
+
+
+
+    QSqlDatabase Session::getDatabase() const{
+        return database;
+    }
+
+    void Session::setDatabase(const QSqlDatabase &database){
+        this->database = database;
+    }
+
 }
 

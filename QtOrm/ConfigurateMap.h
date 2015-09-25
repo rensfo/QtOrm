@@ -5,12 +5,8 @@
 #include<QMap>
 #include<QDebug>
 
-#include <QMap>
-#include <QString>
-
 #include "ClassMap.h"
 #include "ClassMapBase.h"
-#include "configurate.h"
 
 namespace QtOrm{
     namespace Config{
@@ -24,6 +20,8 @@ namespace QtOrm{
             static ClassMapBase* getMappedClass(QString className);
             static void writeRegisteredClassesToDebug();
         };
+
+        extern QMap<QString, ClassMapBase*> mappedClass;
 
         template<class T>
         void ConfigurateMap::classRegister(){

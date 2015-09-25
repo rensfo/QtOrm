@@ -8,5 +8,4 @@ class QTORMSHARED_EXPORT QtOrm{
 public:
     QtOrm();
 };
-
 #endif // QTORM_H
