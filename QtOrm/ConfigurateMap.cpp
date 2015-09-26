@@ -16,6 +16,10 @@ namespace QtOrm{
             return mappedClass.value(className);
         }
 
+        bool ConfigurateMap::isRegisterClass(QString className) {
+            return mappedClass.contains(className);
+        }
+
         void ConfigurateMap::writeRegisteredClassesToDebug(){
             qDebug() << mappedClass;
         }

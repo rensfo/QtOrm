@@ -18,6 +18,7 @@ namespace QtOrm{
             template<class T>
             static void classRegister();
             static ClassMapBase* getMappedClass(QString className);
+            static bool isRegisterClass(QString className);
             static void writeRegisteredClassesToDebug();
         };
 

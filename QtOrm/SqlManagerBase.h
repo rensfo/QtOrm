@@ -10,17 +10,19 @@
 
 namespace QtOrm{
     namespace Sql{
+        enum class SqlManagerType{ Simple, Setter };
+
         class SqlManagerBase : public QObject
         {
             Q_OBJECT
         public:
-            explicit SqlManagerBase(QSqlDatabase &database, QObject *parent = 0);
-            virtual QSqlQuery getObjectById(const QString objectName, QVariant id);
-            virtual QString getSelect(const QString objectName) const;
-            virtual QString getFrom(const QString objectName) const;
-            virtual QString getWhere(const QString objectName) const;
+            explicit SqlManagerBase(const QSqlDatabase &database, QObject *parent = 0);
+            virtual QSqlQuery getObjectById(const QString objectName, QVariant id) = 0;
+            virtual QString getSelect(const QString objectName) const = 0;
+            virtual QString getFrom(const QString objectName) const = 0;
+            virtual QString getWhere(const QString objectName) const = 0;
 
-        private:
+        protected:
             QString generateTableAlias();
             void resetTableNumber();
 
@@ -28,7 +30,7 @@ namespace QtOrm{
 
         public slots:
 
-        private:
+        protected:
             int tableNumber;
             QString sqlQueryTemplate = "%1 %2 %3";
             QSqlDatabase database;

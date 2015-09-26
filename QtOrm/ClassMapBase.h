@@ -30,6 +30,8 @@ namespace QtOrm{
             QMetaObject getMetaObject() const;
             void setMetaObject(const QMetaObject &metaObject);
 
+            PropertyMap& getIdProperty();
+
         private:
             PropertyMap &createProperty(QString propertyName);
 

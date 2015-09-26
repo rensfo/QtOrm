@@ -25,6 +25,15 @@ namespace QtOrm{
         }
 
         PropertyMap &ClassMapBase::id(QString propertyName){
+            if(!idProperty.isEmpty()){
+                QString errorText = QString("При связывании поля '%1' класса '%2' произошла исключительная ситуация - id уже зарезервировано за '%3'")
+                        .arg(propertyName)
+                        .arg(getClassName())
+                        .arg(idProperty);
+                throw new Exception(errorText);
+            }
+
+            idProperty = propertyName;
             return createProperty(propertyName).setIsId(true);
         }
 
@@ -44,7 +53,7 @@ namespace QtOrm{
                 QString message = QString("In class %1 Property %2 not found")
                         .arg(metaObject.className())
                         .arg(propertyName);
-                throw new Exception::Exception(message);
+                throw new Exception(message);
             }
 
             PropertyMap *propertyMap = new PropertyMap(propertyName);
@@ -59,6 +68,10 @@ namespace QtOrm{
 
         void ClassMapBase::setMetaObject(const QMetaObject &metaObject){
             this->metaObject = metaObject;
+        }
+
+        PropertyMap &ClassMapBase::getIdProperty() {
+            return *(properties.value(idProperty));
         }
 
     }
