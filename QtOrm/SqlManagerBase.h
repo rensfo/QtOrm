@@ -1,17 +1,38 @@
-#ifndef SQLMANAGER_H
-#define SQLMANAGER_H
+#ifndef SQLMANAGERBASE_H
+#define SQLMANAGERBASE_H
 
 #include <QObject>
+#include <QSqlDatabase>
+#include <QSqlQuery>
+#include <QVariant>
 
-class SqlManagerBase : public QObject
-{
-    Q_OBJECT
-public:
-    explicit SqlManagerBase(QObject *parent = 0);
+#include "ConfigurateMap.h"
 
-signals:
+namespace QtOrm{
+    namespace Sql{
+        class SqlManagerBase : public QObject
+        {
+            Q_OBJECT
+        public:
+            explicit SqlManagerBase(QSqlDatabase &database, QObject *parent = 0);
+            virtual QSqlQuery getObjectById(const QString objectName, QVariant id);
+            virtual QString getSelect(const QString objectName) const;
+            virtual QString getFrom(const QString objectName) const;
+            virtual QString getWhere(const QString objectName) const;
 
-public slots:
-};
+        private:
+            QString generateTableAlias();
+            void resetTableNumber();
 
-#endif // SQLMANAGER_H
+        signals:
+
+        public slots:
+
+        private:
+            int tableNumber;
+            QString sqlQueryTemplate = "%1 %2 %3";
+            QSqlDatabase database;
+        };
+    }
+}
+#endif // SQLMANAGERBASE_H
