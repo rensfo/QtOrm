@@ -3,11 +3,11 @@
 
 #include <QObject>
 
-class SqlManager : public QObject
+class SqlManagerBase : public QObject
 {
     Q_OBJECT
 public:
-    explicit SqlManager(QObject *parent = 0);
+    explicit SqlManagerBase(QObject *parent = 0);
 
 signals:
 

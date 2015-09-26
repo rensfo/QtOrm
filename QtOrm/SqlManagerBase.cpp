@@ -1,6 +1,6 @@
-#include "SqlManager.h"
+#include "SqlManagerBase.h"
 
-SqlManager::SqlManager(QObject *parent) : QObject(parent)
+SqlManagerBase::SqlManagerBase(QObject *parent) : QObject(parent)
 {
 
 }
