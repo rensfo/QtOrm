@@ -15,7 +15,8 @@ namespace QtOrm {
     class Session : public QObject{
         Q_OBJECT
     public:
-        explicit Session(const QSqlDatabase &database, QObject *parent = 0);
+        explicit Session(const QSqlDatabase &database, Sql::SqlManagerType sqlManagerType, QObject *parent = 0);
+        explicit Session(const QSqlDatabase &database, QTextStream *textStream, Sql::SqlManagerType sqlManagerType, QObject *parent = 0);
         void insertObject(const QObject &object);
         void updateObject(const QObject &object);
         void deleteObject(const QObject &object);
@@ -26,8 +27,12 @@ namespace QtOrm {
         void setDatabase(const QSqlDatabase &database);
 
     private:
+        void sqlToStream(const QSqlQuery query);
+
+    private:
         QSqlDatabase database;
         Sql::SqlManagerBase *sqlManager;
+        QTextStream *textStream;
     };
 
     template<class T>
@@ -39,9 +44,13 @@ namespace QtOrm {
 
         QSqlQuery query = sqlManager->getObjectById(className, id);
         if(!query.exec()){
-            qDebug() << query.lastQuery();
+            sqlToStream(query);
             throw new Exception(query.lastError().text());
         }
+
+        sqlToStream(query);
+
+        //qDebug() << query.lastQuery();
 
         if(query.size() == 0)
             throw new Exception(QString("Нет записи с идентификатором '%1'").arg(id.toString()));

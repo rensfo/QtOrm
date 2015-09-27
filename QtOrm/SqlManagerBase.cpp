@@ -8,8 +8,7 @@ namespace QtOrm{
 
     namespace Sql{
         SqlManagerBase::SqlManagerBase(const QSqlDatabase &database, QObject *parent)
-            : QObject(parent), database(database){
-
+             : QObject(parent), database(database) {
         }
 
         QString SqlManagerBase::generateTableAlias() {

@@ -18,9 +18,9 @@ namespace QtOrm{
         public:
             explicit SqlManagerBase(const QSqlDatabase &database, QObject *parent = 0);
             virtual QSqlQuery getObjectById(const QString objectName, QVariant id) = 0;
-            virtual QString getSelect(const QString objectName) const = 0;
-            virtual QString getFrom(const QString objectName) const = 0;
-            virtual QString getWhere(const QString objectName) const = 0;
+            virtual QSqlQuery insertObject(const QObject &object) = 0;
+            virtual QSqlQuery updateObject(const QObject &object) = 0;
+            virtual QSqlQuery deleteObject(const QObject &object) = 0;
 
         protected:
             QString generateTableAlias();
@@ -34,6 +34,7 @@ namespace QtOrm{
             int tableNumber;
             QString sqlQueryTemplate = "%1 %2 %3";
             QSqlDatabase database;
+
         };
     }
 }

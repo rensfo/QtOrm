@@ -1,0 +1,8 @@
+#ifndef QTORM
+#define QTORM
+
+#include "Configurate.h"
+
+
+#endif // QTORM
+

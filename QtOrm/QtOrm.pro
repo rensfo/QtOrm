@@ -33,7 +33,8 @@ HEADERS += QtOrm.h\
     Session.h \
     SqlManagerBase.h \
     Configurate.h \
-    SimpleSqlManager.h
+    SimpleSqlManager.h \
+    QtOrm
 
 CONFIG += c++11
 
