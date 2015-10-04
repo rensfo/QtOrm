@@ -5,6 +5,7 @@
 #include <QSqlDatabase>
 #include <QSqlError>
 #include <QSqlRecord>
+#include <QSqlDriver>
 #include <QVariant>
 #include <QList>
 
@@ -55,10 +56,22 @@ namespace QtOrm {
         QSqlQuery query = sqlBuilder->getObjectById(className, id);
         queryExec(query);
 
-        noDataFoundCheck(query);
-        tooManyRowsCheck(query, id.toString());
+        qDebug() << " query size = " << query.size() << " query = " << query.numRowsAffected();
 
-        auto obj = new T();
+        if(database.driver()->hasFeature(QSqlDriver::QuerySize)){
+            noDataFoundCheck(query);
+            tooManyRowsCheck(query, id.toString());
+        }
+
+
+        QList<T*> *list = convertFromSqlQueryToList<T>(className, query);
+        qDebug() << "list count = " << list->size();
+
+        if(list->size() == 0)
+            throw new Exception("Не найдено ни одной записи.");
+
+        return list->takeFirst();
+        /*auto obj = new T();
 
         query.next();
         QSqlRecord record = query.record();
@@ -68,8 +81,7 @@ namespace QtOrm {
             QVariant value = record.value(prop->getColumn());
             obj->setProperty(prop->getName().toStdString().c_str(), value);
         }
-
-        return obj;
+        return obj;*/
     }
 
     template<class T>

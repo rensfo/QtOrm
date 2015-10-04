@@ -13,15 +13,14 @@ namespace QtOrm{
     namespace Mapping{
 
         template<class T>
-        class ClassMap : public ClassMapBase{
+        class ClassMap : public ClassMapBase {
         public:
             ClassMap();
 
         };
 
         template<class T>
-        ClassMap<T>::ClassMap() : ClassMapBase()
-        {
+        ClassMap<T>::ClassMap() : ClassMapBase() {
             (void)static_cast<QObject*>((T*)0);
             setMetaObject(T::staticMetaObject);
         }

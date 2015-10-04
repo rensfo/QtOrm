@@ -8,6 +8,7 @@
 
 #include "PropertyMap.h"
 #include "Exception.h"
+#include "OneToMany.h"
 
 namespace QtOrm{
     namespace Mapping{
@@ -33,14 +34,18 @@ namespace QtOrm{
             PropertyMap& getIdProperty();
             PropertyMap& getProperty(const QString &property);
 
+            OneToMany &oneToMany(const QString &property);
+
         private:
             PropertyMap &createProperty(QString propertyName);
+            void checkToExistProperty(const QString &property);
 
         private:
             QString table;
             QMap<QString, PropertyMap*> properties;
+            QMap<QString, OneToMany*> oneToManyRelations;
 
-            QString idProperty; //??
+            QString idProperty;
 
             QMetaObject metaObject;
         };

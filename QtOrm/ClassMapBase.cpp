@@ -47,14 +47,7 @@ namespace QtOrm{
         }
 
         PropertyMap &ClassMapBase::createProperty(QString propertyName){
-            int propertyIndex = metaObject.indexOfProperty(propertyName.toStdString().data());
-            if(propertyIndex == -1)
-            {
-                QString message = QString("In class %1 Property %2 not found")
-                        .arg(metaObject.className())
-                        .arg(propertyName);
-                throw new Exception(message);
-            }
+            checkToExistProperty(propertyName);
 
             PropertyMap *propertyMap = new PropertyMap(propertyName);
             properties.insert(propertyName, propertyMap);
@@ -76,6 +69,26 @@ namespace QtOrm{
 
         PropertyMap &ClassMapBase::getProperty(const QString &property){
             return *(properties.value(property));
+        }
+
+        OneToMany &ClassMapBase::oneToMany(const QString &property) {
+            checkToExistProperty(property);
+
+            OneToMany *relation = new OneToMany();
+            oneToManyRelations.insert(property, relation);
+
+            return *relation;
+        }
+
+        void ClassMapBase::checkToExistProperty(const QString &property) {
+            int propertyIndex = metaObject.indexOfProperty(property.toStdString().data());
+            if(propertyIndex == -1)
+            {
+                QString message = QString("В классе %1 свойство %2 не найдено.")
+                        .arg(metaObject.className())
+                        .arg(property);
+                throw new Exception(message);
+            }
         }
 
     }
