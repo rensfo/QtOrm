@@ -6,32 +6,43 @@
 #include <QSqlError>
 #include <QSqlRecord>
 #include <QVariant>
+#include <QList>
 
 #include "ConfigurateMap.h"
 #include "Exception.h"
-#include "SimpleSqlManager.h"
+#include "SimpleSqlBuilder.h"
 
 namespace QtOrm {
     class Session : public QObject{
         Q_OBJECT
     public:
-        explicit Session(const QSqlDatabase &database, Sql::SqlManagerType sqlManagerType, QObject *parent = 0);
-        explicit Session(const QSqlDatabase &database, QTextStream *textStream, Sql::SqlManagerType sqlManagerType, QObject *parent = 0);
+        explicit Session(const QSqlDatabase &database, Sql::SqlBuilderType sqlManagerType, QObject *parent = 0);
+        explicit Session(const QSqlDatabase &database, QTextStream *textStream, Sql::SqlBuilderType sqlManagerType, QObject *parent = 0);
         void insertObject(const QObject &object);
         void updateObject(const QObject &object);
         void deleteObject(const QObject &object);
         template<class T>
         T *getById(const QVariant &id);
+        template<class T>
+        QList<T*> *getList();
+        template<class T>
+        QList<T*> *getList(const QString &property, const QVariant &value);
 
         QSqlDatabase getDatabase() const;
         void setDatabase(const QSqlDatabase &database);
 
     private:
         void sqlToStream(const QSqlQuery query);
+        void checkClass(const QString &className);
+        void queryExec(QSqlQuery &query);
+        void noDataFoundCheck(const QSqlQuery &query);
+        void tooManyRowsCheck(const QSqlQuery &query, const QString &id);
+        template<class T>
+        QList<T*> *convertFromSqlQueryToList(const QString &className, QSqlQuery &query);
 
     private:
         QSqlDatabase database;
-        Sql::SqlManagerBase *sqlManager;
+        Sql::SqlBuilderBase *sqlBuilder;
         QTextStream *textStream;
     };
 
@@ -39,24 +50,13 @@ namespace QtOrm {
     T *Session::getById(const QVariant &id)
     {
         QString className = T::staticMetaObject.className();
-        if(!Config::ConfigurateMap::isRegisterClass(className))
-            throw new Exception(QString("Класс '%1' не зарегистрирован.").arg(className));
+        checkClass(className);
 
-        QSqlQuery query = sqlManager->getObjectById(className, id);
-        if(!query.exec()){
-            sqlToStream(query);
-            throw new Exception(query.lastError().text());
-        }
+        QSqlQuery query = sqlBuilder->getObjectById(className, id);
+        queryExec(query);
 
-        sqlToStream(query);
-
-        //qDebug() << query.lastQuery();
-
-        if(query.size() == 0)
-            throw new Exception(QString("Нет записи с идентификатором '%1'").arg(id.toString()));
-
-        if(query.size() > 1)
-            throw new Exception(QString("Найдено %1 записей с идентификатором '%2'").arg(query.size()).arg(id.toString()));
+        noDataFoundCheck(query);
+        tooManyRowsCheck(query, id.toString());
 
         auto obj = new T();
 
@@ -70,6 +70,48 @@ namespace QtOrm {
         }
 
         return obj;
+    }
+
+    template<class T>
+    QList<T*> *Session::getList(){
+        QString className = T::staticMetaObject.className();
+        checkClass(className);
+
+        QSqlQuery query = sqlBuilder->getListObject(className);
+        queryExec(query);
+
+        QList<T*> *list = convertFromSqlQueryToList<T>(className, query);
+        return list;
+    }
+
+    template<class T>
+    QList<T*> *Session::getList(const QString &property, const QVariant &value){
+        QString className = T::staticMetaObject.className();
+        checkClass(className);
+
+        QSqlQuery query = sqlBuilder->getListObject(className, property, value);
+        queryExec(query);
+
+        QList<T*> *list = convertFromSqlQueryToList<T>(className, query);
+        return list;
+    }
+
+    template<class T>
+    QList<T*> *Session::convertFromSqlQueryToList(const QString &className, QSqlQuery &query){
+        Mapping::ClassMapBase *classMap = Config::ConfigurateMap::getMappedClass(className);
+        auto properties = classMap->getProperties();
+        QList<T*> *list = new QList<T*>();
+        while(query.next()){
+            T *obj = new T();
+            foreach(auto prop, properties){
+                QVariant value = query.record().value(prop->getColumn());
+                obj->setProperty(prop->getName().toStdString().c_str(), value);
+            }
+
+            list->append(obj);
+        }
+
+        return list;
     }
 }
 #endif // SESSION_H

@@ -74,5 +74,9 @@ namespace QtOrm{
             return *(properties.value(idProperty));
         }
 
+        PropertyMap &ClassMapBase::getProperty(const QString &property){
+            return *(properties.value(property));
+        }
+
     }
 }

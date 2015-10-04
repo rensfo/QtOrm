@@ -20,8 +20,8 @@ SOURCES += QtOrm.cpp \
     ClassMapBase.cpp \
     Exception.cpp \
     Session.cpp \
-    SqlManagerBase.cpp \
-    SimpleSqlManager.cpp
+    SimpleSqlBuilder.cpp \
+    SqlBuilderBase.cpp
 
 HEADERS += QtOrm.h\
         qtorm_global.h \
@@ -31,10 +31,10 @@ HEADERS += QtOrm.h\
     ClassMapBase.h \
     Exception.h \
     Session.h \
-    SqlManagerBase.h \
     Configurate.h \
-    SimpleSqlManager.h \
-    QtOrm
+    QtOrm \
+    SimpleSqlBuilder.h \
+    SqlBuilderBase.h
 
 CONFIG += c++11
 

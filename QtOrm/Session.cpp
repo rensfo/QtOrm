@@ -1,53 +1,49 @@
 #include "Session.h"
 
 namespace QtOrm { 
-    Session::Session(const QSqlDatabase &database, Sql::SqlManagerType sqlManagerType, QObject *parent)
+    Session::Session(const QSqlDatabase &database, Sql::SqlBuilderType sqlManagerType, QObject *parent)
         : Session(database, nullptr, sqlManagerType, parent) {
     }
 
-    Session::Session(const QSqlDatabase &database, QTextStream *textStream, Sql::SqlManagerType sqlManagerType, QObject *parent)
+    Session::Session(const QSqlDatabase &database, QTextStream *textStream, Sql::SqlBuilderType sqlManagerType, QObject *parent)
         : QObject(parent), database(database), textStream(textStream){
         //Должна быть фабрика, если потребуется
         switch(sqlManagerType){
-        case Sql::SqlManagerType::Simple:
-            sqlManager = new Sql::SimpleSqlManager(database);
+        case Sql::SqlBuilderType::Simple:
+            sqlBuilder = new Sql::SimpleSqlBuilder(database);
             break;
-        case Sql::SqlManagerType::Setter:
+        case Sql::SqlBuilderType::Setter:
             break;
         }
     }
 
     void Session::insertObject(const QObject &object) {
-        QSqlQuery query = sqlManager->insertObject(object);
+        QSqlQuery query = sqlBuilder->insertObject(object);
         if(!query.exec()){
             sqlToStream(query);
             throw new Exception(query.lastError().text());
         }
 
         sqlToStream(query);
-
-        //qDebug() << query.lastQuery();
     }
 
     void Session::updateObject(const QObject &object) {
-        QSqlQuery query = sqlManager->updateObject(object);
+        QSqlQuery query = sqlBuilder->updateObject(object);
         if(!query.exec()){
             sqlToStream(query);
             throw new Exception(query.lastError().text());
         }
 
         sqlToStream(query);
-        //qDebug() << query.lastQuery();
     }
 
     void Session::deleteObject(const QObject &object) {
-        QSqlQuery query = sqlManager->deleteObject(object);
+        QSqlQuery query = sqlBuilder->deleteObject(object);
         if(!query.exec()){
             sqlToStream(query);
             throw new Exception(query.lastError().text());
         }
         sqlToStream(query);
-        //qDebug() << query.lastQuery();
     }
 
     QSqlDatabase Session::getDatabase() const {
@@ -58,8 +54,7 @@ namespace QtOrm {
         this->database = database;
     }
 
-    void Session::sqlToStream(const QSqlQuery query)
-    {
+    void Session::sqlToStream(const QSqlQuery query) {
         if(textStream){
             *textStream << query.lastQuery() << endl;
 
@@ -67,6 +62,30 @@ namespace QtOrm {
             for(auto it = boundValues.begin(); it != boundValues.end(); ++it)
                 *textStream << it.key() << " = " << it.value().toString() << endl;
         }
+    }
+
+    void Session::checkClass(const QString &className) {
+        if(!Config::ConfigurateMap::isRegisterClass(className))
+            throw new Exception(QString("Класс '%1' не зарегистрирован.").arg(className));
+    }
+
+    void Session::queryExec(QSqlQuery &query) {
+        if(!query.exec()){
+            sqlToStream(query);
+            throw new Exception(query.lastError().text());
+        }
+        sqlToStream(query);
+    }
+
+    void Session::noDataFoundCheck(const QSqlQuery &query) {
+        if(query.size() == 0)
+            //throw new Exception(QString("Нет записи с идентификатором '%1'").arg(id.toString()));
+            throw new Exception("Не найдено ни одной записи.");
+    }
+
+    void Session::tooManyRowsCheck(const QSqlQuery &query, const QString &id) {
+        if(query.size() > 1)
+            throw new Exception(QString("Найдено %1 записей с идентификатором '%2'").arg(query.size()).arg(id));
     }
 
 }

@@ -1,24 +1,62 @@
-#include "SimpleSqlManager.h"
+#include "SimpleSqlBuilder.h"
 
 namespace QtOrm{
 namespace Sql {
-        SimpleSqlManager::SimpleSqlManager(const QSqlDatabase &database, QObject *parent)
-            : SqlManagerBase(database, parent){
+        SimpleSqlBuilder::SimpleSqlBuilder(const QSqlDatabase &database, QObject *parent)
+            : SqlBuilderBase(database, parent){
         }
 
-        QSqlQuery SimpleSqlManager::getObjectById(const QString objectName, QVariant id) {
+        QSqlQuery SimpleSqlBuilder::getListObject(const QString &objectName) {
+            Mapping::ClassMapBase* classBase = Config::ConfigurateMap::getMappedClass(objectName);
+            resetTableNumber();
+
+            this->generateTableAlias();
+            QString select = getSelect();
+            QString from = getFrom(classBase->getTable());
+
+            QString fullSqlText = sqlQueryTemplate
+                    .arg(select)
+                    .arg(from)
+                    .arg("");
+
+            QSqlQuery *query = new QSqlQuery(database);
+            query->prepare(fullSqlText);
+
+            return *query;
+        }
+
+        QSqlQuery SimpleSqlBuilder::getListObject(const QString &objectName, const QString property, const QVariant value) {
+            Mapping::ClassMapBase* classBase = Config::ConfigurateMap::getMappedClass(objectName);
+            resetTableNumber();
+            QString tableAlias = this->generateTableAlias();
+            QString select = getSelect();
+            QString from = getFrom(classBase->getTable());
+            QString column = classBase->getProperty(property).getColumn();
+            QString placeHolder =  ":" + column;
+            QString where = getWhere(tableAlias, column, placeHolder);
+
+            QString fullSqlText = sqlQueryTemplate
+                    .arg(select)
+                    .arg(from)
+                    .arg(where);
+
+            QSqlQuery *query = new QSqlQuery(database);
+            query->prepare(fullSqlText);
+            query->bindValue(placeHolder, value);
+
+            return *query;
+        }
+
+        QSqlQuery SimpleSqlBuilder::getObjectById(const QString &objectName, QVariant id) {
             Mapping::ClassMapBase* classBase = Config::ConfigurateMap::getMappedClass(objectName);
             resetTableNumber();
 
             QString tableAlias = this->generateTableAlias();
-            QString select = QString("select %1.*").arg(tableAlias);
-            QString from = QString("from %1 %2").arg(classBase->getTable()).arg(tableAlias);
+            QString select = getSelect();
+            QString from = getFrom(classBase->getTable());
             QString idColumn = classBase->getIdProperty().getColumn();
             QString idPlaceHolder =  ":" + idColumn;
-            QString where = QString("where %1.%2 = %3")
-                    .arg(tableAlias)
-                    .arg(idColumn)
-                    .arg(idPlaceHolder);
+            QString where = getWhere(tableAlias, idColumn, idPlaceHolder);
 
             QString fullSqlText = sqlQueryTemplate
                     .arg(select)
@@ -32,19 +70,19 @@ namespace Sql {
             return *query;
         }
 
-        QString SimpleSqlManager::getSelect(const QString objectName) const {
-
+        QString SimpleSqlBuilder::getSelect() const {
+            return QString("select %1.*").arg(getCurrentTableAlias());
         }
 
-        QString SimpleSqlManager::getFrom(const QString objectName) const {
-
+        QString SimpleSqlBuilder::getFrom(const QString &tableName) const {
+            return QString("from %1 %2").arg(tableName).arg(getCurrentTableAlias());
         }
 
-        QString SimpleSqlManager::getWhere(const QString objectName) const {
-
+        QString SimpleSqlBuilder::getWhere(const QString &tableAlias, const QString &column, const QString &placeHolder) const {
+            return QString("where %1.%2 = %3").arg(tableAlias).arg(column).arg(placeHolder);
         }
 
-        QSqlQuery SimpleSqlManager::insertObject(const QObject &object) {
+        QSqlQuery SimpleSqlBuilder::insertObject(const QObject &object) {
             Mapping::ClassMapBase* classBase = Config::ConfigurateMap::getMappedClass(object.metaObject()->className());
 
             QString columns;
@@ -67,7 +105,7 @@ namespace Sql {
             return *query;
         }
 
-        QSqlQuery SimpleSqlManager::updateObject(const QObject &object) {
+        QSqlQuery SimpleSqlBuilder::updateObject(const QObject &object) {
             Mapping::ClassMapBase* classBase = Config::ConfigurateMap::getMappedClass(object.metaObject()->className());
 
             QString setClause;
@@ -96,7 +134,7 @@ namespace Sql {
             return *query;
         }
 
-        QSqlQuery SimpleSqlManager::deleteObject(const QObject &object) {
+        QSqlQuery SimpleSqlBuilder::deleteObject(const QObject &object) {
             Mapping::ClassMapBase* classBase = Config::ConfigurateMap::getMappedClass(object.metaObject()->className());
 
             QString idColumnName = classBase->getIdProperty().getColumn();
