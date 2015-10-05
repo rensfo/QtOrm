@@ -36,6 +36,8 @@ namespace QtOrm{
 
             OneToMany &oneToMany(const QString &property);
 
+            QMap<QString, OneToMany *> getOneToManyRelations() const;
+
         private:
             PropertyMap &createProperty(QString propertyName);
             void checkToExistProperty(const QString &property);

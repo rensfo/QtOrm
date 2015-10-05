@@ -41,8 +41,7 @@ namespace QtOrm{
             return createProperty(propertyName);
         }
 
-        PropertyMap &ClassMapBase::map(QString propertyName, QString columnName)
-        {
+        PropertyMap &ClassMapBase::map(QString propertyName, QString columnName) {
             return createProperty(propertyName).setColumn(columnName);
         }
 
@@ -75,6 +74,7 @@ namespace QtOrm{
             checkToExistProperty(property);
 
             OneToMany *relation = new OneToMany();
+            relation->setProperty(property);
             oneToManyRelations.insert(property, relation);
 
             return *relation;
@@ -90,6 +90,12 @@ namespace QtOrm{
                 throw new Exception(message);
             }
         }
+
+        QMap<QString, OneToMany *> ClassMapBase::getOneToManyRelations() const {
+            return oneToManyRelations;
+        }
+
+
 
     }
 }

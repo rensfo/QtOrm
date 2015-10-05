@@ -40,6 +40,7 @@ namespace QtOrm {
         void tooManyRowsCheck(const QSqlQuery &query, const QString &id);
         template<class T>
         QList<T*> *convertFromSqlQueryToList(const QString &className, QSqlQuery &query);
+        QList<QObject*> *getList(const QString className, const QString &property, const QVariant &value);
 
     private:
         QSqlDatabase database;
@@ -56,32 +57,16 @@ namespace QtOrm {
         QSqlQuery query = sqlBuilder->getObjectById(className, id);
         queryExec(query);
 
-        qDebug() << " query size = " << query.size() << " query = " << query.numRowsAffected();
-
-        if(database.driver()->hasFeature(QSqlDriver::QuerySize)){
-            noDataFoundCheck(query);
-            tooManyRowsCheck(query, id.toString());
-        }
+        noDataFoundCheck(query);
+        tooManyRowsCheck(query, id.toString());
 
 
         QList<T*> *list = convertFromSqlQueryToList<T>(className, query);
-        qDebug() << "list count = " << list->size();
 
         if(list->size() == 0)
             throw new Exception("Не найдено ни одной записи.");
 
         return list->takeFirst();
-        /*auto obj = new T();
-
-        query.next();
-        QSqlRecord record = query.record();
-        Mapping::ClassMapBase *classMap = Config::ConfigurateMap::getMappedClass(className);
-        auto properties = classMap->getProperties();
-        foreach(auto prop, properties){
-            QVariant value = record.value(prop->getColumn());
-            obj->setProperty(prop->getName().toStdString().c_str(), value);
-        }
-        return obj;*/
     }
 
     template<class T>
@@ -113,11 +98,21 @@ namespace QtOrm {
         Mapping::ClassMapBase *classMap = Config::ConfigurateMap::getMappedClass(className);
         auto properties = classMap->getProperties();
         QList<T*> *list = new QList<T*>();
-        while(query.next()){
+        while(query.next()) {
             T *obj = new T();
-            foreach(auto prop, properties){
+            foreach(auto prop, properties) {
                 QVariant value = query.record().value(prop->getColumn());
                 obj->setProperty(prop->getName().toStdString().c_str(), value);
+            }
+
+            foreach(auto oneToMany, classMap->getOneToManyRelations()) {
+                QString refClass = oneToMany->getRefClass();
+                QString property = oneToMany->getProperty();
+                QString refProperty = oneToMany->getRefProperty();
+                QVariant value = obj->property(classMap->getIdProperty().getName().toStdString().data());
+                QList<QObject*> *l = getList(refClass, refProperty, value);
+                QVariant var = QVariant::fromValue(*l);
+                bool ok = obj->setProperty(property.toStdString().data(), var);
             }
 
             list->append(obj);

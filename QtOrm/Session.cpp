@@ -78,14 +78,48 @@ namespace QtOrm {
     }
 
     void Session::noDataFoundCheck(const QSqlQuery &query) {
-        if(query.size() == 0)
+        if(database.driver()->hasFeature(QSqlDriver::QuerySize) && query.size() == 0)
             //throw new Exception(QString("Нет записи с идентификатором '%1'").arg(id.toString()));
             throw new Exception("Не найдено ни одной записи.");
     }
 
     void Session::tooManyRowsCheck(const QSqlQuery &query, const QString &id) {
-        if(query.size() > 1)
+        if(database.driver()->hasFeature(QSqlDriver::QuerySize) && query.size() > 1)
             throw new Exception(QString("Найдено %1 записей с идентификатором '%2'").arg(query.size()).arg(id));
+    }
+
+    QList<QObject *> *Session::getList(const QString className, const QString &property, const QVariant &value) {
+        int id = QMetaType::type(className.toStdString().data());
+        if (id == -1) {
+
+        }
+        checkClass(className);
+
+        QSqlQuery query = sqlBuilder->getListObject(className, property, value);
+        queryExec(query);
+
+        Mapping::ClassMapBase *classMap = Config::ConfigurateMap::getMappedClass(className);
+        auto properties = classMap->getProperties();
+        QList<QObject *> *objects = new QList<QObject *>();
+        while(query.next()) {
+            QObject *obj = classMap->getMetaObject().newInstance();
+                     //(QObject*)QMetaType::create(id);
+            foreach(auto prop, properties) {
+                QVariant value = query.record().value(prop->getColumn());
+                obj->setProperty(prop->getName().toStdString().c_str(), value);
+            }
+
+            foreach(auto oneToMany, classMap->getOneToManyRelations()) {
+                QString refClass = oneToMany->getRefClass();
+                QString property = oneToMany->getProperty();
+                //auto l = getList<refClass>(property, obj->property(property));
+            }
+
+            objects->append(obj);
+        }
+
+        return objects;
+
     }
 
 }
