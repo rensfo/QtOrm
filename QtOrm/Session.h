@@ -41,6 +41,8 @@ namespace QtOrm {
         template<class T>
         QList<T*> *convertFromSqlQueryToList(const QString &className, QSqlQuery &query);
         QList<QObject*> *getList(const QString className, const QString &property, const QVariant &value);
+        void fillObject(const QMap<QString, Mapping::PropertyMap*> &properties, const QSqlRecord &record, QObject &object);
+        void fillOneToMany(const QMap<QString, Mapping::OneToMany *> &relations, const QString &idProperty, QObject &object);
 
     private:
         QSqlDatabase database;
@@ -82,7 +84,7 @@ namespace QtOrm {
     }
 
     template<class T>
-    QList<T*> *Session::getList(const QString &property, const QVariant &value){
+    QList<T*> *Session::getList(const QString &property, const QVariant &value) {
         QString className = T::staticMetaObject.className();
         checkClass(className);
 
@@ -94,27 +96,14 @@ namespace QtOrm {
     }
 
     template<class T>
-    QList<T*> *Session::convertFromSqlQueryToList(const QString &className, QSqlQuery &query){
+    QList<T*> *Session::convertFromSqlQueryToList(const QString &className, QSqlQuery &query) {
         Mapping::ClassMapBase *classMap = Config::ConfigurateMap::getMappedClass(className);
         auto properties = classMap->getProperties();
         QList<T*> *list = new QList<T*>();
         while(query.next()) {
             T *obj = new T();
-            foreach(auto prop, properties) {
-                QVariant value = query.record().value(prop->getColumn());
-                obj->setProperty(prop->getName().toStdString().c_str(), value);
-            }
-
-            foreach(auto oneToMany, classMap->getOneToManyRelations()) {
-                QString refClass = oneToMany->getRefClass();
-                QString property = oneToMany->getProperty();
-                QString refProperty = oneToMany->getRefProperty();
-                QVariant value = obj->property(classMap->getIdProperty().getName().toStdString().data());
-                QList<QObject*> *l = getList(refClass, refProperty, value);
-                QVariant var = QVariant::fromValue(*l);
-                bool ok = obj->setProperty(property.toStdString().data(), var);
-            }
-
+            fillObject(properties, query.record(), *obj);
+            fillOneToMany(classMap->getOneToManyRelations(), classMap->getIdProperty().getName(), *obj);
             list->append(obj);
         }
 

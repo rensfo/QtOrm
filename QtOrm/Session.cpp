@@ -90,9 +90,9 @@ namespace QtOrm {
 
     QList<QObject *> *Session::getList(const QString className, const QString &property, const QVariant &value) {
         int id = QMetaType::type(className.toStdString().data());
-        if (id == -1) {
+        if (id == -1)
+            throw new Exception(QString("Класс %1 не найден.").arg(className));
 
-        }
         checkClass(className);
 
         QSqlQuery query = sqlBuilder->getListObject(className, property, value);
@@ -103,23 +103,38 @@ namespace QtOrm {
         QList<QObject *> *objects = new QList<QObject *>();
         while(query.next()) {
             QObject *obj = classMap->getMetaObject().newInstance();
-                     //(QObject*)QMetaType::create(id);
-            foreach(auto prop, properties) {
-                QVariant value = query.record().value(prop->getColumn());
-                obj->setProperty(prop->getName().toStdString().c_str(), value);
-            }
-
-            foreach(auto oneToMany, classMap->getOneToManyRelations()) {
-                QString refClass = oneToMany->getRefClass();
-                QString property = oneToMany->getProperty();
-                //auto l = getList<refClass>(property, obj->property(property));
-            }
-
+            fillObject(properties, query.record(), *obj);
+            fillOneToMany(classMap->getOneToManyRelations(), classMap->getIdProperty().getName(), *obj);
             objects->append(obj);
         }
 
         return objects;
 
+    }
+
+    void Session::fillObject(const QMap<QString, Mapping::PropertyMap *> &properties, const QSqlRecord &record, QObject &object){
+        foreach(auto prop, properties) {
+            QVariant value = record.value(prop->getColumn());
+            object.setProperty(prop->getName().toStdString().c_str(), value);
+        }
+    }
+
+    void Session::fillOneToMany(const QMap<QString, Mapping::OneToMany *> &relations, const QString &idProperty, QObject &object) {
+        foreach(auto oneToMany, relations) {
+            QString refClass = oneToMany->getRefClass();
+            QString property = oneToMany->getProperty();
+            QString refProperty = oneToMany->getRefProperty();
+            QVariant value = object.property(idProperty.toStdString().data());
+            QList<QObject*> *l = getList(refClass, refProperty, value);
+            QVariant var = QVariant::fromValue(*l);
+            if(!object.setProperty(property.toStdString().data(), var)){
+                QString textError = QString("Произошла ошибка при присваивании значения  '%1' свойству '%2.%3'")
+                        .arg(var.toString())
+                        .arg(object.metaObject()->className())
+                        .arg(property);
+                throw new Exception(textError);
+            }
+        }
     }
 
 }
