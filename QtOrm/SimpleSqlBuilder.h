@@ -13,7 +13,6 @@ namespace QtOrm{
             SimpleSqlBuilder(const QSqlDatabase &database, QObject *parent = 0);
             QSqlQuery getListObject(const QString &objectName);
             QSqlQuery getListObject(const QString &objectName, const QString property, const QVariant value);
-            QSqlQuery getObjectById(const QString &objectName, QVariant id);
             QString getSelect() const;
             QString getFrom(const QString &tableName) const;
             QString getWhere(const QString &tableAlias, const QString &column, const QString &placeHolder) const;

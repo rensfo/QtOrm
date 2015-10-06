@@ -1,6 +1,7 @@
 #ifndef CLASSMAPBASE_H
 #define CLASSMAPBASE_H
 
+#include <QObject>
 #include <QString>
 #include <QMap>
 #include <QMetaObject>
@@ -13,9 +14,9 @@
 namespace QtOrm{
     namespace Mapping{
 
-        class ClassMapBase{
+        class ClassMapBase : public QObject{
         public:
-            ClassMapBase();
+            explicit ClassMapBase(QObject *parent = 0);
 
             QString getTable() const;
             void setTable(const QString &table);

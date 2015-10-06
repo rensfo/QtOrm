@@ -4,8 +4,7 @@
 namespace QtOrm{
     namespace Mapping{
 
-        ClassMapBase::ClassMapBase(){
-
+        ClassMapBase::ClassMapBase(QObject *parent) : QObject(parent){
         }
 
         QString ClassMapBase::getTable() const{

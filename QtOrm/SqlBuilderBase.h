@@ -19,7 +19,6 @@ namespace QtOrm{
             explicit SqlBuilderBase(const QSqlDatabase &database, QObject *parent = 0);
             virtual QSqlQuery getListObject(const QString &objectName) = 0;
             virtual QSqlQuery getListObject(const QString &objectName, const QString property, const QVariant value) = 0;
-            virtual QSqlQuery getObjectById(const QString &objectName, QVariant id) = 0;
             virtual QSqlQuery insertObject(const QObject &object) = 0;
             virtual QSqlQuery updateObject(const QObject &object) = 0;
             virtual QSqlQuery deleteObject(const QObject &object) = 0;

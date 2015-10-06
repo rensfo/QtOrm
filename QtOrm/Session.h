@@ -38,8 +38,6 @@ namespace QtOrm {
         void queryExec(QSqlQuery &query);
         void noDataFoundCheck(const QSqlQuery &query);
         void tooManyRowsCheck(const QSqlQuery &query, const QString &id);
-        template<class T>
-        QList<T*> *convertFromSqlQueryToList(const QString &className, QSqlQuery &query);
         QList<QObject*> *getList(const QString className, const QString &property, const QVariant &value);
         void fillObject(const QMap<QString, Mapping::PropertyMap*> &properties, const QSqlRecord &record, QObject &object);
         void fillOneToMany(const QMap<QString, Mapping::OneToMany *> &relations, const QString &idProperty, QObject &object);
@@ -55,18 +53,14 @@ namespace QtOrm {
     {
         QString className = T::staticMetaObject.className();
         checkClass(className);
+        Mapping::ClassMapBase *classMap = Config::ConfigurateMap::getMappedClass(className);
+        QList<T*> *list = getList<T>(classMap->getIdProperty().getName(), id);
 
-        QSqlQuery query = sqlBuilder->getObjectById(className, id);
-        queryExec(query);
-
-        noDataFoundCheck(query);
-        tooManyRowsCheck(query, id.toString());
-
-
-        QList<T*> *list = convertFromSqlQueryToList<T>(className, query);
-
-        if(list->size() == 0)
+        if(database.driver()->hasFeature(QSqlDriver::QuerySize) && list->size() == 0)
             throw new Exception("Не найдено ни одной записи.");
+
+        if(database.driver()->hasFeature(QSqlDriver::QuerySize) && list->size() > 1)
+            throw new Exception(QString("Найдено %1 записей с идентификатором '%2'").arg(list->size()).arg(id.toString()));
 
         return list->takeFirst();
     }
@@ -74,39 +68,14 @@ namespace QtOrm {
     template<class T>
     QList<T*> *Session::getList(){
         QString className = T::staticMetaObject.className();
-        checkClass(className);
-
-        QSqlQuery query = sqlBuilder->getListObject(className);
-        queryExec(query);
-
-        QList<T*> *list = convertFromSqlQueryToList<T>(className, query);
+        QList<T*> *list = (QList<T*>*)getList(className, "", QVariant());
         return list;
     }
 
     template<class T>
     QList<T*> *Session::getList(const QString &property, const QVariant &value) {
         QString className = T::staticMetaObject.className();
-        checkClass(className);
-
-        QSqlQuery query = sqlBuilder->getListObject(className, property, value);
-        queryExec(query);
-
-        QList<T*> *list = convertFromSqlQueryToList<T>(className, query);
-        return list;
-    }
-
-    template<class T>
-    QList<T*> *Session::convertFromSqlQueryToList(const QString &className, QSqlQuery &query) {
-        Mapping::ClassMapBase *classMap = Config::ConfigurateMap::getMappedClass(className);
-        auto properties = classMap->getProperties();
-        QList<T*> *list = new QList<T*>();
-        while(query.next()) {
-            T *obj = new T();
-            fillObject(properties, query.record(), *obj);
-            fillOneToMany(classMap->getOneToManyRelations(), classMap->getIdProperty().getName(), *obj);
-            list->append(obj);
-        }
-
+        QList<T*> *list = (QList<T*>*)getList(className, property, value);
         return list;
     }
 }

@@ -95,7 +95,12 @@ namespace QtOrm {
 
         checkClass(className);
 
-        QSqlQuery query = sqlBuilder->getListObject(className, property, value);
+        QSqlQuery query;
+        if(property.isNull() || property.isEmpty())
+            query = sqlBuilder->getListObject(className);
+        else
+            query = sqlBuilder->getListObject(className, property, value);
+
         queryExec(query);
 
         Mapping::ClassMapBase *classMap = Config::ConfigurateMap::getMappedClass(className);

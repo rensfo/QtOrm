@@ -47,29 +47,6 @@ namespace Sql {
             return *query;
         }
 
-        QSqlQuery SimpleSqlBuilder::getObjectById(const QString &objectName, QVariant id) {
-            Mapping::ClassMapBase* classBase = Config::ConfigurateMap::getMappedClass(objectName);
-            resetTableNumber();
-
-            QString tableAlias = this->generateTableAlias();
-            QString select = getSelect();
-            QString from = getFrom(classBase->getTable());
-            QString idColumn = classBase->getIdProperty().getColumn();
-            QString idPlaceHolder =  ":" + idColumn;
-            QString where = getWhere(tableAlias, idColumn, idPlaceHolder);
-
-            QString fullSqlText = sqlQueryTemplate
-                    .arg(select)
-                    .arg(from)
-                    .arg(where);
-
-            QSqlQuery *query = new QSqlQuery(database);
-            query->prepare(fullSqlText);
-            query->bindValue(idPlaceHolder, id);
-
-            return *query;
-        }
-
         QString SimpleSqlBuilder::getSelect() const {
             return QString("select %1.*").arg(getCurrentTableAlias());
         }
