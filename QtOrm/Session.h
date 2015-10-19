@@ -36,11 +36,11 @@ namespace QtOrm {
         void sqlToStream(const QSqlQuery query);
         void checkClass(const QString &className);
         void queryExec(QSqlQuery &query);
-        void noDataFoundCheck(const QSqlQuery &query);
-        void tooManyRowsCheck(const QSqlQuery &query, const QString &id);
         QList<QObject*> *getList(const QString className, const QString &property, const QVariant &value);
         void fillObject(const QMap<QString, Mapping::PropertyMap*> &properties, const QSqlRecord &record, QObject &object);
         void fillOneToMany(const QMap<QString, Mapping::OneToMany *> &relations, const QString &idProperty, QObject &object);
+        void fillOneToOne(const QMap<QString, Mapping::OneToOne *> &relations, QObject &object);
+        void objectSetProperty(QObject &object, const char *propertyName, const QVariant &value);
 
     private:
         QSqlDatabase database;
@@ -56,10 +56,10 @@ namespace QtOrm {
         Mapping::ClassMapBase *classMap = Config::ConfigurateMap::getMappedClass(className);
         QList<T*> *list = getList<T>(classMap->getIdProperty().getName(), id);
 
-        if(database.driver()->hasFeature(QSqlDriver::QuerySize) && list->size() == 0)
+        if(list->size() == 0)
             throw new Exception("Не найдено ни одной записи.");
 
-        if(database.driver()->hasFeature(QSqlDriver::QuerySize) && list->size() > 1)
+        if(list->size() > 1)
             throw new Exception(QString("Найдено %1 записей с идентификатором '%2'").arg(list->size()).arg(id.toString()));
 
         return list->takeFirst();

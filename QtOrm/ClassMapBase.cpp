@@ -79,6 +79,16 @@ namespace QtOrm{
             return *relation;
         }
 
+        OneToOne &ClassMapBase::oneToOne(const QString &property) {
+            checkToExistProperty(property);
+
+            OneToOne *relation = new OneToOne();
+            relation->setProperty(property);
+            oneToOneRelations.insert(property, relation);
+
+            return *relation;
+        }
+
         void ClassMapBase::checkToExistProperty(const QString &property) {
             int propertyIndex = metaObject.indexOfProperty(property.toStdString().data());
             if(propertyIndex == -1)
@@ -92,6 +102,10 @@ namespace QtOrm{
 
         QMap<QString, OneToMany *> ClassMapBase::getOneToManyRelations() const {
             return oneToManyRelations;
+        }
+
+        QMap<QString, OneToOne *> ClassMapBase::getOneToOneRelations() const{
+            return oneToOneRelations;
         }
 
 

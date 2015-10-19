@@ -22,7 +22,8 @@ SOURCES += QtOrm.cpp \
     Session.cpp \
     SimpleSqlBuilder.cpp \
     SqlBuilderBase.cpp \
-    OneToMany.cpp
+    OneToMany.cpp \
+    OneToOne.cpp
 
 HEADERS += QtOrm.h\
         qtorm_global.h \
@@ -36,7 +37,8 @@ HEADERS += QtOrm.h\
     QtOrm \
     SimpleSqlBuilder.h \
     SqlBuilderBase.h \
-    OneToMany.h
+    OneToMany.h \
+    OneToOne.h
 
 CONFIG += c++11
 

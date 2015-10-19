@@ -77,17 +77,6 @@ namespace QtOrm {
         sqlToStream(query);
     }
 
-    void Session::noDataFoundCheck(const QSqlQuery &query) {
-        if(database.driver()->hasFeature(QSqlDriver::QuerySize) && query.size() == 0)
-            //throw new Exception(QString("Нет записи с идентификатором '%1'").arg(id.toString()));
-            throw new Exception("Не найдено ни одной записи.");
-    }
-
-    void Session::tooManyRowsCheck(const QSqlQuery &query, const QString &id) {
-        if(database.driver()->hasFeature(QSqlDriver::QuerySize) && query.size() > 1)
-            throw new Exception(QString("Найдено %1 записей с идентификатором '%2'").arg(query.size()).arg(id));
-    }
-
     QList<QObject *> *Session::getList(const QString className, const QString &property, const QVariant &value) {
         int id = QMetaType::type(className.toStdString().data());
         if (id == -1)
@@ -110,6 +99,7 @@ namespace QtOrm {
             QObject *obj = classMap->getMetaObject().newInstance();
             fillObject(properties, query.record(), *obj);
             fillOneToMany(classMap->getOneToManyRelations(), classMap->getIdProperty().getName(), *obj);
+            fillOneToOne(classMap->getOneToOneRelations(), *obj);
             objects->append(obj);
         }
 
@@ -132,13 +122,31 @@ namespace QtOrm {
             QVariant value = object.property(idProperty.toStdString().data());
             QList<QObject*> *l = getList(refClass, refProperty, value);
             QVariant var = QVariant::fromValue(*l);
-            if(!object.setProperty(property.toStdString().data(), var)){
-                QString textError = QString("Произошла ошибка при присваивании значения  '%1' свойству '%2.%3'")
-                        .arg(var.toString())
-                        .arg(object.metaObject()->className())
-                        .arg(property);
-                throw new Exception(textError);
+            objectSetProperty(object, property.toStdString().data(), var);
+        }
+    }
+
+    void Session::fillOneToOne(const QMap<QString, Mapping::OneToOne *> &relations, QObject &object) {
+        foreach(auto oneToOne, relations) {
+            QString property = oneToOne->getProperty();
+            int propertyIndex = object.metaObject()->indexOfProperty(property.toStdString().data());
+            QString refClass = object.metaObject()->property(propertyIndex).typeName();
+            QString refProperty = Config::ConfigurateMap::getMappedClass(refClass)->getIdProperty().getColumn();
+            QVariant value = object.property(oneToOne->getValueProperty().toStdString().data());
+            QList<QObject*> *l = getList(refClass, refProperty, value);
+            if(l->count() != 0){
+                QVariant var = QVariant::fromValue(l->first());
+                objectSetProperty(object, property.toStdString().data(), var);
             }
+        }
+    }
+
+    void Session::objectSetProperty(QObject &object, const char *propertyName, const QVariant &value){
+        if(!object.setProperty(propertyName, value)){
+            QString textError = QString("Произошла ошибка при присваивании значения свойству '%1.%2'")
+                    .arg(object.metaObject()->className())
+                    .arg(propertyName);
+            throw new Exception(textError);
         }
     }
 

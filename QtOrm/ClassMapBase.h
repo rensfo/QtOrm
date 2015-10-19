@@ -10,6 +10,7 @@
 #include "PropertyMap.h"
 #include "Exception.h"
 #include "OneToMany.h"
+#include "OneToOne.h"
 
 namespace QtOrm{
     namespace Mapping{
@@ -36,8 +37,10 @@ namespace QtOrm{
             PropertyMap& getProperty(const QString &property);
 
             OneToMany &oneToMany(const QString &property);
+            OneToOne &oneToOne(const QString &property);
 
             QMap<QString, OneToMany *> getOneToManyRelations() const;
+            QMap<QString, OneToOne *> getOneToOneRelations() const;
 
         private:
             PropertyMap &createProperty(QString propertyName);
@@ -47,6 +50,7 @@ namespace QtOrm{
             QString table;
             QMap<QString, PropertyMap*> properties;
             QMap<QString, OneToMany*> oneToManyRelations;
+            QMap<QString, OneToOne*> oneToOneRelations;
 
             QString idProperty;
 
