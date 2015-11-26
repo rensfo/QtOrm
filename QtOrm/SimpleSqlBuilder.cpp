@@ -6,59 +6,6 @@ namespace Sql {
             : SqlBuilderBase(database, parent){
         }
 
-        QSqlQuery SimpleSqlBuilder::getListObject(const QString &objectName) {
-            Mapping::ClassMapBase* classBase = Config::ConfigurateMap::getMappedClass(objectName);
-            resetTableNumber();
-
-            this->generateTableAlias();
-            QString select = getSelect();
-            QString from = getFrom(classBase->getTable());
-
-            QString fullSqlText = sqlQueryTemplate
-                    .arg(select)
-                    .arg(from)
-                    .arg("");
-
-            QSqlQuery *query = new QSqlQuery(database);
-            query->prepare(fullSqlText);
-
-            return *query;
-        }
-
-        QSqlQuery SimpleSqlBuilder::getListObject(const QString &objectName, const QString property, const QVariant value) {
-            Mapping::ClassMapBase* classBase = Config::ConfigurateMap::getMappedClass(objectName);
-            resetTableNumber();
-            QString tableAlias = this->generateTableAlias();
-            QString select = getSelect();
-            QString from = getFrom(classBase->getTable());
-            QString column = classBase->getProperty(property).getColumn();
-            QString placeHolder =  ":" + column;
-            QString where = getWhere(tableAlias, column, placeHolder);
-
-            QString fullSqlText = sqlQueryTemplate
-                    .arg(select)
-                    .arg(from)
-                    .arg(where);
-
-            QSqlQuery *query = new QSqlQuery(database);
-            query->prepare(fullSqlText);
-            query->bindValue(placeHolder, value);
-
-            return *query;
-        }
-
-        QString SimpleSqlBuilder::getSelect() const {
-            return QString("select %1.*").arg(getCurrentTableAlias());
-        }
-
-        QString SimpleSqlBuilder::getFrom(const QString &tableName) const {
-            return QString("from %1 %2").arg(tableName).arg(getCurrentTableAlias());
-        }
-
-        QString SimpleSqlBuilder::getWhere(const QString &tableAlias, const QString &column, const QString &placeHolder) const {
-            return QString("where %1.%2 = %3").arg(tableAlias).arg(column).arg(placeHolder);
-        }
-
         QSqlQuery SimpleSqlBuilder::insertObject(const QObject &object) {
             Mapping::ClassMapBase* classBase = Config::ConfigurateMap::getMappedClass(object.metaObject()->className());
 
