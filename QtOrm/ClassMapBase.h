@@ -42,6 +42,15 @@ namespace QtOrm{
             QMap<QString, OneToMany *> getOneToManyRelations() const;
             QMap<QString, OneToOne *> getOneToOneRelations() const;
 
+            QString getContext() const;
+            void setContext(const QString &value);
+
+            QString getInsertFunction() const;
+            void setInsertFunction(const QString &value);
+
+            QString getDeleteFunction() const;
+            void setDeleteFunction(const QString &value);
+
         private:
             PropertyMap &createProperty(QString propertyName);
             void checkToExistProperty(const QString &property);
@@ -55,6 +64,9 @@ namespace QtOrm{
             QString idProperty;
 
             QMetaObject metaObject;
+            QString context;
+            QString insertFunction;
+            QString deleteFunction;
         };
     }
 }

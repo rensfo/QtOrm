@@ -99,11 +99,41 @@ namespace QtOrm{
                 throw new Exception(message);
             }
         }
-
+        QString ClassMapBase::getDeleteFunction() const
+        {
+            return deleteFunction;
+        }
+        
+        void ClassMapBase::setDeleteFunction(const QString &value)
+        {
+            deleteFunction = value;
+        }
+        
+        QString ClassMapBase::getInsertFunction() const
+        {
+            return insertFunction;
+        }
+        
+        void ClassMapBase::setInsertFunction(const QString &value)
+        {
+            insertFunction = value;
+        }
+        
+        QString ClassMapBase::getContext() const
+        {
+            return context;
+        }
+        
+        void ClassMapBase::setContext(const QString &value)
+        {
+            context = value;
+        }
+        
+        
         QMap<QString, OneToMany *> ClassMapBase::getOneToManyRelations() const {
             return oneToManyRelations;
         }
-
+        
         QMap<QString, OneToOne *> ClassMapBase::getOneToOneRelations() const{
             return oneToOneRelations;
         }

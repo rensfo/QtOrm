@@ -23,7 +23,9 @@ SOURCES += QtOrm.cpp \
     SimpleSqlBuilder.cpp \
     SqlBuilderBase.cpp \
     OneToMany.cpp \
-    OneToOne.cpp
+    OneToOne.cpp \
+    FunctionSqlBuilder.cpp \
+    PostgreFunctionSqlBuilder.cpp
 
 HEADERS += QtOrm.h\
         qtorm_global.h \
@@ -38,7 +40,9 @@ HEADERS += QtOrm.h\
     SimpleSqlBuilder.h \
     SqlBuilderBase.h \
     OneToMany.h \
-    OneToOne.h
+    OneToOne.h \
+    FunctionSqlBuilder.h \
+    PostgreFunctionSqlBuilder.h
 
 CONFIG += c++11
 

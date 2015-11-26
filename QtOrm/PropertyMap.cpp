@@ -38,6 +38,16 @@ namespace QtOrm{
         bool PropertyMap::getIsId(){
             return isId;
         }
-
+        QString PropertyMap::getUpdateFunction() const
+        {
+            return updateFunction;
+        }
+        
+        void PropertyMap::setUpdateFunction(const QString &value)
+        {
+            updateFunction = value;
+        }
+        
+        
     }
 }
