@@ -3,24 +3,21 @@
 
 #include "SqlBuilderBase.h"
 
-
-namespace QtOrm{
+namespace QtOrm {
 namespace Sql {
-    class FunctionSqlBuilder : public SqlBuilderBase
-    {
-        Q_OBJECT
+class FunctionSqlBuilder : public SqlBuilderBase {
+  Q_OBJECT
 
-    public:
-        FunctionSqlBuilder(const QSqlDatabase &database, QObject *parent = 0);
+public:
+  FunctionSqlBuilder(const QSqlDatabase &database, QObject *parent = 0);
 
-        QSqlQuery insertObject(const QObject &object);
-        QSqlQuery updateObject(const QObject &object);
-        QSqlQuery deleteObject(const QObject &object);
+  QSqlQuery insertObject(const QObject &object);
+  QSqlQuery updateObject(const QObject &object);
+  QSqlQuery deleteObject(const QObject &object);
 
-    private:
-        SqlBuilderBase *functionBuilder;
-    };
-
+private:
+  SqlBuilderBase *functionBuilder;
+};
 }
 }
 #endif // FUNCTIONSQLBUILDER_H

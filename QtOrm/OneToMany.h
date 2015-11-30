@@ -3,30 +3,27 @@
 
 #include <QString>
 
-namespace QtOrm{
-namespace Mapping{
+namespace QtOrm {
+namespace Mapping {
 
-class OneToMany
-{
+class OneToMany {
 public:
-    OneToMany();
+  OneToMany();
 
-    QString getProperty() const;
-    OneToMany &setProperty(const QString &property);
+  QString getProperty() const;
+  OneToMany &setProperty(const QString &property);
 
-    QString getRefClass() const;
-    OneToMany &setRefClass(const QString &refClass);
+  QString getRefClass() const;
+  OneToMany &setRefClass(const QString &refClass);
 
-    QString getRefProperty() const;
-    OneToMany &setRefProperty(const QString &refProperty);
+  QString getRefProperty() const;
+  OneToMany &setRefProperty(const QString &refProperty);
 
 private:
-    QString property;
-    QString refClass;
-    QString refProperty;
+  QString property;
+  QString refClass;
+  QString refProperty;
 };
-
-
 }
 }
 #endif // ONETOMANY_H

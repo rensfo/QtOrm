@@ -3,23 +3,22 @@
 
 #include <QString>
 
-namespace QtOrm{
-namespace Mapping{
+namespace QtOrm {
+namespace Mapping {
 
-class OneToOne{
+class OneToOne {
 public:
-    OneToOne();
-    QString getProperty() const;
-    OneToOne &setProperty(const QString &property);
+  OneToOne();
+  QString getProperty() const;
+  OneToOne &setProperty(const QString &property);
 
-    QString getValueProperty() const;
-    OneToOne &setValueProperty(const QString &column);
+  QString getValueProperty() const;
+  OneToOne &setValueProperty(const QString &column);
 
 private:
-    QString property;
-    QString valueProperty;
+  QString property;
+  QString valueProperty;
 };
-
 }
 }
 #endif // ONETOONE_H

@@ -14,69 +14,74 @@
 #include "SimpleSqlBuilder.h"
 
 namespace QtOrm {
-    class Session : public QObject{
-        Q_OBJECT
-    public:
-        explicit Session(const QSqlDatabase &database, Sql::SqlBuilderType sqlManagerType, QObject *parent = 0);
-        explicit Session(const QSqlDatabase &database, QTextStream *textStream, Sql::SqlBuilderType sqlManagerType, QObject *parent = 0);
-        void insertObject(const QObject &object);
-        void updateObject(const QObject &object);
-        void deleteObject(const QObject &object);
-        template<class T>
-        T *getById(const QVariant &id);
-        template<class T>
-        QList<T*> *getList();
-        template<class T>
-        QList<T*> *getList(const QString &property, const QVariant &value);
+class Session : public QObject {
+  Q_OBJECT
+public:
+  explicit Session(const QSqlDatabase &database,
+                   Sql::SqlBuilderType sqlManagerType, QObject *parent = 0);
+  explicit Session(const QSqlDatabase &database, QTextStream *textStream,
+                   Sql::SqlBuilderType sqlManagerType, QObject *parent = 0);
+  void insertObject(const QObject &object);
+  void updateObject(const QObject &object);
+  void deleteObject(const QObject &object);
+  template <class T> T *getById(const QVariant &id);
+  template <class T> QList<T *> *getList();
+  template <class T>
+  QList<T *> *getList(const QString &property, const QVariant &value);
 
-        QSqlDatabase getDatabase() const;
-        void setDatabase(const QSqlDatabase &database);
+  QSqlDatabase getDatabase() const;
+  void setDatabase(const QSqlDatabase &database);
 
-    private:
-        void sqlToStream(const QSqlQuery query);
-        void checkClass(const QString &className);
-        void queryExec(QSqlQuery &query);
-        QList<QObject*> *getList(const QString className, const QString &property, const QVariant &value);
-        void fillObject(const QMap<QString, Mapping::PropertyMap*> &properties, const QSqlRecord &record, QObject &object);
-        void fillOneToMany(const QMap<QString, Mapping::OneToMany *> &relations, const QString &idProperty, QObject &object);
-        void fillOneToOne(const QMap<QString, Mapping::OneToOne *> &relations, QObject &object);
-        void objectSetProperty(QObject &object, const char *propertyName, const QVariant &value);
+private:
+  void sqlToStream(const QSqlQuery query);
+  void checkClass(const QString &className);
+  void queryExec(QSqlQuery &query);
+  QList<QObject *> *getList(const QString className, const QString &property,
+                            const QVariant &value);
+  void fillObject(const QMap<QString, Mapping::PropertyMap *> &properties,
+                  const QSqlRecord &record, QObject &object);
+  void fillOneToMany(const QMap<QString, Mapping::OneToMany *> &relations,
+                     const QString &idProperty, QObject &object);
+  void fillOneToOne(const QMap<QString, Mapping::OneToOne *> &relations,
+                    QObject &object);
+  void objectSetProperty(QObject &object, const char *propertyName,
+                         const QVariant &value);
 
-    private:
-        QSqlDatabase database;
-        Sql::SqlBuilderBase *sqlBuilder;
-        QTextStream *textStream;
-    };
+private:
+  QSqlDatabase database;
+  Sql::SqlBuilderBase *sqlBuilder;
+  QTextStream *textStream;
+};
 
-    template<class T>
-    T *Session::getById(const QVariant &id)
-    {
-        QString className = T::staticMetaObject.className();
-        checkClass(className);
-        Mapping::ClassMapBase *classMap = Config::ConfigurateMap::getMappedClass(className);
-        QList<T*> *list = getList<T>(classMap->getIdProperty().getName(), id);
+template <class T> T *Session::getById(const QVariant &id) {
+  QString className = T::staticMetaObject.className();
+  checkClass(className);
+  Mapping::ClassMapBase *classMap =
+      Config::ConfigurateMap::getMappedClass(className);
+  QList<T *> *list = getList<T>(classMap->getIdProperty().getName(), id);
 
-        if(list->size() == 0)
-            throw new Exception("Не найдено ни одной записи.");
+  if (list->size() == 0)
+    throw new Exception("Не найдено ни одной записи.");
 
-        if(list->size() > 1)
-            throw new Exception(QString("Найдено %1 записей с идентификатором '%2'").arg(list->size()).arg(id.toString()));
+  if (list->size() > 1)
+    throw new Exception(QString("Найдено %1 записей с идентификатором '%2'")
+                            .arg(list->size())
+                            .arg(id.toString()));
 
-        return list->takeFirst();
-    }
+  return list->takeFirst();
+}
 
-    template<class T>
-    QList<T*> *Session::getList(){
-        QString className = T::staticMetaObject.className();
-        QList<T*> *list = (QList<T*>*)getList(className, "", QVariant());
-        return list;
-    }
+template <class T> QList<T *> *Session::getList() {
+  QString className = T::staticMetaObject.className();
+  QList<T *> *list = (QList<T *> *)getList(className, "", QVariant());
+  return list;
+}
 
-    template<class T>
-    QList<T*> *Session::getList(const QString &property, const QVariant &value) {
-        QString className = T::staticMetaObject.className();
-        QList<T*> *list = (QList<T*>*)getList(className, property, value);
-        return list;
-    }
+template <class T>
+QList<T *> *Session::getList(const QString &property, const QVariant &value) {
+  QString className = T::staticMetaObject.className();
+  QList<T *> *list = (QList<T *> *)getList(className, property, value);
+  return list;
+}
 }
 #endif // SESSION_H
