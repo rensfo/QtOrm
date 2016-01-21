@@ -27,10 +27,6 @@ QObject *SqlBuilderBase::getById(const QString &className, const QVariant &id) {
 }
 
 QList<QObject *> *SqlBuilderBase::getListObject(const QString &className, const QString property, const QVariant value) {
-  int id = QMetaType::type(className.toStdString().data());
-  if (id == -1)
-    throw new Exception(QString("Тип %1 не найден.").arg(className));
-
   checkClass(className);
 
   Mapping::ClassMapBase *classBase = Config::ConfigurateMap::getMappedClass(className);
