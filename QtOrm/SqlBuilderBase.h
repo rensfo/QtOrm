@@ -16,24 +16,32 @@ class SqlBuilderBase : public QObject {
   Q_OBJECT
 public:
   explicit SqlBuilderBase(const QSqlDatabase &database, QObject *parent = 0);
-  QSqlQuery getListObject(const QString &objectName);
-  QSqlQuery getListObject(const QString &objectName, const QString property,
-                          const QVariant value);
+  QObject *getById(const QString &className, const QVariant &id);
+  QList<QObject *> *getListObject(const QString &className, const QString property = QString(), const QVariant value = QVariant());
   virtual void insertObject(QObject &object) = 0;
   virtual void updateObject(const QObject &object) = 0;
   virtual void deleteObject(const QObject &object) = 0;
+
+  QTextStream *getTextStream() const;
+  void setTextStream(QTextStream *value);
 
 protected:
   QString generateTableAlias();
   QString getCurrentTableAlias() const;
   void resetTableNumber();
   QString getPlaceHolder(const QString param);
+  void sqlQueryToStream(const QSqlQuery &query);
 
 private:
   QString getSelect() const;
   QString getFrom(const QString &tableName) const;
-  QString getWhere(const QString &tableAlias, const QString &column,
-                   const QString &placeHolder) const;
+  QString getWhere(const QString &column, const QString &placeHolder) const;
+  QList<QObject *> *getList(Mapping::ClassMapBase &classBase, QSqlQuery &query);
+  void checkClass(const QString &className);
+  void fillObject(const QMap<QString, Mapping::PropertyMap *> &properties, const QSqlRecord &record, QObject &object);
+  void fillOneToMany(const QMap<QString, Mapping::OneToMany *> &relations, const QString &idProperty, QObject &object);
+  void fillOneToOne(const QMap<QString, Mapping::OneToOne *> &relations, QObject &object);
+  void objectSetProperty(QObject &object, const char *propertyName, const QVariant &value);
 
 signals:
 
@@ -44,6 +52,7 @@ protected:
   const QString sqlQueryTemplate = "%1 %2 %3";
   const QString tableAliasTemplate = "tb_%1";
   QSqlDatabase database;
+  QTextStream *textStream;
 };
 }
 }
