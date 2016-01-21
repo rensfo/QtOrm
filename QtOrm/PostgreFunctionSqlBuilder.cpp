@@ -1,4 +1,5 @@
 #include "PostgreFunctionSqlBuilder.h"
+#include <QSqlError>
 
 namespace QtOrm {
 namespace Sql {
@@ -7,106 +8,63 @@ PostgreFunctionSqlBuilder::PostgreFunctionSqlBuilder(const QSqlDatabase &databas
     : SqlBuilderBase(database, parent) {
 }
 
-QSqlQuery PostgreFunctionSqlBuilder::insertObject(const QObject &object) {
+void PostgreFunctionSqlBuilder::insertObject(QObject &object) {
   Mapping::ClassMapBase *classBase = Config::ConfigurateMap::getMappedClass(object.metaObject()->className());
 
-  const QString paramName = "lNewId";
-  QString declare = getDeclareText(*classBase, paramName);
-
-  QString newRecord = getInsertFunctionText(*classBase, paramName);
-
-  QString body;
-  QString updateColumnText = getUpdateColumnText(*classBase);
-  body = newRecord + updateColumnText;
-
-  QString text = getAnonymousBlock(declare, body);
-  QSqlQuery *query = new QSqlQuery(database);
-  query->prepare(text);
-  bindColumns(*classBase, *query, object);
-
-  return *query;
+  auto idValue = insertRecord(*classBase);
+  object.setProperty(classBase->getIdProperty().getName().toStdString().c_str(), idValue);
+  updateRecord(object, *classBase);
 }
 
-QSqlQuery PostgreFunctionSqlBuilder::updateObject(const QObject &object) {
+void PostgreFunctionSqlBuilder::updateObject(const QObject &object) {
   Mapping::ClassMapBase *classBase = Config::ConfigurateMap::getMappedClass(object.metaObject()->className());
 
-  QString updateText = getUpdateColumnText(*classBase);
-  QString text = getAnonymousBlock("", updateText);
-  QSqlQuery *query = new QSqlQuery(database);
-  query->prepare(text);
-  bindColumns(*classBase, *query, object);
-
-  return *query;
+  updateRecord(object, *classBase);
 }
 
-QSqlQuery PostgreFunctionSqlBuilder::deleteObject(const QObject &object) {
+void PostgreFunctionSqlBuilder::deleteObject(const QObject &object) {
   Mapping::ClassMapBase *classBase = Config::ConfigurateMap::getMappedClass(object.metaObject()->className());
 
-  QString deleteText = getDeleteFunctionText(*classBase);
-  QString text = getAnonymousBlock("", deleteText);
-  QSqlQuery *query = new QSqlQuery(database);
-  query->prepare(text);
-  auto property = classBase->getIdProperty();
-  query->bindValue(":" + property.getColumn(), object.property(property.getName().toStdString().data()));
-
-  return *query;
+  deleteRecord(object, *classBase);
 }
 
-QString PostgreFunctionSqlBuilder::getDeclareText(Mapping::ClassMapBase &classBase, QString paramName) {
-  return QString("%1 %2.%3%type;\n")
-      .arg(paramName)
-      .arg(classBase.getTable())
-      .arg(classBase.getIdProperty().getColumn());
-}
-
-QString PostgreFunctionSqlBuilder::getUpdateColumnText(Mapping::ClassMapBase &classBase) {
-  QString psqlText = "";
+QMap<Config::PropertyMap *, QString> *PostgreFunctionSqlBuilder::getUpdateColumnText(Mapping::ClassMapBase &classBase) {
+  QMap<Config::PropertyMap *, QString> *updates = new QMap<Config::PropertyMap *, QString>();
 
   for (auto property : classBase.getProperties()) {
     if (property->getIsId())
       continue;
 
     QString columnUpdateText =
-        getExecuteFunctionText(*property, classBase.getIdProperty().getColumn(), classBase.getContext());
+        getUpdateFunctionText(*property, classBase.getIdProperty().getColumn(), classBase.getContext());
 
-    psqlText += columnUpdateText;
+    updates->insert(property, columnUpdateText);
   }
 
-  return psqlText;
+  return updates;
 }
 
-QString PostgreFunctionSqlBuilder::getAnonymousBlock(QString declare, QString body) {
-  return QString("do$$\n"
-                 "declare\n"
-                 "%1"
-                 "begin\n"
-                 "%2"
-                 "end$$;")
-      .arg(declare)
-      .arg(body);
-}
-
-QString PostgreFunctionSqlBuilder::getExecuteFunctionText(const Mapping::PropertyMap &property,
-                                                          const QString &idParamName, const QString &context) {
+QString PostgreFunctionSqlBuilder::getUpdateFunctionText(const Mapping::PropertyMap &property,
+                                                         const QString &idParamName,
+                                                         const QString &context) {
   QString functionText = getFunctionText(property.getUpdateFunction(), context);
-  QString updateText = QString("perform %1(:%2, :%3);\n").arg(functionText).arg(idParamName).arg(property.getColumn());
-  ;
+  QString updateText = QString("%1(:%2, :%3)").arg(functionText).arg(idParamName).arg(property.getColumn());
 
-  return updateText;
+  return wrapSelect(updateText);
 }
 
-QString PostgreFunctionSqlBuilder::getInsertFunctionText(Mapping::ClassMapBase &classBase, QString paramName) {
+QString PostgreFunctionSqlBuilder::getInsertFunctionText(Mapping::ClassMapBase &classBase) {
   QString functionText = getFunctionText(classBase.getInsertFunction(), classBase.getContext());
-  QString newRecord = QString("%1 := %2();\n").arg(paramName).arg(functionText);
+  QString newRecord = QString("%1()").arg(functionText);
 
-  return newRecord;
+  return wrapSelect(newRecord);
 }
 
 QString PostgreFunctionSqlBuilder::getDeleteFunctionText(Mapping::ClassMapBase &classBase) {
   QString functionText = getFunctionText(classBase.getDeleteFunction(), classBase.getContext());
-  QString deleteRecord = QString("perform %1(:%2);\n").arg(functionText).arg(classBase.getIdProperty().getColumn());
+  QString deleteRecord = QString("%1(:%2)").arg(functionText).arg(classBase.getIdProperty().getColumn());
 
-  return deleteRecord;
+  return wrapSelect(deleteRecord);
 }
 
 QString PostgreFunctionSqlBuilder::getFunctionText(const QString &functionName, const QString &context) {
@@ -120,13 +78,43 @@ QString PostgreFunctionSqlBuilder::getFunctionText(const QString &functionName, 
   return text;
 }
 
-void PostgreFunctionSqlBuilder::bindColumns(Mapping::ClassMapBase &classBase, QSqlQuery &query, const QObject &object) {
-  for (auto property : classBase.getProperties()) {
-    if (property->getIsId())
-      continue;
+QString PostgreFunctionSqlBuilder::wrapSelect(const QString &functionText) {
+  return QString("select %1;").arg(functionText);
+}
 
-    query.bindValue(":" + property->getColumn(), object.property(property->getName().toStdString().data()));
+QVariant PostgreFunctionSqlBuilder::insertRecord(Mapping::ClassMapBase &classBase) {
+  QSqlQuery query(database);
+
+  QString newRecord = getInsertFunctionText(classBase);
+  if (!query.exec(newRecord))
+    throw new Exception(query.lastError().text());
+
+  query.next();
+  QVariant newId = query.value(0);
+
+  return newId;
+}
+
+void PostgreFunctionSqlBuilder::updateRecord(const QObject &object, Mapping::ClassMapBase &classBase) {
+  auto updateText = getUpdateColumnText(classBase);
+  auto idValue = object.property(classBase.getIdProperty().getName().toStdString().c_str());
+  QSqlQuery query(database);
+  for (auto it = updateText->begin(); it != updateText->end(); ++it) {
+    query.clear();
+    query.prepare(it.value());
+    query.bindValue(getPlaceHolder(classBase.getIdProperty().getName()), idValue);
+    query.bindValue(getPlaceHolder(it.key()->getColumn()), object.property(it.key()->getName().toStdString().c_str()));
+    if (!query.exec())
+      throw new Exception(query.lastError().text());
   }
+}
+
+void PostgreFunctionSqlBuilder::deleteRecord(const QObject &object, Mapping::ClassMapBase &classBase) {
+  QString deleteText = getDeleteFunctionText(classBase);
+  QSqlQuery query(database);
+  query.prepare(deleteText);
+  auto property = classBase.getIdProperty();
+  query.bindValue(getPlaceHolder(property.getColumn()), object.property(property.getName().toStdString().c_str()));
 }
 }
 }

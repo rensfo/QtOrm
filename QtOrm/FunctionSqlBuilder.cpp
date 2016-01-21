@@ -12,16 +12,16 @@ FunctionSqlBuilder::FunctionSqlBuilder(const QSqlDatabase &database, QObject *pa
     throw "Function Sql Buider: not supported driver " + database.driverName();
 }
 
-QSqlQuery FunctionSqlBuilder::insertObject(const QObject &object) {
-  return functionBuilder->insertObject(object);
+void FunctionSqlBuilder::insertObject(QObject &object) {
+  functionBuilder->insertObject(object);
 }
 
-QSqlQuery FunctionSqlBuilder::updateObject(const QObject &object) {
-  return functionBuilder->updateObject(object);
+void FunctionSqlBuilder::updateObject(const QObject &object) {
+  functionBuilder->updateObject(object);
 }
 
-QSqlQuery FunctionSqlBuilder::deleteObject(const QObject &object) {
-  return functionBuilder->deleteObject(object);
+void FunctionSqlBuilder::deleteObject(const QObject &object) {
+  functionBuilder->deleteObject(object);
 }
 }
 }

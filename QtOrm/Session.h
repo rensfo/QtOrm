@@ -21,7 +21,7 @@ public:
                    Sql::SqlBuilderType sqlManagerType, QObject *parent = 0);
   explicit Session(const QSqlDatabase &database, QTextStream *textStream,
                    Sql::SqlBuilderType sqlManagerType, QObject *parent = 0);
-  void insertObject(const QObject &object);
+  void insertObject(QObject &object);
   void updateObject(const QObject &object);
   void deleteObject(const QObject &object);
   template <class T> T *getById(const QVariant &id);

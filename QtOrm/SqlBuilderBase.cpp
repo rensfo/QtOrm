@@ -54,7 +54,11 @@ QString SqlBuilderBase::getCurrentTableAlias() const {
 }
 
 void SqlBuilderBase::resetTableNumber() {
-  tableNumber = 0;
+    tableNumber = 0;
+}
+
+QString SqlBuilderBase::getPlaceHolder(const QString param){
+    return QString(":%1").arg(param);
 }
 
 QString SqlBuilderBase::getSelect() const {

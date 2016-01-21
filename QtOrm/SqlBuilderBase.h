@@ -19,14 +19,15 @@ public:
   QSqlQuery getListObject(const QString &objectName);
   QSqlQuery getListObject(const QString &objectName, const QString property,
                           const QVariant value);
-  virtual QSqlQuery insertObject(const QObject &object) = 0;
-  virtual QSqlQuery updateObject(const QObject &object) = 0;
-  virtual QSqlQuery deleteObject(const QObject &object) = 0;
+  virtual void insertObject(QObject &object) = 0;
+  virtual void updateObject(const QObject &object) = 0;
+  virtual void deleteObject(const QObject &object) = 0;
 
 protected:
   QString generateTableAlias();
   QString getCurrentTableAlias() const;
   void resetTableNumber();
+  QString getPlaceHolder(const QString param);
 
 private:
   QString getSelect() const;

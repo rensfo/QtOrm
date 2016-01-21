@@ -10,9 +10,12 @@ class SimpleSqlBuilder : public SqlBuilderBase {
 
 public:
   SimpleSqlBuilder(const QSqlDatabase &database, QObject *parent = 0);
-  QSqlQuery insertObject(const QObject &object);
-  QSqlQuery updateObject(const QObject &object);
-  QSqlQuery deleteObject(const QObject &object);
+  void insertObject(QObject &object);
+  void updateObject(const QObject &object);
+  void deleteObject(const QObject &object);
+
+private:
+  void executeQuery(QSqlQuery &query);
 };
 }
 }

@@ -16,9 +16,5 @@ ClassMapBase *ConfigurateMap::getMappedClass(QString className) {
 bool ConfigurateMap::isRegisterClass(QString className) {
   return mappedClass.contains(className);
 }
-
-void ConfigurateMap::writeRegisteredClassesToDebug() {
-  qDebug() << mappedClass;
-}
 }
 }

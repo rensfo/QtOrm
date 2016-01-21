@@ -1,3 +1,4 @@
+#include "FunctionSqlBuilder.h"
 #include "Session.h"
 
 namespace QtOrm {
@@ -16,37 +17,39 @@ Session::Session(const QSqlDatabase &database,
     sqlBuilder = new Sql::SimpleSqlBuilder(database);
     break;
   case Sql::SqlBuilderType::Setter:
+      sqlBuilder = new Sql::FunctionSqlBuilder(database);
     break;
   }
 }
 
-void Session::insertObject(const QObject &object) {
-  QSqlQuery query = sqlBuilder->insertObject(object);
-  if (!query.exec()) {
-    sqlToStream(query);
-    throw new Exception(query.lastError().text());
-  }
+void Session::insertObject(QObject &object) {
+  sqlBuilder->insertObject(object);
+//  if (!query.exec()) {
+//    sqlToStream(query);
+//    throw new Exception(query.lastError().text());
+//  }
 
-  sqlToStream(query);
+//  sqlToStream(query);
 }
 
 void Session::updateObject(const QObject &object) {
-  QSqlQuery query = sqlBuilder->updateObject(object);
-  if (!query.exec()) {
-    sqlToStream(query);
-    throw new Exception(query.lastError().text());
-  }
+  sqlBuilder->updateObject(object);
+//  if (!query.exec()) {
+//    sqlToStream(query);
+//    throw new Exception(query.lastError().text());
+//  }
 
-  sqlToStream(query);
+//  sqlToStream(query);
 }
 
 void Session::deleteObject(const QObject &object) {
-  QSqlQuery query = sqlBuilder->deleteObject(object);
-  if (!query.exec()) {
-    sqlToStream(query);
-    throw new Exception(query.lastError().text());
-  }
-  sqlToStream(query);
+    sqlBuilder->deleteObject(object);
+//  QSqlQuery query = sqlBuilder->deleteObject(object);
+//  if (!query.exec()) {
+//    sqlToStream(query);
+//    throw new Exception(query.lastError().text());
+//  }
+//  sqlToStream(query);
 }
 
 QSqlDatabase Session::getDatabase() const {

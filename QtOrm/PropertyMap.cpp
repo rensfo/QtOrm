@@ -3,13 +3,16 @@
 namespace QtOrm {
 namespace Mapping {
 
-PropertyMap::PropertyMap() {
+PropertyMap::PropertyMap() : isId(false) {
 }
 
-PropertyMap::PropertyMap(QString name) : name(name) {
+PropertyMap::PropertyMap(QString name) : PropertyMap() {
+    this->name = name;
 }
 
-PropertyMap::PropertyMap(QString name, QString column) : name(name), column(column) {
+PropertyMap::PropertyMap(QString name, QString column) : PropertyMap() {
+    this->name = name;
+    this->column = column;
 }
 
 PropertyMap &PropertyMap::setName(QString name) {
