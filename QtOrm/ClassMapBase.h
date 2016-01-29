@@ -16,6 +16,7 @@ namespace QtOrm {
 namespace Mapping {
 
 class ClassMapBase : public QObject {
+    Q_OBJECT
 public:
   explicit ClassMapBase(QObject *parent = 0);
 
@@ -31,7 +32,7 @@ public:
   PropertyMap &map(QString propertyName, QString columnName);
 
   QMetaObject getMetaObject() const;
-  void setMetaObject(const QMetaObject &metaObject);
+  void setMetaObject(const QMetaObject &classMetaObject);
 
   PropertyMap &getIdProperty();
   PropertyMap &getProperty(const QString &property);
@@ -63,7 +64,7 @@ private:
 
   QString idProperty;
 
-  QMetaObject metaObject;
+  QMetaObject classMetaObject;
   QString context;
   QString insertFunction;
   QString deleteFunction;

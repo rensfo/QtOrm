@@ -5,7 +5,7 @@ namespace QtOrm {
 Session::Session(const QSqlDatabase &database,
                  Sql::SqlBuilderType sqlManagerType,
                  QObject *parent)
-    : QObject(parent), database(database), textStream(textStream) {
+    : QObject(parent), database(database), sqlBuilder(nullptr), textStream(nullptr) {
   //Должна быть фабрика, если потребуется
   switch (sqlManagerType) {
   case Sql::SqlBuilderType::Simple:

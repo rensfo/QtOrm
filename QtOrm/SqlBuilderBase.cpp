@@ -1,5 +1,7 @@
 #include "SqlBuilderBase.h"
 #include "ClassMapBase.h"
+#include "NullableBase.h"
+#include <QString>
 #include <QSqlError>
 #include <QSqlRecord>
 
@@ -9,7 +11,8 @@ extern QMap<QString, QtOrm::Mapping::ClassMapBase *> mappedClass;
 }
 
 namespace Sql {
-SqlBuilderBase::SqlBuilderBase(const QSqlDatabase &database, QObject *parent) : QObject(parent), database(database) {
+SqlBuilderBase::SqlBuilderBase(const QSqlDatabase &database, QObject *parent)
+    : QObject(parent), database(database), tableNumber(0) {
 }
 
 QObject *SqlBuilderBase::getById(const QString &className, const QVariant &id) {
@@ -30,8 +33,9 @@ QList<QObject *> *SqlBuilderBase::getListObject(const QString &className, const 
   checkClass(className);
 
   Mapping::ClassMapBase *classBase = Config::ConfigurateMap::getMappedClass(className);
+  qDebug() << tableNumber;
   resetTableNumber();
-  this->generateTableAlias();
+  generateTableAlias();
   QString select = getSelect();
   QString from = getFrom(classBase->getTable());
   QString where;
@@ -74,7 +78,7 @@ QString SqlBuilderBase::getPlaceHolder(const QString param) {
   return QString(":%1").arg(param);
 }
 
-void SqlBuilderBase::sqlQueryToStream(const QSqlQuery &query) {
+void SqlBuilderBase::sqlQueryToStream(QSqlQuery &query) {
   if (textStream) {
     *textStream << query.lastQuery() << endl;
 
@@ -82,6 +86,11 @@ void SqlBuilderBase::sqlQueryToStream(const QSqlQuery &query) {
     for (auto it = boundValues.begin(); it != boundValues.end(); ++it)
       *textStream << it.key() << " = " << it.value().toString() << endl;
   }
+}
+
+QVariant SqlBuilderBase::prepareValue(QVariant &value)
+{
+    return value.value<NullableBase>().getVariant();
 }
 
 QString SqlBuilderBase::getSelect() const {

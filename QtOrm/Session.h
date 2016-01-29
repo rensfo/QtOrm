@@ -24,6 +24,8 @@ public:
   template <class T> T *getById(const QVariant &id);
   template <class T> QList<T *> *getList();
   template <class T> QList<T *> *getList(const QString &property, const QVariant &value);
+  template <class T> QList<QObject *> *getObjectList();
+  template <class T> QList<QObject *> *getObjectList(const QString &property, const QVariant &value);
 
   QSqlDatabase getDatabase() const;
   void setDatabase(const QSqlDatabase &database);
@@ -43,16 +45,24 @@ template <class T> T *Session::getById(const QVariant &id) {
 }
 
 template <class T> QList<T *> *Session::getList() {
-  QString className = T::staticMetaObject.className();
-  QList<T *> *list = qobject_cast<QList<T *> *>(sqlBuilder->getListObject(className));
-  return list;
+//  QString className = T::staticMetaObject.className();
+  return reinterpret_cast<QList<T *> *>(getObjectList<T>());
 }
 
-template <class T>
-QList<T *> *Session::getList(const QString &property, const QVariant &value) {
+template <class T> QList<T *> *Session::getList(const QString &property, const QVariant &value) {
+//  QString className = T::staticMetaObject.className();
+//  QList<T *> *list = sqlBuilder->getListObject(className, property, value));
+  return reinterpret_cast<QList<T *> *>(getObjectList<T>(property, value));
+}
+
+template <class T> QList<QObject *> *Session::getObjectList() {
   QString className = T::staticMetaObject.className();
-  QList<T *> *list = qobject_cast<QList<T *> *>(sqlBuilder->getListObject(className, property, value));
-  return list;
+  return sqlBuilder->getListObject(className);
+}
+
+template <class T> QList<QObject *> *Session::getObjectList(const QString &property, const QVariant &value) {
+  QString className = T::staticMetaObject.className();
+  return sqlBuilder->getListObject(className, property, value);
 }
 }
 #endif // SESSION_H

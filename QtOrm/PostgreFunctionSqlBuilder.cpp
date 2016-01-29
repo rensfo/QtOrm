@@ -103,7 +103,8 @@ void PostgreFunctionSqlBuilder::updateRecord(const QObject &object, Mapping::Cla
     query.clear();
     query.prepare(it.value());
     query.bindValue(getPlaceHolder(classBase.getIdProperty().getName()), idValue);
-    query.bindValue(getPlaceHolder(it.key()->getColumn()), object.property(it.key()->getName().toStdString().c_str()));
+    QVariant val = object.property(it.key()->getName().toStdString().c_str());
+    query.bindValue(getPlaceHolder(it.key()->getColumn()), prepareValue(val));
     if (!query.exec())
       throw new Exception(query.lastError().text());
   }

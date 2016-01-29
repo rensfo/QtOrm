@@ -15,7 +15,9 @@ HEADERS += $$PWD/QtOrm.h\
     $$PWD/OneToMany.h \
     $$PWD/OneToOne.h \
     $$PWD/FunctionSqlBuilder.h \
-    $$PWD/PostgreFunctionSqlBuilder.h
+    $$PWD/PostgreFunctionSqlBuilder.h \
+    $$PWD/Nullable.h \
+    $$PWD/NullableBase.h
 
 SOURCES += $$PWD/QtOrm.cpp \
     $$PWD/PropertyMap.cpp \
@@ -29,6 +31,7 @@ SOURCES += $$PWD/QtOrm.cpp \
     $$PWD/OneToMany.cpp \
     $$PWD/OneToOne.cpp \
     $$PWD/FunctionSqlBuilder.cpp \
-    $$PWD/PostgreFunctionSqlBuilder.cpp
+    $$PWD/PostgreFunctionSqlBuilder.cpp \
+    $$PWD/NullableBase.cpp
 
 

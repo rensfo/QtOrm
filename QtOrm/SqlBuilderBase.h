@@ -30,7 +30,8 @@ protected:
   QString getCurrentTableAlias() const;
   void resetTableNumber();
   QString getPlaceHolder(const QString param);
-  void sqlQueryToStream(const QSqlQuery &query);
+  void sqlQueryToStream(QSqlQuery &query);
+  QVariant prepareValue(QVariant &value);
 
 private:
   QString getSelect() const;

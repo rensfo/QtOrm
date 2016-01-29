@@ -20,7 +20,7 @@ const QMap<QString, PropertyMap *> ClassMapBase::getProperties() const {
 }
 
 QString ClassMapBase::getClassName() const {
-  return metaObject.className();
+  return classMetaObject.className();
 }
 
 PropertyMap &ClassMapBase::id(QString propertyName) {
@@ -55,11 +55,11 @@ PropertyMap &ClassMapBase::createProperty(QString propertyName) {
 }
 
 QMetaObject ClassMapBase::getMetaObject() const {
-  return metaObject;
+  return classMetaObject;
 }
 
 void ClassMapBase::setMetaObject(const QMetaObject &metaObject) {
-  this->metaObject = metaObject;
+  this->classMetaObject = metaObject;
 }
 
 PropertyMap &ClassMapBase::getIdProperty() {
@@ -91,9 +91,9 @@ OneToOne &ClassMapBase::oneToOne(const QString &property) {
 }
 
 void ClassMapBase::checkToExistProperty(const QString &property) {
-  int propertyIndex = metaObject.indexOfProperty(property.toStdString().data());
+  int propertyIndex = classMetaObject.indexOfProperty(property.toStdString().data());
   if (propertyIndex == -1) {
-    QString message = QString("В классе %1 свойство %2 не найдено.").arg(metaObject.className()).arg(property);
+    QString message = QString("В классе %1 свойство %2 не найдено.").arg(classMetaObject.className()).arg(property);
     throw new Exception(message);
   }
 }

@@ -53,7 +53,7 @@ void SimpleSqlBuilder::updateObject(const QObject &object) {
   foreach (auto prop, classBase->getProperties()) {
     QString idPlaceHolder = getPlaceHolder(prop->getColumn());
     QVariant idValue = object.property(prop->getName().toStdString().c_str());
-    query.bindValue(idPlaceHolder, idValue);
+    query.bindValue(idPlaceHolder, prepareValue(idValue));
   }
 
   executeQuery(query);
