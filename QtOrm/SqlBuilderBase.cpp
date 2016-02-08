@@ -4,6 +4,7 @@
 #include <QString>
 #include <QSqlError>
 #include <QSqlRecord>
+#include <QMetaProperty>
 
 namespace QtOrm {
 namespace Config {
@@ -29,27 +30,27 @@ QObject *SqlBuilderBase::getById(const QString &className, const QVariant &id) {
   return list->takeFirst();
 }
 
-QList<QObject *> *SqlBuilderBase::getListObject(const QString &className, const QString property, const QVariant value) {
+QList<QObject *> *
+SqlBuilderBase::getListObject(const QString &className, const QString property, const QVariant value) {
   checkClass(className);
 
   Mapping::ClassMapBase *classBase = Config::ConfigurateMap::getMappedClass(className);
-  qDebug() << tableNumber;
   resetTableNumber();
   generateTableAlias();
   QString select = getSelect();
   QString from = getFrom(classBase->getTable());
   QString where;
   QString placeHolder;
-  if(!property.isEmpty()){
+  if (!property.isEmpty()) {
     QString column = classBase->getProperty(property).getColumn();
-    placeHolder  = getPlaceHolder(column);
+    placeHolder = getPlaceHolder(column);
     where = getWhere(column, placeHolder);
   }
   QString fullSqlText = sqlQueryTemplate.arg(select).arg(from).arg(where);
 
   QSqlQuery query(database);
   query.prepare(fullSqlText);
-  if(!property.isEmpty()){
+  if (!property.isEmpty()) {
     query.bindValue(placeHolder, value);
   }
 
@@ -88,9 +89,11 @@ void SqlBuilderBase::sqlQueryToStream(QSqlQuery &query) {
   }
 }
 
-QVariant SqlBuilderBase::prepareValue(QVariant &value)
-{
+QVariant SqlBuilderBase::prepareValue(QVariant &value) {
+  if (value.canConvert(QMetaType::type("NullableBase")))
     return value.value<NullableBase>().getVariant();
+
+  return value;
 }
 
 QString SqlBuilderBase::getSelect() const {
@@ -106,13 +109,13 @@ QString SqlBuilderBase::getWhere(const QString &column, const QString &placeHold
 }
 
 QList<QObject *> *SqlBuilderBase::getList(Mapping::ClassMapBase &classBase, QSqlQuery &query) {
-  auto properties = classBase.getProperties();
+//  auto properties = classBase.getProperties();
   QList<QObject *> *objects = new QList<QObject *>();
   while (query.next()) {
     QObject *obj = classBase.getMetaObject().newInstance();
-    fillObject(properties, query.record(), *obj);
+    fillObject(classBase, query.record(), *obj);
     fillOneToMany(classBase.getOneToManyRelations(), classBase.getIdProperty().getName(), *obj);
-    fillOneToOne(classBase.getOneToOneRelations(), *obj);
+    fillOneToOne(classBase, *obj);
     objects->append(obj);
   }
 
@@ -124,12 +127,23 @@ void SqlBuilderBase::checkClass(const QString &className) {
     throw new Exception(QString("Класс '%1' не зарегистрирован.").arg(className));
 }
 
-void SqlBuilderBase::fillObject(const QMap<QString, Mapping::PropertyMap *> &properties,
+void SqlBuilderBase::fillObject(const Mapping::ClassMapBase &classBase,
                                 const QSqlRecord &record,
                                 QObject &object) {
+  auto properties = classBase.getProperties();
   foreach (auto prop, properties) {
     QVariant value = record.value(prop->getColumn());
-    object.setProperty(prop->getName().toStdString().c_str(), value);
+    int propertyIndex = object.metaObject()->indexOfProperty(prop->getName().toStdString().c_str());
+    QMetaProperty metaProperty = object.metaObject()->property(propertyIndex);
+    if (QString(metaProperty.typeName()) == "NullableBase") {
+      NullableBase *tmpValNullable = new NullableBase();
+      tmpValNullable->setVariant(value);
+      value = QVariant::fromValue(*tmpValNullable);
+    }
+    bool success = object.setProperty(prop->getName().toStdString().c_str(), value);
+    if(!success){
+        throw new Exception(QString("Неудалось поместить значние в %1.%2").arg(classBase.getClassName()).arg(prop->getName()));
+    }
   }
 }
 
@@ -147,16 +161,52 @@ void SqlBuilderBase::fillOneToMany(const QMap<QString, Mapping::OneToMany *> &re
   }
 }
 
-void SqlBuilderBase::fillOneToOne(const QMap<QString, Mapping::OneToOne *> &relations, QObject &object) {
+void SqlBuilderBase::fillOneToOne(Mapping::ClassMapBase &classBase, QObject &object) {
+  const QMap<QString, Mapping::OneToOne *> &relations = classBase.getOneToOneRelations();
   foreach (auto oneToOne, relations) {
     QString property = oneToOne->getProperty();
     int propertyIndex = object.metaObject()->indexOfProperty(property.toStdString().data());
-    QString refClass = object.metaObject()->property(propertyIndex).typeName();
-    QString refProperty = Config::ConfigurateMap::getMappedClass(refClass)->getIdProperty().getColumn();
-    QVariant value = object.property(oneToOne->getValueProperty().toStdString().data());
-    QList<QObject *> *l = getListObject(refClass, refProperty, value);
-    if (l->count() != 0) {
-      QVariant var = QVariant::fromValue(l->first());
+    QMetaProperty metaProperty = object.metaObject()->property(propertyIndex);
+    QString refClass = metaProperty.typeName();
+    if(refClass.right(1) == "*")
+        refClass = refClass.left(refClass.size() - 1);
+    Mapping::ClassMapBase *refClassBase = Config::ConfigurateMap::getMappedClass(refClass);
+//    QString refProperty = refClassBase->getIdProperty().getColumn();
+//    QVariant value = object.property(oneToOne->getValueProperty().toStdString().data());
+//    QList<QObject *> *l = getListObject(refClass, refProperty, value);
+
+
+//    resetTableNumber();
+//    generateTableAlias();
+    QString fullSqlText = QString("select t2.* "
+                             "from %1 t1 join %2 t2 on (t1.%3 = t2.%4) "
+                             "where t1.%5 = :id")
+                    .arg(classBase.getTable())
+                    .arg(refClassBase->getTable())
+                    .arg(oneToOne->getTableColumn())
+                    .arg(refClassBase->getIdProperty().getColumn())
+                    .arg(classBase.getIdProperty().getColumn());
+
+    QSqlQuery query(database);
+    query.prepare(fullSqlText);
+
+    QVariant curObjIdVal = object.property(classBase.getIdProperty().getName().toStdString().data());
+    query.bindValue(":id", curObjIdVal);
+
+    if (!query.exec()) {
+      sqlQueryToStream(query);
+      throw new QtOrm::Exception(query.lastError().text());
+    }
+    sqlQueryToStream(query);
+
+    QList<QObject *> *lst = getList(*refClassBase, query);
+
+//      QString column = classBase->getProperty(property).getColumn();
+//      placeHolder = getPlaceHolder(column);
+//      where = getWhere(column, placeHolder);
+
+    if (lst->count() != 0) {
+      QVariant var = QVariant::fromValue(lst->first());
       objectSetProperty(object, property.toStdString().data(), var);
     }
   }
@@ -170,6 +220,7 @@ void SqlBuilderBase::objectSetProperty(QObject &object, const char *propertyName
     throw new Exception(textError);
   }
 }
+
 QTextStream *SqlBuilderBase::getTextStream() const {
   return textStream;
 }

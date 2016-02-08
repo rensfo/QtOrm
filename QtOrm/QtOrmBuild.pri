@@ -1,0 +1,25 @@
+#QTORM - project name
+
+include($$FRAMEWORK/Framework.pri)
+
+QTORM_VER_MAJ      = 0
+QTORM_VER_MIN      = 0
+QTORM_VER_PAT      = 1
+QTORM_VERSION      = $${QTORM_VER_MAJ}.$${QTORM_VER_MIN}.$${QTORM_VER_PAT}
+
+QTORM_FOLDER_NAME  = QtOrm
+QTORM_INCLUDE = $$FRAMEWORK_INCLUDE/$$QTORM_FOLDER_NAME
+
+CONFIG              += debug_and_release
+CONFIG              += build_all
+
+isEmpty(DESTDIR) {
+    QTORM_INSTALL_PATH = $$FRAMEWORK/include/$$QTORM_FOLDER_NAME
+} else {
+    QTORM_INSTALL_PATH = $${DESTDIR}/include/$$QTORM_FOLDER_NAME
+}
+
+DESTDIR =
+
+QTORM_LIB_NAME = QtOrm$${QT_MAJOR_VERSION}$${LIB_SUFFIX}
+message(QTORM_LIB_NAME: $$QTORM_LIB_NAME)

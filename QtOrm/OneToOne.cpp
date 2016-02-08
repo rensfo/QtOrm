@@ -23,5 +23,15 @@ OneToOne &OneToOne::setValueProperty(const QString &valueProperty) {
   this->valueProperty = valueProperty;
   return *this;
 }
+QString OneToOne::getTableColumn() const
+{
+    return tableColumn;
+}
+
+void OneToOne::setTableColumn(const QString &value)
+{
+    tableColumn = value;
+}
+
 }
 }

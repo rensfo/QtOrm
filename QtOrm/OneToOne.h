@@ -15,9 +15,13 @@ public:
   QString getValueProperty() const;
   OneToOne &setValueProperty(const QString &column);
 
+  QString getTableColumn() const;
+  void setTableColumn(const QString &value);
+
 private:
   QString property;
   QString valueProperty;
+  QString tableColumn;
 };
 }
 }

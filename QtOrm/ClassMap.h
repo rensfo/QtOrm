@@ -1,12 +1,6 @@
 #ifndef CLASSMAP_H
 #define CLASSMAP_H
 
-#include <QString>
-#include <QMetaObject>
-#include <QMetaProperty>
-#include <QMap>
-#include <QDebug>
-
 #include "ClassMapBase.h"
 
 namespace QtOrm {

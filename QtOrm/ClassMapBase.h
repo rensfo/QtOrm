@@ -5,7 +5,6 @@
 #include <QString>
 #include <QMap>
 #include <QMetaObject>
-#include <QDebug>
 
 #include "PropertyMap.h"
 #include "Exception.h"

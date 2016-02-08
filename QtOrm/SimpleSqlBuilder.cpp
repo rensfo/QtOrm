@@ -18,6 +18,10 @@ void SimpleSqlBuilder::insertObject(QObject &object) {
     columns.append(prop->getColumn());
     values.append(getPlaceHolder(prop->getColumn()));
   }
+  foreach (auto prop, classBase->getOneToOneRelations()) {
+      columns.append(prop->getTableColumn());
+      values.append(getPlaceHolder(prop->getTableColumn()));
+  }
   QString fullSqlText = QString("insert into %1(%2) values(%3)")
                             .arg(classBase->getTable())
                             .arg(columns.join(", "))
@@ -30,6 +34,15 @@ void SimpleSqlBuilder::insertObject(QObject &object) {
       continue;
     query.bindValue(getPlaceHolder(prop->getColumn()), object.property(prop->getName().toStdString().c_str()));
   }
+  foreach (auto prop, classBase->getOneToOneRelations()) {
+    QVariant valFromProp = object.property(prop->getProperty().toStdString().c_str());
+    QObject *objFromProp = valFromProp.value<QObject *>();
+    Mapping::ClassMapBase *refClassBase = Config::ConfigurateMap::getMappedClass(objFromProp->metaObject()->className());
+    QString propRefClass = refClassBase->getIdProperty().getName();
+    QVariant val = objFromProp->property(propRefClass.toStdString().c_str());
+    query.bindValue(getPlaceHolder(prop->getTableColumn()), val);
+  }
+
   executeQuery(query);
 
   object.setProperty(classBase->getIdProperty().getName().toStdString().c_str(), query.lastInsertId());

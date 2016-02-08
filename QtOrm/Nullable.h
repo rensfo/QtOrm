@@ -4,7 +4,8 @@
 #include "NullableBase.h"
 #include <QMetaType>
 
-template <class T> class Nullable : public NullableBase {
+template <class T>
+class Nullable : public NullableBase {
 public:
   Nullable();
   Nullable(const Nullable<T> &value);
@@ -17,18 +18,17 @@ public:
 
   Nullable<T> &operator=(const T &value);
   Nullable<T> &operator=(const Nullable<T> &value);
-
-private:
-  T value;
-  bool isNull;
 };
 
-template <class T> Nullable<T>::Nullable() : NullableBase() ,isNull(true) {
+template <class T> Nullable<T>::Nullable() : NullableBase() {
 }
 
 template <class T> Nullable<T>::Nullable(const Nullable<T> &value) : Nullable<T>(){
     isNull = !hasValue();
-    this->value = value.getValue();
+    if(value.getVariant().isValid())
+        this->value = value.getVariant();
+    else
+        this->value = QVariant();
 }
 
 template <class T> Nullable<T>::Nullable(T &value) : Nullable<T>() {
@@ -36,11 +36,11 @@ template <class T> Nullable<T>::Nullable(T &value) : Nullable<T>() {
 }
 
 template <class T> T Nullable<T>::getValue() const {
-  return value;
+  return value.value<T>();
 }
 
 template <class T> void Nullable<T>::setValue(const T &value) {
-  value = value;
+  this->value = QVariant(value);
   isNull = false;
 }
 
@@ -61,7 +61,6 @@ template <class T> Nullable<T> &Nullable<T>::operator=(const Nullable<T> &value)
 }
 
 #define ORM_DECLARE_METATYPE_TEMPLATE_1ARG(SINGLE_ARG_TEMPLATE) \
-QT_BEGIN_NAMESPACE \
 template <typename T> \
 struct QMetaTypeId< SINGLE_ARG_TEMPLATE<T> > \
 { \
@@ -89,6 +88,6 @@ struct QMetaTypeId< SINGLE_ARG_TEMPLATE<T> > \
     } \
 }; \
 
-ORM_DECLARE_METATYPE_TEMPLATE_1ARG(Nullable)
+//ORM_DECLARE_METATYPE_TEMPLATE_1ARG(Nullable)
 
 #endif // NULLABLE_H

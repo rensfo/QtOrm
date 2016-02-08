@@ -2,9 +2,7 @@
 #define CONFIGURATEMAP_H
 
 #include <QMap>
-#include <QDebug>
 
-#include "ClassMap.h"
 #include "ClassMapBase.h"
 
 namespace QtOrm {

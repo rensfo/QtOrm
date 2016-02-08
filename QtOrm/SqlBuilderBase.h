@@ -4,6 +4,7 @@
 #include <QObject>
 #include <QSqlDatabase>
 #include <QSqlQuery>
+#include <QTextStream>
 #include <QVariant>
 
 #include "ConfigurateMap.h"
@@ -39,9 +40,9 @@ private:
   QString getWhere(const QString &column, const QString &placeHolder) const;
   QList<QObject *> *getList(Mapping::ClassMapBase &classBase, QSqlQuery &query);
   void checkClass(const QString &className);
-  void fillObject(const QMap<QString, Mapping::PropertyMap *> &properties, const QSqlRecord &record, QObject &object);
+  void fillObject(const Mapping::ClassMapBase &classBase, const QSqlRecord &record, QObject &object);
   void fillOneToMany(const QMap<QString, Mapping::OneToMany *> &relations, const QString &idProperty, QObject &object);
-  void fillOneToOne(const QMap<QString, Mapping::OneToOne *> &relations, QObject &object);
+  void fillOneToOne(Mapping::ClassMapBase &classBase, QObject &object);
   void objectSetProperty(QObject &object, const char *propertyName, const QVariant &value);
 
 signals:
