@@ -8,6 +8,7 @@
 #include <QVariant>
 
 #include "ConfigurateMap.h"
+#include "Group.h"
 
 namespace QtOrm {
 namespace Sql {
@@ -19,6 +20,7 @@ public:
   explicit SqlBuilderBase(const QSqlDatabase &database, QObject *parent = 0);
   QObject *getById(const QString &className, const QVariant &id);
   QList<QObject *> *getListObject(const QString &className, const QString property = QString(), const QVariant value = QVariant());
+  QList<QObject *> *getListObject(const QString &className, const Group &conditions);
   virtual void insertObject(QObject &object) = 0;
   virtual void updateObject(const QObject &object) = 0;
   virtual void deleteObject(const QObject &object) = 0;
@@ -37,7 +39,10 @@ protected:
 private:
   QString getSelect() const;
   QString getFrom(const QString &tableName) const;
-  QString getWhere(const QString &column, const QString &placeHolder) const;
+  QString getWhere(const QString &tableName, const Group &conditions) const;
+  QString operationToString(Operation operation) const;
+  QString groupOperationToString(GroupOperation groupOperation) const;
+  void bindValues(QSqlQuery &query, const Group &conditions);
   QList<QObject *> *getList(Mapping::ClassMapBase &classBase, QSqlQuery &query);
   void checkClass(const QString &className);
   void fillObject(const Mapping::ClassMapBase &classBase, const QSqlRecord &record, QObject &object);

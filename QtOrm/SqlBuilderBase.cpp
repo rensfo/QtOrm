@@ -32,7 +32,7 @@ QObject *SqlBuilderBase::getById(const QString &className, const QVariant &id) {
 
 QList<QObject *> *
 SqlBuilderBase::getListObject(const QString &className, const QString property, const QVariant value) {
-  checkClass(className);
+  /*checkClass(className);
 
   Mapping::ClassMapBase *classBase = Config::ConfigurateMap::getMappedClass(className);
   resetTableNumber();
@@ -53,6 +53,47 @@ SqlBuilderBase::getListObject(const QString &className, const QString property, 
   if (!property.isEmpty()) {
     query.bindValue(placeHolder, value);
   }
+
+  if (!query.exec()) {
+    sqlQueryToStream(query);
+    throw new QtOrm::Exception(query.lastError().text());
+  }
+  sqlQueryToStream(query);
+
+  return getList(*classBase, query);*/
+
+  Group group;
+  Mapping::ClassMapBase *classBase = Config::ConfigurateMap::getMappedClass(className);
+  if (!property.isEmpty()) {
+    QString column = classBase->getProperty(property).getColumn();
+    Filter *filter = new Filter();
+    filter->setFieldName(column);
+    filter->setOperation(Operation::Equal);
+    QList<QVariant> values;
+    values.append(value);
+    filter->setValues(values);
+    group.addFilter(filter);
+  }
+
+  return getListObject(className, group);
+}
+
+QList<QObject *> *SqlBuilderBase::getListObject(const QString &className, const Group &conditions) {
+  checkClass(className);
+
+  Mapping::ClassMapBase *classBase = Config::ConfigurateMap::getMappedClass(className);
+  resetTableNumber();
+  QString tableName = generateTableAlias();
+  QString select = getSelect();
+  QString from = getFrom(classBase->getTable());
+  QString where;
+  if(!conditions.isEmpty())
+    where = QString("where %1").arg(getWhere(tableName, conditions));
+  QString fullSqlText = sqlQueryTemplate.arg(select).arg(from).arg(where);
+
+  QSqlQuery query(database);
+  query.prepare(fullSqlText);
+  bindValues(query, conditions);
 
   if (!query.exec()) {
     sqlQueryToStream(query);
@@ -104,12 +145,53 @@ QString SqlBuilderBase::getFrom(const QString &tableName) const {
   return QString("from %1 %2").arg(tableName).arg(getCurrentTableAlias());
 }
 
-QString SqlBuilderBase::getWhere(const QString &column, const QString &placeHolder) const {
-  return QString("where %1.%2 = %3").arg(getCurrentTableAlias()).arg(column).arg(placeHolder);
+QString SqlBuilderBase::getWhere(const QString &tableName, const Group &conditions) const {
+  QString whereClause;
+  for (Filter *f : conditions.getFilters()) {
+    QString groupOp = whereClause.isEmpty() ? "" : groupOperationToString(conditions.getOperation());
+    whereClause += QString("%1 %2.%3 %4 :%3")
+                       .arg(groupOp)
+                       .arg(tableName)
+                       .arg(f->getFieldName())
+                       .arg(operationToString(f->getOperation()));
+  }
+
+  for (Group *group : conditions.getGroups()) {
+    QString groupOp = whereClause.isEmpty() ? "" : groupOperationToString(conditions.getOperation());
+    whereClause += QString("%1 (%2)").arg(groupOp).arg(getWhere(tableName, *group));
+  }
+  return whereClause;
+}
+
+QString SqlBuilderBase::operationToString(Operation operation) const {
+  QString operationString;
+  if (operation == Operation::Equal) {
+    operationString = "=";
+  } else if (operation == Operation::NotEqual) {
+    operationString = "!=";
+  } else if (operation == Operation::Like) {
+    operationString = "like";
+  }
+  return operationString;
+}
+
+QString SqlBuilderBase::groupOperationToString(GroupOperation groupOperation) const {
+  return groupOperation == GroupOperation::And ? "and" : "or";
+}
+
+void SqlBuilderBase::bindValues(QSqlQuery &query, const Group &conditions) {
+  for (Filter *f : conditions.getFilters()) {
+    if (!f->getValues().isEmpty()) {
+      query.bindValue(getPlaceHolder(f->getFieldName()), f->getValues().first());
+    }
+  }
+  for (Group *g : conditions.getGroups()) {
+    bindValues(query, *g);
+  }
 }
 
 QList<QObject *> *SqlBuilderBase::getList(Mapping::ClassMapBase &classBase, QSqlQuery &query) {
-//  auto properties = classBase.getProperties();
+  //  auto properties = classBase.getProperties();
   QList<QObject *> *objects = new QList<QObject *>();
   while (query.next()) {
     QObject *obj = classBase.getMetaObject().newInstance();
@@ -127,9 +209,7 @@ void SqlBuilderBase::checkClass(const QString &className) {
     throw new Exception(QString("Класс '%1' не зарегистрирован.").arg(className));
 }
 
-void SqlBuilderBase::fillObject(const Mapping::ClassMapBase &classBase,
-                                const QSqlRecord &record,
-                                QObject &object) {
+void SqlBuilderBase::fillObject(const Mapping::ClassMapBase &classBase, const QSqlRecord &record, QObject &object) {
   auto properties = classBase.getProperties();
   foreach (auto prop, properties) {
     QVariant value = record.value(prop->getColumn());
@@ -141,8 +221,9 @@ void SqlBuilderBase::fillObject(const Mapping::ClassMapBase &classBase,
       value = QVariant::fromValue(*tmpValNullable);
     }
     bool success = object.setProperty(prop->getName().toStdString().c_str(), value);
-    if(!success){
-        throw new Exception(QString("Неудалось поместить значние в %1.%2").arg(classBase.getClassName()).arg(prop->getName()));
+    if (!success) {
+      throw new Exception(
+          QString("Неудалось поместить значние в %1.%2").arg(classBase.getClassName()).arg(prop->getName()));
     }
   }
 }
@@ -168,17 +249,17 @@ void SqlBuilderBase::fillOneToOne(Mapping::ClassMapBase &classBase, QObject &obj
     int propertyIndex = object.metaObject()->indexOfProperty(property.toStdString().data());
     QMetaProperty metaProperty = object.metaObject()->property(propertyIndex);
     QString refClass = metaProperty.typeName();
-    if(refClass.right(1) == "*")
-        refClass = refClass.left(refClass.size() - 1);
+    if (refClass.right(1) == "*")
+      refClass = refClass.left(refClass.size() - 1);
     Mapping::ClassMapBase *refClassBase = Config::ConfigurateMap::getMappedClass(refClass);
     QString fullSqlText = QString("select t2.* "
-                             "from %1 t1 join %2 t2 on (t1.%3 = t2.%4) "
-                             "where t1.%5 = :id")
-                    .arg(classBase.getTable())
-                    .arg(refClassBase->getTable())
-                    .arg(oneToOne->getTableColumn())
-                    .arg(refClassBase->getIdProperty().getColumn())
-                    .arg(classBase.getIdProperty().getColumn());
+                                  "from %1 t1 join %2 t2 on (t1.%3 = t2.%4) "
+                                  "where t1.%5 = :id")
+                              .arg(classBase.getTable())
+                              .arg(refClassBase->getTable())
+                              .arg(oneToOne->getTableColumn())
+                              .arg(refClassBase->getIdProperty().getColumn())
+                              .arg(classBase.getIdProperty().getColumn());
 
     QSqlQuery query(database);
     query.prepare(fullSqlText);
