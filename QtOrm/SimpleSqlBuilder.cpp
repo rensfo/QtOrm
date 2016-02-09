@@ -59,6 +59,9 @@ void SimpleSqlBuilder::updateObject(const QObject &object) {
     else
       setClause += QString("%1%2 = :%2").arg(setClause.isEmpty() ? "" : ", ").arg(prop->getColumn());
   }
+  foreach (auto prop, classBase->getOneToOneRelations()) {
+      setClause += QString("%1%2 = :%2").arg(setClause.isEmpty() ? "" : ", ").arg(prop->getTableColumn());
+  }
 
   QString fullSqlText = QString("update %1 set %2 where %3").arg(classBase->getTable()).arg(setClause).arg(whereClause);
   QSqlQuery query(database);
@@ -67,6 +70,14 @@ void SimpleSqlBuilder::updateObject(const QObject &object) {
     QString idPlaceHolder = getPlaceHolder(prop->getColumn());
     QVariant idValue = object.property(prop->getName().toStdString().c_str());
     query.bindValue(idPlaceHolder, prepareValue(idValue));
+  }
+  foreach (auto prop, classBase->getOneToOneRelations()) {
+      QVariant valFromProp = object.property(prop->getProperty().toStdString().c_str());
+      QObject *objFromProp = valFromProp.value<QObject *>();
+      Mapping::ClassMapBase *refClassBase = Config::ConfigurateMap::getMappedClass(objFromProp->metaObject()->className());
+      QString propRefClass = refClassBase->getIdProperty().getName();
+      QVariant val = objFromProp->property(propRefClass.toStdString().c_str());
+      query.bindValue(getPlaceHolder(prop->getTableColumn()), val);
   }
 
   executeQuery(query);

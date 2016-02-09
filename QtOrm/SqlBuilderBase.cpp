@@ -171,13 +171,6 @@ void SqlBuilderBase::fillOneToOne(Mapping::ClassMapBase &classBase, QObject &obj
     if(refClass.right(1) == "*")
         refClass = refClass.left(refClass.size() - 1);
     Mapping::ClassMapBase *refClassBase = Config::ConfigurateMap::getMappedClass(refClass);
-//    QString refProperty = refClassBase->getIdProperty().getColumn();
-//    QVariant value = object.property(oneToOne->getValueProperty().toStdString().data());
-//    QList<QObject *> *l = getListObject(refClass, refProperty, value);
-
-
-//    resetTableNumber();
-//    generateTableAlias();
     QString fullSqlText = QString("select t2.* "
                              "from %1 t1 join %2 t2 on (t1.%3 = t2.%4) "
                              "where t1.%5 = :id")
@@ -200,10 +193,6 @@ void SqlBuilderBase::fillOneToOne(Mapping::ClassMapBase &classBase, QObject &obj
     sqlQueryToStream(query);
 
     QList<QObject *> *lst = getList(*refClassBase, query);
-
-//      QString column = classBase->getProperty(property).getColumn();
-//      placeHolder = getPlaceHolder(column);
-//      where = getWhere(column, placeHolder);
 
     if (lst->count() != 0) {
       QVariant var = QVariant::fromValue(lst->first());
