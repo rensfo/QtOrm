@@ -13,6 +13,7 @@ Session::Session(const QSqlDatabase &database, Sql::SqlBuilderType sqlManagerTyp
     sqlBuilder = new Sql::FunctionSqlBuilder(database);
     break;
   }
+  connect(sqlBuilder, SIGNAL(executeSql(QString)), SIGNAL(executeSql(QString)));
 }
 
 void Session::insertObject(QObject &object) {
@@ -35,11 +36,11 @@ void Session::setDatabase(const QSqlDatabase &database) {
   this->database = database;
 }
 
-QTextStream *Session::getTextStream() const {
-  return sqlBuilder->getTextStream();
-}
+//QTextStream *Session::getTextStream() const {
+//  return sqlBuilder->getTextStream();
+//}
 
-void Session::setTextStream(QTextStream *value) {
-  sqlBuilder->setTextStream(value);
-}
+//void Session::setTextStream(QTextStream *value) {
+//  sqlBuilder->setTextStream(value);
+//}
 }

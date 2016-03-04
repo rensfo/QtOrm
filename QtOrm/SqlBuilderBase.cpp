@@ -32,36 +32,6 @@ QObject *SqlBuilderBase::getById(const QString &className, const QVariant &id) {
 
 QList<QObject *> *
 SqlBuilderBase::getListObject(const QString &className, const QString property, const QVariant value) {
-  /*checkClass(className);
-
-  Mapping::ClassMapBase *classBase = Config::ConfigurateMap::getMappedClass(className);
-  resetTableNumber();
-  generateTableAlias();
-  QString select = getSelect();
-  QString from = getFrom(classBase->getTable());
-  QString where;
-  QString placeHolder;
-  if (!property.isEmpty()) {
-    QString column = classBase->getProperty(property).getColumn();
-    placeHolder = getPlaceHolder(column);
-    where = getWhere(column, placeHolder);
-  }
-  QString fullSqlText = sqlQueryTemplate.arg(select).arg(from).arg(where);
-
-  QSqlQuery query(database);
-  query.prepare(fullSqlText);
-  if (!property.isEmpty()) {
-    query.bindValue(placeHolder, value);
-  }
-
-  if (!query.exec()) {
-    sqlQueryToStream(query);
-    throw new QtOrm::Exception(query.lastError().text());
-  }
-  sqlQueryToStream(query);
-
-  return getList(*classBase, query);*/
-
   Group group;
   Mapping::ClassMapBase *classBase = Config::ConfigurateMap::getMappedClass(className);
   if (!property.isEmpty()) {
@@ -87,7 +57,7 @@ QList<QObject *> *SqlBuilderBase::getListObject(const QString &className, const 
   QString select = getSelect();
   QString from = getFrom(classBase->getTable());
   QString where;
-  if(!conditions.isEmpty())
+  if (!conditions.isEmpty())
     where = QString("where %1").arg(getWhere(tableName, conditions));
   QString fullSqlText = sqlQueryTemplate.arg(select).arg(from).arg(where);
 
@@ -96,10 +66,10 @@ QList<QObject *> *SqlBuilderBase::getListObject(const QString &className, const 
   bindValues(query, conditions);
 
   if (!query.exec()) {
-    sqlQueryToStream(query);
+    emit executeSql(getSqlTextWithBindParams(query));
     throw new QtOrm::Exception(query.lastError().text());
   }
-  sqlQueryToStream(query);
+  emit executeSql(getSqlTextWithBindParams(query));
 
   return getList(*classBase, query);
 }
@@ -120,14 +90,15 @@ QString SqlBuilderBase::getPlaceHolder(const QString param) {
   return QString(":%1").arg(param);
 }
 
-void SqlBuilderBase::sqlQueryToStream(QSqlQuery &query) {
-  if (textStream) {
-    *textStream << query.lastQuery() << endl;
+QString SqlBuilderBase::getSqlTextWithBindParams(QSqlQuery &query) {
+  QString text;
+  text = query.lastQuery() + "\n";
 
-    auto boundValues = query.boundValues();
-    for (auto it = boundValues.begin(); it != boundValues.end(); ++it)
-      *textStream << it.key() << " = " << it.value().toString() << endl;
-  }
+  auto boundValues = query.boundValues();
+  for (auto it = boundValues.begin(); it != boundValues.end(); ++it)
+    text += QString("%1 = %2\n").arg(it.key()).arg(it.value().toString());
+
+  return text;
 }
 
 QVariant SqlBuilderBase::prepareValue(QVariant &value) {
@@ -135,6 +106,10 @@ QVariant SqlBuilderBase::prepareValue(QVariant &value) {
     return value.value<NullableBase>().getVariant();
 
   return value;
+}
+
+QString SqlBuilderBase::getLikeCondition(const QString &tableName, const QString &fieldName) const {
+  return QString("%1.%2 like '%' || :%2 || '%'").arg(tableName).arg(fieldName);
 }
 
 QString SqlBuilderBase::getSelect() const {
@@ -149,11 +124,16 @@ QString SqlBuilderBase::getWhere(const QString &tableName, const Group &conditio
   QString whereClause;
   for (Filter *f : conditions.getFilters()) {
     QString groupOp = whereClause.isEmpty() ? "" : groupOperationToString(conditions.getOperation());
-    whereClause += QString("%1 %2.%3 %4 :%3")
-                       .arg(groupOp)
-                       .arg(tableName)
-                       .arg(f->getFieldName())
-                       .arg(operationToString(f->getOperation()));
+
+    if (f->getOperation() == Operation::Like) {
+      whereClause += QString("%1 %2").arg(groupOp).arg(getLikeCondition(tableName, f->getFieldName()));
+    } else {
+      whereClause += QString("%1 %2.%3 %4 :%3")
+                         .arg(groupOp)
+                         .arg(tableName)
+                         .arg(f->getFieldName())
+                         .arg(operationToString(f->getOperation()));
+    }
   }
 
   for (Group *group : conditions.getGroups()) {
@@ -191,7 +171,6 @@ void SqlBuilderBase::bindValues(QSqlQuery &query, const Group &conditions) {
 }
 
 QList<QObject *> *SqlBuilderBase::getList(Mapping::ClassMapBase &classBase, QSqlQuery &query) {
-  //  auto properties = classBase.getProperties();
   QList<QObject *> *objects = new QList<QObject *>();
   while (query.next()) {
     QObject *obj = classBase.getMetaObject().newInstance();
@@ -268,10 +247,10 @@ void SqlBuilderBase::fillOneToOne(Mapping::ClassMapBase &classBase, QObject &obj
     query.bindValue(":id", curObjIdVal);
 
     if (!query.exec()) {
-      sqlQueryToStream(query);
+      getSqlTextWithBindParams(query);
       throw new QtOrm::Exception(query.lastError().text());
     }
-    sqlQueryToStream(query);
+    getSqlTextWithBindParams(query);
 
     QList<QObject *> *lst = getList(*refClassBase, query);
 
@@ -291,12 +270,12 @@ void SqlBuilderBase::objectSetProperty(QObject &object, const char *propertyName
   }
 }
 
-QTextStream *SqlBuilderBase::getTextStream() const {
-  return textStream;
-}
+//QTextStream *SqlBuilderBase::getTextStream() const {
+//  return textStream;
+//}
 
-void SqlBuilderBase::setTextStream(QTextStream *value) {
-  textStream = value;
-}
+//void SqlBuilderBase::setTextStream(QTextStream *value) {
+//  textStream = value;
+//}
 }
 }

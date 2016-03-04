@@ -19,8 +19,8 @@ void SimpleSqlBuilder::insertObject(QObject &object) {
     values.append(getPlaceHolder(prop->getColumn()));
   }
   foreach (auto prop, classBase->getOneToOneRelations()) {
-      columns.append(prop->getTableColumn());
-      values.append(getPlaceHolder(prop->getTableColumn()));
+    columns.append(prop->getTableColumn());
+    values.append(getPlaceHolder(prop->getTableColumn()));
   }
   QString fullSqlText = QString("insert into %1(%2) values(%3)")
                             .arg(classBase->getTable())
@@ -37,7 +37,8 @@ void SimpleSqlBuilder::insertObject(QObject &object) {
   foreach (auto prop, classBase->getOneToOneRelations()) {
     QVariant valFromProp = object.property(prop->getProperty().toStdString().c_str());
     QObject *objFromProp = valFromProp.value<QObject *>();
-    Mapping::ClassMapBase *refClassBase = Config::ConfigurateMap::getMappedClass(objFromProp->metaObject()->className());
+    Mapping::ClassMapBase *refClassBase =
+        Config::ConfigurateMap::getMappedClass(objFromProp->metaObject()->className());
     QString propRefClass = refClassBase->getIdProperty().getName();
     QVariant val = objFromProp->property(propRefClass.toStdString().c_str());
     query.bindValue(getPlaceHolder(prop->getTableColumn()), val);
@@ -60,7 +61,7 @@ void SimpleSqlBuilder::updateObject(const QObject &object) {
       setClause += QString("%1%2 = :%2").arg(setClause.isEmpty() ? "" : ", ").arg(prop->getColumn());
   }
   foreach (auto prop, classBase->getOneToOneRelations()) {
-      setClause += QString("%1%2 = :%2").arg(setClause.isEmpty() ? "" : ", ").arg(prop->getTableColumn());
+    setClause += QString("%1%2 = :%2").arg(setClause.isEmpty() ? "" : ", ").arg(prop->getTableColumn());
   }
 
   QString fullSqlText = QString("update %1 set %2 where %3").arg(classBase->getTable()).arg(setClause).arg(whereClause);
@@ -72,12 +73,13 @@ void SimpleSqlBuilder::updateObject(const QObject &object) {
     query.bindValue(idPlaceHolder, prepareValue(idValue));
   }
   foreach (auto prop, classBase->getOneToOneRelations()) {
-      QVariant valFromProp = object.property(prop->getProperty().toStdString().c_str());
-      QObject *objFromProp = valFromProp.value<QObject *>();
-      Mapping::ClassMapBase *refClassBase = Config::ConfigurateMap::getMappedClass(objFromProp->metaObject()->className());
-      QString propRefClass = refClassBase->getIdProperty().getName();
-      QVariant val = objFromProp->property(propRefClass.toStdString().c_str());
-      query.bindValue(getPlaceHolder(prop->getTableColumn()), val);
+    QVariant valFromProp = object.property(prop->getProperty().toStdString().c_str());
+    QObject *objFromProp = valFromProp.value<QObject *>();
+    Mapping::ClassMapBase *refClassBase =
+        Config::ConfigurateMap::getMappedClass(objFromProp->metaObject()->className());
+    QString propRefClass = refClassBase->getIdProperty().getName();
+    QVariant val = objFromProp->property(propRefClass.toStdString().c_str());
+    query.bindValue(getPlaceHolder(prop->getTableColumn()), val);
   }
 
   executeQuery(query);

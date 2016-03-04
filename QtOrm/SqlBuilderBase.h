@@ -25,16 +25,17 @@ public:
   virtual void updateObject(const QObject &object) = 0;
   virtual void deleteObject(const QObject &object) = 0;
 
-  QTextStream *getTextStream() const;
-  void setTextStream(QTextStream *value);
+//  QTextStream *getTextStream() const;
+//  void setTextStream(QTextStream *value);
 
 protected:
   QString generateTableAlias();
   QString getCurrentTableAlias() const;
   void resetTableNumber();
   QString getPlaceHolder(const QString param);
-  void sqlQueryToStream(QSqlQuery &query);
+  QString getSqlTextWithBindParams(QSqlQuery &query);
   QVariant prepareValue(QVariant &value);
+  virtual QString getLikeCondition(const QString &tableName, const QString &fieldName) const;
 
 private:
   QString getSelect() const;
@@ -51,6 +52,7 @@ private:
   void objectSetProperty(QObject &object, const char *propertyName, const QVariant &value);
 
 signals:
+  void executeSql(QString sqlText);
 
 public slots:
 
@@ -59,7 +61,7 @@ protected:
   const QString sqlQueryTemplate = "%1 %2 %3";
   const QString tableAliasTemplate = "tb_%1";
   QSqlDatabase database;
-  QTextStream *textStream;
+//  QTextStream *textStream;
 };
 }
 }

@@ -33,8 +33,10 @@ public:
   QSqlDatabase getDatabase() const;
   void setDatabase(const QSqlDatabase &database);
 
-  QTextStream *getTextStream() const;
-  void setTextStream(QTextStream *value);
+//  QTextStream *getTextStream() const;
+//  void setTextStream(QTextStream *value);
+signals:
+  void executeSql(QString sqlText);
 
 private:
   QSqlDatabase database;
