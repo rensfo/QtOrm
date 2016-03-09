@@ -1,0 +1,24 @@
+#COMMON - project name
+
+include(Framework.pri)
+
+COMMON_VER_MAJ      = 0
+COMMON_VER_MIN      = 0
+COMMON_VER_PAT      = 1
+COMMON_VERSION      = $${COMMON_VER_MAJ}.$${COMMON_VER_MIN}.$${COMMON_VER_PAT}
+
+COMMON_FOLDER_NAME  = Common
+COMMON_INCLUDE = $$FRAMEWORK_INCLUDE/$$COMMON_FOLDER_NAME
+
+CONFIG              += debug_and_release
+CONFIG              += build_all
+
+isEmpty(DESTDIR) {
+    COMMON_INSTALL_PATH = $$FRAMEWORK/include/$$COMMON_FOLDER_NAME
+} else {
+    COMMON_INSTALL_PATH = $${DESTDIR}/include/$$COMMON_FOLDER_NAME
+}
+
+DESTDIR =
+
+COMMON_LIB_NAME = Common$${QT_MAJOR_VERSION}$${LIB_SUFFIX}
