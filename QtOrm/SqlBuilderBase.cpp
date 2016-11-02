@@ -12,8 +12,8 @@ namespace QtOrm {
 namespace Sql {
 using namespace Config;
 
-SqlBuilderBase::SqlBuilderBase(QObject *parent)
-    : QObject(parent), tableNumber(0) {}
+SqlBuilderBase::SqlBuilderBase(QObject *parent) : QObject(parent), tableNumber(0) {
+}
 
 QSqlQuery SqlBuilderBase::selectQuery() {
   fillOneToOneAlias();
@@ -58,14 +58,13 @@ QString SqlBuilderBase::getPlaceHolder(const QString param) {
 }
 
 QVariant SqlBuilderBase::prepareValue(QVariant &value) {
-  //if (value.canConvert<NullableBase>())
+  // if (value.canConvert<NullableBase>())
   //  return value.value<NullableBase>().getVariant();
 
   return value;
 }
 
-QString SqlBuilderBase::getLikeCondition(const QString &tableName,
-                                         const QString &fieldName) const {
+QString SqlBuilderBase::getLikeCondition(const QString &tableName, const QString &fieldName) const {
   return QString("%1.%2 like '%' || :%2 || '%'").arg(tableName).arg(fieldName);
 }
 
@@ -74,12 +73,9 @@ QString SqlBuilderBase::getSelect(const Mapping::ClassMapBase &classBase) {
 
   for (PropertyMap *propertyMap : classBase.getProperties()) {
     if (result.isEmpty())
-      result = QString("select %1.%2 as %1_%2")
-                   .arg(tableAlias)
-                   .arg(propertyMap->getColumn());
+      result = QString("select %1.%2 as %1_%2").arg(tableAlias).arg(propertyMap->getColumn());
     else
-      result +=
-          QString(", %1.%2 as %1_%2").arg(tableAlias, propertyMap->getColumn());
+      result += QString(", %1.%2 as %1_%2").arg(tableAlias, propertyMap->getColumn());
   }
 
   for (OneToOne *oneToOne : classBase.getOneToOneRelations())
@@ -88,20 +84,16 @@ QString SqlBuilderBase::getSelect(const Mapping::ClassMapBase &classBase) {
   return result;
 }
 
-QString
-SqlBuilderBase::getOneToOneSelect(const Mapping::ClassMapBase &classBase,
-                                  OneToOne *oneToOne) {
+QString SqlBuilderBase::getOneToOneSelect(const Mapping::ClassMapBase &classBase, OneToOne *oneToOne) {
   QString result = "";
 
   QString tableAlias = oneToOneAlias.value(oneToOne);
 
   QString property = oneToOne->getProperty();
   QString refClass = getTypeNameOfProperty(classBase.getMetaObject(), property);
-  Mapping::ClassMapBase *refClassBase =
-      ConfigurationMap::getMappedClass(refClass);
+  Mapping::ClassMapBase *refClassBase = ConfigurationMap::getMappedClass(refClass);
   for (PropertyMap *propertyMap : refClassBase->getProperties())
-    result +=
-        QString(", %1.%2 as %1_%2").arg(tableAlias, propertyMap->getColumn());
+    result += QString(", %1.%2 as %1_%2").arg(tableAlias, propertyMap->getColumn());
 
   for (OneToOne *oneToOne : refClassBase->getOneToOneRelations())
     result += getOneToOneSelect(*refClassBase, oneToOne);
@@ -110,8 +102,7 @@ SqlBuilderBase::getOneToOneSelect(const Mapping::ClassMapBase &classBase,
 }
 
 QString SqlBuilderBase::getFrom(const Mapping::ClassMapBase &classBase) {
-  QString result =
-      QString("from %1 %2").arg(classBase.getTable()).arg(tableAlias);
+  QString result = QString("from %1 %2").arg(classBase.getTable()).arg(tableAlias);
 
   for (OneToOne *oneToOne : classBase.getOneToOneRelations())
     result += getOneToOneFrom(classBase, oneToOne, tableAlias);
@@ -119,8 +110,7 @@ QString SqlBuilderBase::getFrom(const Mapping::ClassMapBase &classBase) {
   return result;
 }
 
-QString SqlBuilderBase::getOneToOneFrom(const Mapping::ClassMapBase &classBase,
-                                        OneToOne *oneToOne,
+QString SqlBuilderBase::getOneToOneFrom(const Mapping::ClassMapBase &classBase, OneToOne *oneToOne,
                                         const QString &mainTableAlias) {
   QString result = "";
 
@@ -128,8 +118,7 @@ QString SqlBuilderBase::getOneToOneFrom(const Mapping::ClassMapBase &classBase,
 
   QString property = oneToOne->getProperty();
   QString refClass = getTypeNameOfProperty(classBase.getMetaObject(), property);
-  Mapping::ClassMapBase *refClassBase =
-      ConfigurationMap::getMappedClass(refClass);
+  Mapping::ClassMapBase *refClassBase = ConfigurationMap::getMappedClass(refClass);
 
   result += QString(" left join %1 %2 on %2.%3 = %4.%5")
                 .arg(refClassBase->getTable())
@@ -144,34 +133,22 @@ QString SqlBuilderBase::getOneToOneFrom(const Mapping::ClassMapBase &classBase,
   return result;
 }
 
-QString SqlBuilderBase::getWhere(const QString &tableName,
-                                 const GroupConditions &conditions) const {
+QString SqlBuilderBase::getWhere(const QString &tableName, const GroupConditions &conditions) const {
   QString whereClause;
   for (Condition *f : conditions.getConditions()) {
-    QString groupOp = whereClause.isEmpty()
-                          ? ""
-                          : groupOperationToString(conditions.getOperation());
+    QString groupOp = whereClause.isEmpty() ? "" : groupOperationToString(conditions.getOperation());
 
     if (f->getOperation() == Operation::Like) {
-      whereClause += QString("%1 %2 ").arg(groupOp).arg(
-          getLikeCondition(tableName, f->getPropertyName()));
+      whereClause += QString("%1 %2 ").arg(groupOp).arg(getLikeCondition(tableName, f->getPropertyName()));
     } else {
       if (f->getOperation() == Operation::NotEqual &&
-          (f->getValues().first().isNull() ||
-           !f->getValues().first().isValid())) {
+          (f->getValues().first().isNull() || !f->getValues().first().isValid())) {
         if (tableName.isEmpty())
-          whereClause +=
-              QString("%1 %2 is not null ").arg(groupOp).arg(f->getPropertyName());
+          whereClause += QString("%1 %2 is not null ").arg(groupOp).arg(f->getPropertyName());
         else
-          whereClause += QString("%1 %2.%3 is not null ")
-                             .arg(groupOp)
-                             .arg(tableName)
-                             .arg(f->getPropertyName());
+          whereClause += QString("%1 %2.%3 is not null ").arg(groupOp).arg(tableName).arg(f->getPropertyName());
       } else if (tableName.isEmpty())
-        whereClause += QString("%1 %2 %4 :%2 ")
-                           .arg(groupOp)
-                           .arg(f->getPropertyName())
-                           .arg(operationToString(*f));
+        whereClause += QString("%1 %2 %4 :%2 ").arg(groupOp).arg(f->getPropertyName()).arg(operationToString(*f));
       else
         whereClause += QString("%1 %2.%3 %4 :%3 ")
                            .arg(groupOp)
@@ -182,9 +159,7 @@ QString SqlBuilderBase::getWhere(const QString &tableName,
   }
 
   for (GroupConditions *group : conditions.getGroups()) {
-    QString groupOp = whereClause.isEmpty()
-                          ? ""
-                          : groupOperationToString(conditions.getOperation());
+    QString groupOp = whereClause.isEmpty() ? "" : groupOperationToString(conditions.getOperation());
     QString groupWhere = getWhere(tableName, *group);
     if (!groupWhere.isEmpty())
       whereClause += QString("%1 (%2)").arg(groupOp).arg(groupWhere);
@@ -198,8 +173,7 @@ QString SqlBuilderBase::operationToString(const Condition &filter) const {
   if (operation == Operation::Equal) {
     operationString = "=";
   } else if (operation == Operation::NotEqual) {
-    if (filter.getValues().first().isNull() ||
-        !filter.getValues().first().isValid())
+    if (filter.getValues().first().isNull() || !filter.getValues().first().isValid())
       operationString = "is not";
     else
       operationString = "!=";
@@ -209,16 +183,14 @@ QString SqlBuilderBase::operationToString(const Condition &filter) const {
   return operationString;
 }
 
-QString
-SqlBuilderBase::groupOperationToString(GroupOperation groupOperation) const {
+QString SqlBuilderBase::groupOperationToString(GroupOperation groupOperation) const {
   return groupOperation == GroupOperation::And ? "and" : "or";
 }
 
 void SqlBuilderBase::bindValues(QSqlQuery &query, const GroupConditions &conditions) {
   for (Condition *f : conditions.getConditions()) {
     if (!f->getValues().isEmpty()) {
-      query.bindValue(getPlaceHolder(f->getPropertyName()),
-                      f->getValues().first());
+      query.bindValue(getPlaceHolder(f->getPropertyName()), f->getValues().first());
     }
   }
   for (GroupConditions *g : conditions.getGroups()) {
@@ -235,16 +207,13 @@ void SqlBuilderBase::fillOneToOneAlias() {
     fillOneToOneAlias(*classBase, oneToOne);
 }
 
-void SqlBuilderBase::fillOneToOneAlias(const ClassMapBase &classBase,
-                                       OneToOne *oneToOne) {
+void SqlBuilderBase::fillOneToOneAlias(const ClassMapBase &classBase, OneToOne *oneToOne) {
   if (!oneToOneAlias.contains(oneToOne))
     oneToOneAlias.insert(oneToOne, generateTableAlias());
 
   QString property = oneToOne->getProperty();
-  QString refClass = SqlBuilderBase::getTypeNameOfProperty(
-      classBase.getMetaObject(), property);
-  Mapping::ClassMapBase *refClassBase =
-      ConfigurationMap::getMappedClass(refClass);
+  QString refClass = SqlBuilderBase::getTypeNameOfProperty(classBase.getMetaObject(), property);
+  Mapping::ClassMapBase *refClassBase = ConfigurationMap::getMappedClass(refClass);
   for (OneToOne *oneToOne : refClassBase->getOneToOneRelations())
     fillOneToOneAlias(*refClassBase, oneToOne);
 }
@@ -257,33 +226,43 @@ QString SqlBuilderBase::getCurrentTableAlias() const {
   return tableAliasTemplate.arg(tableNumber);
 }
 
-void SqlBuilderBase::resetTableNumber() { tableNumber = 0; }
+void SqlBuilderBase::resetTableNumber() {
+  tableNumber = 0;
+}
 
 QMap<OneToOne *, QString> SqlBuilderBase::getOneToOneAlias() const {
   return oneToOneAlias;
 }
 
-QSqlDatabase SqlBuilderBase::getDatabase() const { return database; }
+QSqlDatabase SqlBuilderBase::getDatabase() const {
+  return database;
+}
 
 void SqlBuilderBase::setDatabase(const QSqlDatabase &value) {
   database = value;
 }
 
-QObject *SqlBuilderBase::getObject() const { return object; }
+QObject *SqlBuilderBase::getObject() const {
+  return object;
+}
 
-void SqlBuilderBase::setObject(QObject *value) { object = value; }
+void SqlBuilderBase::setObject(QObject *value) {
+  object = value;
+}
 
-ClassMapBase *SqlBuilderBase::getClassBase() const { return classBase; }
+ClassMapBase *SqlBuilderBase::getClassBase() const {
+  return classBase;
+}
 
-void SqlBuilderBase::setClassBase(ClassMapBase *value) { classBase = value; }
+void SqlBuilderBase::setClassBase(ClassMapBase *value) {
+  classBase = value;
+}
 
-QString SqlBuilderBase::getTypeNameOfProperty(const QObject &obj,
-                                              const QString &prop) {
+QString SqlBuilderBase::getTypeNameOfProperty(const QObject &obj, const QString &prop) {
   return getTypeNameOfProperty(*obj.metaObject(), prop);
 }
 
-QString SqlBuilderBase::getTypeNameOfProperty(const QMetaObject &meta,
-                                              const QString &prop) {
+QString SqlBuilderBase::getTypeNameOfProperty(const QMetaObject &meta, const QString &prop) {
   int propertyIndex = meta.indexOfProperty(prop.toStdString().data());
   QMetaProperty metaProperty = meta.property(propertyIndex);
   QString refClass = metaProperty.typeName();
@@ -293,12 +272,20 @@ QString SqlBuilderBase::getTypeNameOfProperty(const QMetaObject &meta,
   return refClass;
 }
 
-QString SqlBuilderBase::getTableAlias() const { return tableAlias; }
+QString SqlBuilderBase::getTableAlias() const {
+  return tableAlias;
+}
 
-void SqlBuilderBase::setTableAlias(const QString &value) { tableAlias = value; }
+void SqlBuilderBase::setTableAlias(const QString &value) {
+  tableAlias = value;
+}
 
-GroupConditions SqlBuilderBase::getConditions() const { return conditions; }
+GroupConditions SqlBuilderBase::getConditions() const {
+  return conditions;
+}
 
-void SqlBuilderBase::setConditions(const GroupConditions &value) { conditions = value; }
+void SqlBuilderBase::setConditions(const GroupConditions &value) {
+  conditions = value;
+}
 }
 }

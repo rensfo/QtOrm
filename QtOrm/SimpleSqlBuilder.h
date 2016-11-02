@@ -22,8 +22,7 @@ protected:
   virtual QString getDeleteText();
   virtual void bindInsert(QSqlQuery &query);
   virtual void bindUpdate(QSqlQuery &query);
-  virtual void bindOneColumnUpdate(QSqlQuery &query,
-                                   const QString &propertyName);
+  virtual void bindOneColumnUpdate(QSqlQuery &query, const QString &propertyName);
   virtual void bindDelete(QSqlQuery &query);
   void bind(QSqlQuery &query, const PropertyMap &property);
   void bind(QSqlQuery &query, const OneToOne &oneToOne);

@@ -22,7 +22,6 @@ HEADERS += PropertyMap.h \
     ClassMapBase.h \
     Exception.h \
     Session.h \
-    QtOrm \
     SimpleSqlBuilder.h \
     SqlBuilderBase.h \
     OneToMany.h \
