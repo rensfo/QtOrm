@@ -29,9 +29,9 @@ HEADERS += PropertyMap.h \
     OneToOne.h \
     Query.h \
     Relation.h \
-    Group.h \
     Operation.h \
-    Condition.h
+    Condition.h \
+    GroupConditions.h
 
 SOURCES += PropertyMap.cpp \
     ClassMap.cpp \
@@ -45,8 +45,8 @@ SOURCES += PropertyMap.cpp \
     OneToOne.cpp \
     Query.cpp \
     Relation.cpp \
-    Group.cpp \
-    Condition.cpp
+    Condition.cpp \
+    GroupConditions.cpp
 
 OTHER_FILES += QtOrmInclude.pri
 

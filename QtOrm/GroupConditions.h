@@ -1,5 +1,5 @@
-#ifndef CONDITION_H
-#define CONDITION_H
+#ifndef GROUPCONDITIONS_H
+#define GROUPCONDITIONS_H
 
 #include <QObject>
 
@@ -7,11 +7,11 @@
 
 enum class GroupOperation { And, Or };
 
-class Group : public QObject {
+class GroupConditions : public QObject {
   Q_OBJECT
 public:
-  explicit Group(QObject *parent = 0);
-  Group(const Group &group);
+  explicit GroupConditions(QObject *parent = nullptr);
+  GroupConditions(const GroupConditions &group);
 
   GroupOperation getOperation() const;
   void setOperation(const GroupOperation &value);
@@ -19,10 +19,10 @@ public:
   QList<Condition *> getFilters() const;
   void setFilters(const QList<Condition *> &value);
 
-  QList<Group *> getGroups() const;
-  void setGroups(const QList<Group *> &value);
+  QList<GroupConditions *> getGroups() const;
+  void setGroups(const QList<GroupConditions *> &value);
 
-  void addGroup(const Group &value);
+  void addGroup(const GroupConditions &value);
   void addFilter(const Condition &value);
   void addFilter(const QString &fieldName, const Operation &operation, const QVariant &value);
   void addFilterEqual(const QString &fieldName, const QVariant &value);
@@ -32,12 +32,12 @@ public:
   void clear();
   bool isEmpty() const;
 
-  Group &operator=(const Group &group);
+  GroupConditions &operator=(const GroupConditions &group);
 
 private:
   GroupOperation operation = GroupOperation::And;
   QList<Condition *> filters;
-  QList<Group *> groups;
+  QList<GroupConditions *> groups;
 };
 
-#endif // CONDITION_H
+#endif // GROUPCONDITIONS_H

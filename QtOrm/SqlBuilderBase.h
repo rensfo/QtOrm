@@ -9,7 +9,7 @@
 #include <QVariant>
 
 #include "ConfigurationMap.h"
-#include "Group.h"
+#include "GroupConditions.h"
 #include "OneToOne.h"
 
 namespace QtOrm {
@@ -29,8 +29,8 @@ public:
   virtual QSqlQuery deleteQuery() = 0;
   virtual QSqlQuery updateOneColumnQuery(const QString &property) = 0;
 
-  Group getConditions() const;
-  void setConditions(const Group &value);
+  GroupConditions getConditions() const;
+  void setConditions(const GroupConditions &value);
 
   QString getTableAlias() const;
   void setTableAlias(const QString &value);
@@ -72,10 +72,10 @@ protected:
   QString getFrom(const Mapping::ClassMapBase &classBase);
   QString getOneToOneFrom(const Mapping::ClassMapBase &classBase,
                           OneToOne *oneToOne, const QString &mainTableAlias);
-  QString getWhere(const QString &tableName, const Group &conditions) const;
+  QString getWhere(const QString &tableName, const GroupConditions &conditions) const;
   QString operationToString(const Condition &filter) const;
   QString groupOperationToString(GroupOperation groupOperation) const;
-  void bindValues(QSqlQuery &query, const Group &conditions);
+  void bindValues(QSqlQuery &query, const GroupConditions &conditions);
 
 protected:
   int tableNumber;
@@ -84,7 +84,7 @@ protected:
   QSqlDatabase database;
   QMap<OneToOne *, QString> oneToOneAlias;
   ClassMapBase *classBase = nullptr;
-  Group conditions;
+  GroupConditions conditions;
   QString tableAlias;
   QObject *object;
 };

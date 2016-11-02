@@ -145,7 +145,7 @@ QString SqlBuilderBase::getOneToOneFrom(const Mapping::ClassMapBase &classBase,
 }
 
 QString SqlBuilderBase::getWhere(const QString &tableName,
-                                 const Group &conditions) const {
+                                 const GroupConditions &conditions) const {
   QString whereClause;
   for (Condition *f : conditions.getFilters()) {
     QString groupOp = whereClause.isEmpty()
@@ -181,7 +181,7 @@ QString SqlBuilderBase::getWhere(const QString &tableName,
     }
   }
 
-  for (Group *group : conditions.getGroups()) {
+  for (GroupConditions *group : conditions.getGroups()) {
     QString groupOp = whereClause.isEmpty()
                           ? ""
                           : groupOperationToString(conditions.getOperation());
@@ -214,14 +214,14 @@ SqlBuilderBase::groupOperationToString(GroupOperation groupOperation) const {
   return groupOperation == GroupOperation::And ? "and" : "or";
 }
 
-void SqlBuilderBase::bindValues(QSqlQuery &query, const Group &conditions) {
+void SqlBuilderBase::bindValues(QSqlQuery &query, const GroupConditions &conditions) {
   for (Condition *f : conditions.getFilters()) {
     if (!f->getValues().isEmpty()) {
       query.bindValue(getPlaceHolder(f->getFieldName()),
                       f->getValues().first());
     }
   }
-  for (Group *g : conditions.getGroups()) {
+  for (GroupConditions *g : conditions.getGroups()) {
     bindValues(query, *g);
   }
 }
@@ -297,8 +297,8 @@ QString SqlBuilderBase::getTableAlias() const { return tableAlias; }
 
 void SqlBuilderBase::setTableAlias(const QString &value) { tableAlias = value; }
 
-Group SqlBuilderBase::getConditions() const { return conditions; }
+GroupConditions SqlBuilderBase::getConditions() const { return conditions; }
 
-void SqlBuilderBase::setConditions(const Group &value) { conditions = value; }
+void SqlBuilderBase::setConditions(const GroupConditions &value) { conditions = value; }
 }
 }

@@ -37,7 +37,7 @@ QObject *Query::getById(const QString &className, const QVariant &id) {
 }
 
 QList<QObject *> *Query::getListObject(const QString &className, const QString property, const QVariant value) {
-  Group group;
+  GroupConditions group;
   Mapping::ClassMapBase *classBase = ConfigurationMap::getMappedClass(className);
   if (!property.isEmpty()) {
     QString column = classBase->getProperty(property).getColumn();
@@ -51,7 +51,7 @@ QList<QObject *> *Query::getListObject(const QString &className, const QString p
   return getListObject(className, group);
 }
 
-QList<QObject *> *Query::getListObject(const QString &className, const Group &conditions) {
+QList<QObject *> *Query::getListObject(const QString &className, const GroupConditions &conditions) {
   Mapping::ClassMapBase *classBase = ConfigurationMap::getMappedClass(className);
   QString mainTableAlias = sqlBuilder->generateTableAlias();
   sqlBuilder->setClassBase(classBase);
@@ -131,7 +131,7 @@ void Query::deleteObject(QObject &object) {
 void Query::refresh(QObject &object) {
   Mapping::ClassMapBase *classBase = ConfigurationMap::getMappedClass(object.metaObject()->className());
   QString mainTableAlias = sqlBuilder->generateTableAlias();
-  Group group;
+  GroupConditions group;
   group.addFilterEqual(classBase->getIdProperty().getColumn(),
                        object.property(classBase->getIdProperty().getName().toStdString().data()));
   sqlBuilder->setClassBase(classBase);

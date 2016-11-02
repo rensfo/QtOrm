@@ -25,7 +25,7 @@ public:
   virtual QObject *getById(const QString &className, const QVariant &id);
   virtual QList<QObject *> *getListObject(const QString &className, const QString property = QString(),
                                           const QVariant value = QVariant());
-  virtual QList<QObject *> *getListObject(const QString &className, const Group &conditions);
+  virtual QList<QObject *> *getListObject(const QString &className, const GroupConditions &conditions);
   virtual void saveObject(QObject &object);
   virtual void deleteObject(QObject &object);
   virtual void refresh(QObject &object);

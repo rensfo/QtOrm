@@ -11,7 +11,7 @@
 
 #include "ConfigurationMap.h"
 #include "Exception.h"
-#include "Group.h"
+#include "GroupConditions.h"
 #include "Query.h"
 #include "SimpleSqlBuilder.h"
 
@@ -34,13 +34,13 @@ public:
   template <class T>
   QList<T *> *getList(const QString &property, const QVariant &value);
   template <class T>
-  QList<T *> *getList(const Group &conditions);
+  QList<T *> *getList(const GroupConditions &conditions);
   template <class T>
   QList<QObject *> *getObjectList();
   template <class T>
   QList<QObject *> *getObjectList(const QString &property, const QVariant &value);
   template <class T>
-  QList<QObject *> *getObjectList(const Group &conditions);
+  QList<QObject *> *getObjectList(const GroupConditions &conditions);
   void refresh(QObject &value);
 
   QSqlDatabase getDatabase() const;
@@ -70,7 +70,7 @@ T *Session::getById(const QVariant &id) {
 
 template <class T>
 T *Session::get(const Condition &filter) {
-  Group group;
+  GroupConditions group;
   group.addFilter(filter);
   auto list = getList<T>(group);
 
@@ -92,7 +92,7 @@ QList<T *> *Session::getList(const QString &property, const QVariant &value) {
 }
 
 template <class T>
-QList<T *> *Session::getList(const Group &conditions) {
+QList<T *> *Session::getList(const GroupConditions &conditions) {
   return reinterpret_cast<QList<T *> *>(getObjectList<T>(conditions));
 }
 
@@ -115,7 +115,7 @@ QList<QObject *> *Session::getObjectList(const QString &property, const QVariant
 }
 
 template <class T>
-QList<QObject *> *Session::getObjectList(const Group &conditions) {
+QList<QObject *> *Session::getObjectList(const GroupConditions &conditions) {
   QString className = T::staticMetaObject.className();
   QList<QObject *> *result;
   result = query.getListObject(className, conditions);
