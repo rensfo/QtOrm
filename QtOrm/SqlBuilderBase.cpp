@@ -147,7 +147,7 @@ QString SqlBuilderBase::getOneToOneFrom(const Mapping::ClassMapBase &classBase,
 QString SqlBuilderBase::getWhere(const QString &tableName,
                                  const Group &conditions) const {
   QString whereClause;
-  for (Filter *f : conditions.getFilters()) {
+  for (Condition *f : conditions.getFilters()) {
     QString groupOp = whereClause.isEmpty()
                           ? ""
                           : groupOperationToString(conditions.getOperation());
@@ -192,7 +192,7 @@ QString SqlBuilderBase::getWhere(const QString &tableName,
   return whereClause;
 }
 
-QString SqlBuilderBase::operationToString(const Filter &filter) const {
+QString SqlBuilderBase::operationToString(const Condition &filter) const {
   QString operationString;
   Operation operation = filter.getOperation();
   if (operation == Operation::Equal) {
@@ -215,7 +215,7 @@ SqlBuilderBase::groupOperationToString(GroupOperation groupOperation) const {
 }
 
 void SqlBuilderBase::bindValues(QSqlQuery &query, const Group &conditions) {
-  for (Filter *f : conditions.getFilters()) {
+  for (Condition *f : conditions.getFilters()) {
     if (!f->getValues().isEmpty()) {
       query.bindValue(getPlaceHolder(f->getFieldName()),
                       f->getValues().first());

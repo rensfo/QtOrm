@@ -6,12 +6,12 @@
 
 #include "Operation.h"
 
-class Filter : public QObject {
+class Condition : public QObject {
   Q_OBJECT
 public:
-  explicit Filter(QObject *parent = nullptr);
-  Filter(const QString &fieldName, const Operation &operation, const QVariant &value, QObject *parent = nullptr);
-  Filter(const Filter &filter);
+  explicit Condition(QObject *parent = nullptr);
+  Condition(const QString &fieldName, const Operation &operation, const QVariant &value, QObject *parent = nullptr);
+  Condition(const Condition &filter);
 
   QString getFieldName() const;
   void setFieldName(const QString &value);
@@ -31,7 +31,5 @@ private:
   Operation operation = Operation::None;
   QList<QVariant> values;
 };
-
-Q_DECLARE_METATYPE(Filter)
 
 #endif // FILTER_H

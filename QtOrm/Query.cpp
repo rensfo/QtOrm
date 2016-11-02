@@ -41,7 +41,7 @@ QList<QObject *> *Query::getListObject(const QString &className, const QString p
   Mapping::ClassMapBase *classBase = ConfigurationMap::getMappedClass(className);
   if (!property.isEmpty()) {
     QString column = classBase->getProperty(property).getColumn();
-    Filter filter(this);
+    Condition filter(this);
     filter.setFieldName(column);
     filter.setOperation(Operation::Equal);
     filter.setValue(value);

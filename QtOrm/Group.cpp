@@ -16,11 +16,11 @@ GroupOperation Group::getOperation() const {
 void Group::setOperation(const GroupOperation &value) {
   operation = value;
 }
-QList<Filter *> Group::getFilters() const {
+QList<Condition *> Group::getFilters() const {
   return filters;
 }
 
-void Group::setFilters(const QList<Filter *> &value) {
+void Group::setFilters(const QList<Condition *> &value) {
   filters = value;
 }
 QList<Group *> Group::getGroups() const {
@@ -35,12 +35,12 @@ void Group::addGroup(const Group &value) {
   groups.append(new Group(value));
 }
 
-void Group::addFilter(const Filter &value) {
-  filters.append(new Filter(value));
+void Group::addFilter(const Condition &value) {
+  filters.append(new Condition(value));
 }
 
 void Group::addFilter(const QString &fieldName, const Operation &operation, const QVariant &value) {
-  Filter newFilter(this);
+  Condition newFilter(this);
   newFilter.setFieldName(fieldName);
   newFilter.setOperation(operation);
   newFilter.setValue(value);
@@ -52,7 +52,7 @@ void Group::addFilterEqual(const QString &fieldName, const QVariant &value) {
   addFilter(fieldName, Operation::Equal, value);
 }
 
-void Group::removeFilter(Filter *value) {
+void Group::removeFilter(Condition *value) {
   filters.removeAll(value);
 }
 

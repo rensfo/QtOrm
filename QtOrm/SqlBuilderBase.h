@@ -73,7 +73,7 @@ protected:
   QString getOneToOneFrom(const Mapping::ClassMapBase &classBase,
                           OneToOne *oneToOne, const QString &mainTableAlias);
   QString getWhere(const QString &tableName, const Group &conditions) const;
-  QString operationToString(const Filter &filter) const;
+  QString operationToString(const Condition &filter) const;
   QString groupOperationToString(GroupOperation groupOperation) const;
   void bindValues(QSqlQuery &query, const Group &conditions);
 

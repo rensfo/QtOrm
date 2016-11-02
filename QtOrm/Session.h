@@ -28,7 +28,7 @@ public:
   template <class T>
   T *getById(const QVariant &id);
   template <class T>
-  T *get(const Filter &filter);
+  T *get(const Condition &filter);
   template <class T>
   QList<T *> *getList();
   template <class T>
@@ -69,7 +69,7 @@ T *Session::getById(const QVariant &id) {
 }
 
 template <class T>
-T *Session::get(const Filter &filter) {
+T *Session::get(const Condition &filter) {
   Group group;
   group.addFilter(filter);
   auto list = getList<T>(group);

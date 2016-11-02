@@ -1,9 +1,9 @@
-#ifndef GROUP_H
-#define GROUP_H
+#ifndef CONDITION_H
+#define CONDITION_H
 
 #include <QObject>
 
-#include "Filter.h"
+#include "Condition.h"
 
 enum class GroupOperation { And, Or };
 
@@ -16,18 +16,17 @@ public:
   GroupOperation getOperation() const;
   void setOperation(const GroupOperation &value);
 
-  QList<Filter *> getFilters() const;
-  void setFilters(const QList<Filter *> &value);
+  QList<Condition *> getFilters() const;
+  void setFilters(const QList<Condition *> &value);
 
   QList<Group *> getGroups() const;
   void setGroups(const QList<Group *> &value);
 
   void addGroup(const Group &value);
-  void addFilter(const Filter &value);
-  void addFilter(const QString &fieldName, const Operation &operation,
-                 const QVariant &value);
+  void addFilter(const Condition &value);
+  void addFilter(const QString &fieldName, const Operation &operation, const QVariant &value);
   void addFilterEqual(const QString &fieldName, const QVariant &value);
-  void removeFilter(Filter *value);
+  void removeFilter(Condition *value);
   void clearFilters();
   void clearGroups();
   void clear();
@@ -37,8 +36,8 @@ public:
 
 private:
   GroupOperation operation = GroupOperation::And;
-  QList<Filter *> filters;
+  QList<Condition *> filters;
   QList<Group *> groups;
 };
 
-#endif // GROUP_H
+#endif // CONDITION_H
