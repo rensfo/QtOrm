@@ -32,8 +32,8 @@ QString SqlBuilderTest::buildWhereClause(const QString &className)
   classBase = ConfigurationMap::getMappedClass(className);
   GroupConditions group;
   group.setOperation(GroupOperation::And);
-  group.addFilterEqual(classBase->getIdProperty().getColumn(), 1);
-  group.addFilterEqual("code", "code1");
+  group.addConditionEqual(classBase->getIdProperty().getColumn(), 1);
+  group.addConditionEqual("code", "code1");
   return getWhere(classBase->getTable(), group);
 }
 

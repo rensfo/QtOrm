@@ -1,5 +1,5 @@
-#ifndef FILTER_H
-#define FILTER_H
+#ifndef CONDITION_H
+#define CONDITION_H
 
 #include <QObject>
 #include <QVariant>
@@ -10,11 +10,11 @@ class Condition : public QObject {
   Q_OBJECT
 public:
   explicit Condition(QObject *parent = nullptr);
-  Condition(const QString &fieldName, const Operation &operation, const QVariant &value, QObject *parent = nullptr);
+  Condition(const QString &propertyName, const Operation &operation, const QVariant &value, QObject *parent = nullptr);
   Condition(const Condition &filter);
 
-  QString getFieldName() const;
-  void setFieldName(const QString &value);
+  QString getPropertyName() const;
+  void setPropertyName(const QString &value);
 
   Operation getOperation() const;
   void setOperation(const Operation &value);
@@ -27,9 +27,9 @@ public:
   void addValue(const QVariant &value);
 
 private:
-  QString fieldName;
+  QString propertyName;
   Operation operation = Operation::None;
   QList<QVariant> values;
 };
 
-#endif // FILTER_H
+#endif // CONDITION_H

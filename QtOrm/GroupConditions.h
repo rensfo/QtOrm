@@ -16,18 +16,18 @@ public:
   GroupOperation getOperation() const;
   void setOperation(const GroupOperation &value);
 
-  QList<Condition *> getFilters() const;
-  void setFilters(const QList<Condition *> &value);
+  QList<Condition *> getConditions() const;
+  void setConditions(const QList<Condition *> &value);
 
   QList<GroupConditions *> getGroups() const;
   void setGroups(const QList<GroupConditions *> &value);
 
   void addGroup(const GroupConditions &value);
-  void addFilter(const Condition &value);
-  void addFilter(const QString &fieldName, const Operation &operation, const QVariant &value);
-  void addFilterEqual(const QString &fieldName, const QVariant &value);
+  void addCondition(const Condition &value);
+  void addCondition(const QString &property, const Operation &operation, const QVariant &value);
+  void addConditionEqual(const QString &fieldName, const QVariant &value);
   void removeFilter(Condition *value);
-  void clearFilters();
+  void clearConditions();
   void clearGroups();
   void clear();
   bool isEmpty() const;
@@ -36,7 +36,7 @@ public:
 
 private:
   GroupOperation operation = GroupOperation::And;
-  QList<Condition *> filters;
+  QList<Condition *> conditions;
   QList<GroupConditions *> groups;
 };
 

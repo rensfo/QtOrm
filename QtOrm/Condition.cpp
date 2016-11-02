@@ -7,23 +7,23 @@ Condition::Condition(QObject *parent) : QObject(parent) {
 
 Condition::Condition(const QString &fieldName, const Operation &operation, const QVariant &value, QObject *parent)
     : Condition(parent) {
-  this->fieldName = fieldName;
+  this->propertyName = fieldName;
   this->operation = operation;
   this->values.append(value);
 }
 
 Condition::Condition(const Condition &filter) : Condition(nullptr) {
-  fieldName = filter.getFieldName();
+  propertyName = filter.getPropertyName();
   operation = filter.getOperation();
   values = filter.getValues();
 }
 
-QString Condition::getFieldName() const {
-  return fieldName;
+QString Condition::getPropertyName() const {
+  return propertyName;
 }
 
-void Condition::setFieldName(const QString &value) {
-  fieldName = value;
+void Condition::setPropertyName(const QString &value) {
+  propertyName = value;
 }
 
 Operation Condition::getOperation() const {

@@ -42,10 +42,10 @@ QList<QObject *> *Query::getListObject(const QString &className, const QString p
   if (!property.isEmpty()) {
     QString column = classBase->getProperty(property).getColumn();
     Condition filter(this);
-    filter.setFieldName(column);
+    filter.setPropertyName(column);
     filter.setOperation(Operation::Equal);
     filter.setValue(value);
-    group.addFilter(filter);
+    group.addCondition(filter);
   }
 
   return getListObject(className, group);
@@ -132,7 +132,7 @@ void Query::refresh(QObject &object) {
   Mapping::ClassMapBase *classBase = ConfigurationMap::getMappedClass(object.metaObject()->className());
   QString mainTableAlias = sqlBuilder->generateTableAlias();
   GroupConditions group;
-  group.addFilterEqual(classBase->getIdProperty().getColumn(),
+  group.addConditionEqual(classBase->getIdProperty().getColumn(),
                        object.property(classBase->getIdProperty().getName().toStdString().data()));
   sqlBuilder->setClassBase(classBase);
   sqlBuilder->setTableAlias(mainTableAlias);

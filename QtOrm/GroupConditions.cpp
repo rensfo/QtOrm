@@ -6,7 +6,7 @@ GroupConditions::GroupConditions(QObject *parent) : QObject(parent) {
 GroupConditions::GroupConditions(const GroupConditions &group) : GroupConditions(nullptr) {
   setParent(group.parent());
   operation = group.getOperation();
-  filters = group.getFilters();
+  conditions = group.getConditions();
   groups = group.getGroups();
 }
 GroupOperation GroupConditions::getOperation() const {
@@ -16,12 +16,12 @@ GroupOperation GroupConditions::getOperation() const {
 void GroupConditions::setOperation(const GroupOperation &value) {
   operation = value;
 }
-QList<Condition *> GroupConditions::getFilters() const {
-  return filters;
+QList<Condition *> GroupConditions::getConditions() const {
+  return conditions;
 }
 
-void GroupConditions::setFilters(const QList<Condition *> &value) {
-  filters = value;
+void GroupConditions::setConditions(const QList<Condition *> &value) {
+  conditions = value;
 }
 QList<GroupConditions *> GroupConditions::getGroups() const {
   return groups;
@@ -35,29 +35,29 @@ void GroupConditions::addGroup(const GroupConditions &value) {
   groups.append(new GroupConditions(value));
 }
 
-void GroupConditions::addFilter(const Condition &value) {
-  filters.append(new Condition(value));
+void GroupConditions::addCondition(const Condition &value) {
+  conditions.append(new Condition(value));
 }
 
-void GroupConditions::addFilter(const QString &fieldName, const Operation &operation, const QVariant &value) {
+void GroupConditions::addCondition(const QString &property, const Operation &operation, const QVariant &value) {
   Condition newFilter(this);
-  newFilter.setFieldName(fieldName);
+  newFilter.setPropertyName(property);
   newFilter.setOperation(operation);
   newFilter.setValue(value);
 
-  addFilter(newFilter);
+  addCondition(newFilter);
 }
 
-void GroupConditions::addFilterEqual(const QString &fieldName, const QVariant &value) {
-  addFilter(fieldName, Operation::Equal, value);
+void GroupConditions::addConditionEqual(const QString &fieldName, const QVariant &value) {
+  addCondition(fieldName, Operation::Equal, value);
 }
 
 void GroupConditions::removeFilter(Condition *value) {
-  filters.removeAll(value);
+  conditions.removeAll(value);
 }
 
-void GroupConditions::clearFilters() {
-  filters.clear();
+void GroupConditions::clearConditions() {
+  conditions.clear();
 }
 
 void GroupConditions::clearGroups() {
@@ -65,17 +65,17 @@ void GroupConditions::clearGroups() {
 }
 
 void GroupConditions::clear() {
-  clearFilters();
+  clearConditions();
   clearGroups();
 }
 
 bool GroupConditions::isEmpty() const {
-  return groups.isEmpty() && filters.isEmpty();
+  return groups.isEmpty() && conditions.isEmpty();
 }
 
 GroupConditions &GroupConditions::operator=(const GroupConditions &group) {
   operation = group.getOperation();
-  filters = group.getFilters();
+  conditions = group.getConditions();
   groups = group.getGroups();
 
   return *this;

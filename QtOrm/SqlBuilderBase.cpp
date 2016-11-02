@@ -147,36 +147,36 @@ QString SqlBuilderBase::getOneToOneFrom(const Mapping::ClassMapBase &classBase,
 QString SqlBuilderBase::getWhere(const QString &tableName,
                                  const GroupConditions &conditions) const {
   QString whereClause;
-  for (Condition *f : conditions.getFilters()) {
+  for (Condition *f : conditions.getConditions()) {
     QString groupOp = whereClause.isEmpty()
                           ? ""
                           : groupOperationToString(conditions.getOperation());
 
     if (f->getOperation() == Operation::Like) {
       whereClause += QString("%1 %2 ").arg(groupOp).arg(
-          getLikeCondition(tableName, f->getFieldName()));
+          getLikeCondition(tableName, f->getPropertyName()));
     } else {
       if (f->getOperation() == Operation::NotEqual &&
           (f->getValues().first().isNull() ||
            !f->getValues().first().isValid())) {
         if (tableName.isEmpty())
           whereClause +=
-              QString("%1 %2 is not null ").arg(groupOp).arg(f->getFieldName());
+              QString("%1 %2 is not null ").arg(groupOp).arg(f->getPropertyName());
         else
           whereClause += QString("%1 %2.%3 is not null ")
                              .arg(groupOp)
                              .arg(tableName)
-                             .arg(f->getFieldName());
+                             .arg(f->getPropertyName());
       } else if (tableName.isEmpty())
         whereClause += QString("%1 %2 %4 :%2 ")
                            .arg(groupOp)
-                           .arg(f->getFieldName())
+                           .arg(f->getPropertyName())
                            .arg(operationToString(*f));
       else
         whereClause += QString("%1 %2.%3 %4 :%3 ")
                            .arg(groupOp)
                            .arg(tableName)
-                           .arg(f->getFieldName())
+                           .arg(f->getPropertyName())
                            .arg(operationToString(*f));
     }
   }
@@ -215,9 +215,9 @@ SqlBuilderBase::groupOperationToString(GroupOperation groupOperation) const {
 }
 
 void SqlBuilderBase::bindValues(QSqlQuery &query, const GroupConditions &conditions) {
-  for (Condition *f : conditions.getFilters()) {
+  for (Condition *f : conditions.getConditions()) {
     if (!f->getValues().isEmpty()) {
-      query.bindValue(getPlaceHolder(f->getFieldName()),
+      query.bindValue(getPlaceHolder(f->getPropertyName()),
                       f->getValues().first());
     }
   }

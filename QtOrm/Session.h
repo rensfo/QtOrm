@@ -71,7 +71,7 @@ T *Session::getById(const QVariant &id) {
 template <class T>
 T *Session::get(const Condition &filter) {
   GroupConditions group;
-  group.addFilter(filter);
+  group.addCondition(filter);
   auto list = getList<T>(group);
 
   if (list->count() == 0) {
