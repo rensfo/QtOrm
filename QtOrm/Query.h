@@ -23,11 +23,9 @@ class Query : public QObject {
 public:
   explicit Query(QObject *parent = nullptr);
   virtual QObject *getById(const QString &className, const QVariant &id);
-  virtual QList<QObject *> *getListObject(const QString &className,
-                                          const QString property = QString(),
+  virtual QList<QObject *> *getListObject(const QString &className, const QString property = QString(),
                                           const QVariant value = QVariant());
-  virtual QList<QObject *> *getListObject(const QString &className,
-                                          const Group &conditions);
+  virtual QList<QObject *> *getListObject(const QString &className, const Group &conditions);
   virtual void saveObject(QObject &object);
   virtual void deleteObject(QObject &object);
   virtual void refresh(QObject &object);
@@ -50,37 +48,24 @@ protected:
   void insertObject(QObject &object);
   void updateObject(QObject &object);
   virtual void executeQuery(QSqlQuery &query);
-  QList<QObject *> *getList(Mapping::ClassMapBase &classBase, QSqlQuery &query,
-                            const QString &mainTableAlias);
+  QList<QObject *> *getList(Mapping::ClassMapBase &classBase, QSqlQuery &query, const QString &mainTableAlias);
 
-  void fillObject(const Mapping::ClassMapBase &classBase,
-                  const QSqlRecord &record, const QString tableAlias,
+  void fillObject(const Mapping::ClassMapBase &classBase, const QSqlRecord &record, const QString tableAlias,
                   QObject &object);
-  void fillOneToMany(const QList<OneToMany *> &relations,
-                     const QString &idProperty, QObject &object);
-  void fillOneToOne(QList<OneToOne *> &relations, QObject &object,
-                    const QSqlRecord &record);
-  void objectSetProperty(QObject &object, const QString &propertyName,
-                         const QVariant &value);
+  void fillOneToMany(const QList<OneToMany *> &relations, const QString &idProperty, QObject &object);
+  void fillOneToOne(QList<OneToOne *> &relations, QObject &object, const QSqlRecord &record);
+  void objectSetProperty(QObject &object, const QString &propertyName, const QVariant &value);
   QObject *createNewInstance(Mapping::ClassMapBase &classBase);
-  bool reestrContainsObject(Mapping::ClassMapBase &classBase,
-                            const QSqlRecord &record,
-                            const QString &tableAlias);
-  QObject *getObjectFromReestr(Mapping::ClassMapBase &classBase,
-                               const QSqlRecord &record,
-                               const QString &tableAlias);
-  void insertObjectIntoReestr(Mapping::ClassMapBase &classBase,
-                              const QSqlRecord &record, QObject *object,
+  bool reestrContainsObject(Mapping::ClassMapBase &classBase, const QSqlRecord &record, const QString &tableAlias);
+  QObject *getObjectFromReestr(Mapping::ClassMapBase &classBase, const QSqlRecord &record, const QString &tableAlias);
+  void insertObjectIntoReestr(Mapping::ClassMapBase &classBase, const QSqlRecord &record, QObject *object,
                               const QString &tableAlias);
-  void insertObjectIntoReestr(Mapping::ClassMapBase &classBase, QObject *object,
-                              QVariant idValue);
+  void insertObjectIntoReestr(Mapping::ClassMapBase &classBase, QObject *object, QVariant idValue);
   void removeObjectFromReestr(QObject *object);
-  QPair<QString, QString> getReestrKey(Mapping::ClassMapBase &classBase,
-                                       const QSqlRecord &record,
+  QPair<QString, QString> getReestrKey(Mapping::ClassMapBase &classBase, const QSqlRecord &record,
                                        const QString &tableAlias);
 
-  void refreshObjectData(QObject &object, const QSqlRecord &record,
-                         const QString tableAlias);
+  void refreshObjectData(QObject &object, const QSqlRecord &record, const QString tableAlias);
 
   QString getSqlTextWithBindParams(QSqlQuery &query);
 
@@ -90,8 +75,7 @@ protected:
   void saveAllOneToMany(QObject &object);
   void saveOneToMany(QObject &object, OneToMany *oneToMany);
 
-  void connectToProperties(QObject &object,
-                           const Mapping::ClassMapBase &classBase);
+  void connectToProperties(QObject &object, const Mapping::ClassMapBase &classBase);
   QMetaMethod findOnObjectPropertyChangedMethod();
   QString getPropertyName(QObject *sender, int senderSignalIndex);
 

@@ -86,7 +86,6 @@ bool BuilderBaseTest::executeListCommand(const QStringList &commands) {
 
 void BuilderBaseTest::configurateSession() {
   session.setDatabase(db);
-  session.setSqlBuilderType(SqlBuilderType::Simple);
 }
 
 void BuilderBaseTest::registerClasses() {

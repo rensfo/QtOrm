@@ -25,17 +25,22 @@ public:
   explicit Session(QObject *parent = nullptr);
   void saveObject(QObject &object);
   void deleteObject(QObject &object);
-  template <class T> T *getById(const QVariant &id);
-  template <class T> T *get(const Filter &filter);
-  template <class T> QList<T *> *getList();
+  template <class T>
+  T *getById(const QVariant &id);
+  template <class T>
+  T *get(const Filter &filter);
+  template <class T>
+  QList<T *> *getList();
   template <class T>
   QList<T *> *getList(const QString &property, const QVariant &value);
-  template <class T> QList<T *> *getList(const Group &conditions);
-  template <class T> QList<QObject *> *getObjectList();
   template <class T>
-  QList<QObject *> *getObjectList(const QString &property,
-                                  const QVariant &value);
-  template <class T> QList<QObject *> *getObjectList(const Group &conditions);
+  QList<T *> *getList(const Group &conditions);
+  template <class T>
+  QList<QObject *> *getObjectList();
+  template <class T>
+  QList<QObject *> *getObjectList(const QString &property, const QVariant &value);
+  template <class T>
+  QList<QObject *> *getObjectList(const Group &conditions);
   void refresh(QObject &value);
 
   QSqlDatabase getDatabase() const;
@@ -52,7 +57,8 @@ private:
   Query query;
 };
 
-template <class T> T *Session::getById(const QVariant &id) {
+template <class T>
+T *Session::getById(const QVariant &id) {
   QString className = T::staticMetaObject.className();
   QObject *selectedObj = query.getById(className, id);
 
@@ -62,7 +68,8 @@ template <class T> T *Session::getById(const QVariant &id) {
   return qobject_cast<T *>(selectedObj);
 }
 
-template <class T> T *Session::get(const Filter &filter) {
+template <class T>
+T *Session::get(const Filter &filter) {
   Group group;
   group.addFilter(filter);
   auto list = getList<T>(group);
@@ -74,7 +81,8 @@ template <class T> T *Session::get(const Filter &filter) {
   return list->first();
 }
 
-template <class T> QList<T *> *Session::getList() {
+template <class T>
+QList<T *> *Session::getList() {
   return reinterpret_cast<QList<T *> *>(getObjectList<T>());
 }
 
@@ -83,11 +91,13 @@ QList<T *> *Session::getList(const QString &property, const QVariant &value) {
   return reinterpret_cast<QList<T *> *>(getObjectList<T>(property, value));
 }
 
-template <class T> QList<T *> *Session::getList(const Group &conditions) {
+template <class T>
+QList<T *> *Session::getList(const Group &conditions) {
   return reinterpret_cast<QList<T *> *>(getObjectList<T>(conditions));
 }
 
-template <class T> QList<QObject *> *Session::getObjectList() {
+template <class T>
+QList<QObject *> *Session::getObjectList() {
   QString className = T::staticMetaObject.className();
   QList<QObject *> *result;
   result = query.getListObject(className, QString(), QVariant());
@@ -96,8 +106,7 @@ template <class T> QList<QObject *> *Session::getObjectList() {
 }
 
 template <class T>
-QList<QObject *> *Session::getObjectList(const QString &property,
-                                         const QVariant &value) {
+QList<QObject *> *Session::getObjectList(const QString &property, const QVariant &value) {
   QString className = T::staticMetaObject.className();
   QList<QObject *> *result;
   result = query.getListObject(className, property, value);
