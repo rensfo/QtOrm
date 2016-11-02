@@ -1,11 +1,21 @@
 #ifndef RELATION_H
 #define RELATION_H
 
+#include <QObject>
 
-class Relation
-{
+namespace QtOrm {
+namespace Mapping {
+
+class Relation : public QObject {
+  Q_OBJECT
 public:
-    Relation();
-};
+  explicit Relation(QObject *parent = nullptr);
 
+  bool getSaveCascade() const;
+
+protected:
+  bool saveCascade = false;
+};
+}
+}
 #endif // RELATION_H

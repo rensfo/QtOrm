@@ -1,14 +1,17 @@
 #ifndef ONETOONE_H
 #define ONETOONE_H
 
+#include "Relation.h"
+
 #include <QString>
 
 namespace QtOrm {
 namespace Mapping {
 
-class OneToOne {
+class OneToOne : public Relation {
+  Q_OBJECT
 public:
-  OneToOne();
+  explicit OneToOne(QObject *parent = nullptr);
   QString getProperty() const;
   OneToOne &setProperty(const QString &property);
 
@@ -16,7 +19,9 @@ public:
   OneToOne &setValueProperty(const QString &column);
 
   QString getTableColumn() const;
-  void setTableColumn(const QString &value);
+  OneToOne &setTableColumn(const QString &value);
+
+  OneToOne &setSaveCascade(bool value);
 
 private:
   QString property;

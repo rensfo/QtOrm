@@ -1,19 +1,13 @@
 #include "ClassMapBase.h"
-#include <QException>
 
 namespace QtOrm {
 namespace Mapping {
 
-ClassMapBase::ClassMapBase(QObject *parent) : QObject(parent) {
-}
+ClassMapBase::ClassMapBase(QObject *parent) : QObject(parent) {}
 
-QString ClassMapBase::getTable() const {
-  return table;
-}
+QString ClassMapBase::getTable() const { return table; }
 
-void ClassMapBase::setTable(const QString &table) {
-  this->table = table;
-}
+void ClassMapBase::setTable(const QString &table) { this->table = table; }
 
 const QMap<QString, PropertyMap *> ClassMapBase::getProperties() const {
   return properties;
@@ -25,20 +19,18 @@ QString ClassMapBase::getClassName() const {
 
 PropertyMap &ClassMapBase::id(QString propertyName) {
   if (!idProperty.isEmpty()) {
-    QString errorText = QString("При связывании поля '%1' класса '%2' произошла исключительная "
-                                "ситуация - id уже зарезервировано за '%3'")
-                            .arg(propertyName)
+    QString errorText = QString::fromUtf8("Field id registred (%1.%2)")
                             .arg(getClassName())
                             .arg(idProperty);
-    throw new Exception(errorText);
+    throw Exception(ErrorGroup::MetaData, errorText);
   }
 
   idProperty = propertyName;
-  return createProperty(propertyName).setIsId(true);
+  return createProperty(propertyName).setColumn(propertyName).setIsId(true);
 }
 
 PropertyMap &ClassMapBase::map(QString propertyName) {
-  return createProperty(propertyName);
+  return createProperty(propertyName).setColumn(propertyName);
 }
 
 PropertyMap &ClassMapBase::map(QString propertyName, QString columnName) {
@@ -54,15 +46,13 @@ PropertyMap &ClassMapBase::createProperty(QString propertyName) {
   return *propertyMap;
 }
 
-QMetaObject ClassMapBase::getMetaObject() const {
-  return classMetaObject;
-}
+QMetaObject ClassMapBase::getMetaObject() const { return classMetaObject; }
 
 void ClassMapBase::setMetaObject(const QMetaObject &metaObject) {
   this->classMetaObject = metaObject;
 }
 
-PropertyMap &ClassMapBase::getIdProperty() {
+PropertyMap &ClassMapBase::getIdProperty() const {
   return *(properties.value(idProperty));
 }
 
@@ -75,7 +65,7 @@ OneToMany &ClassMapBase::oneToMany(const QString &property) {
 
   OneToMany *relation = new OneToMany();
   relation->setProperty(property);
-  oneToManyRelations.insert(property, relation);
+  oneToManyRelations.append(relation);
 
   return *relation;
 }
@@ -85,47 +75,62 @@ OneToOne &ClassMapBase::oneToOne(const QString &property) {
 
   OneToOne *relation = new OneToOne();
   relation->setProperty(property);
-  oneToOneRelations.insert(property, relation);
+  oneToOneRelations.append(relation);
 
   return *relation;
 }
 
 void ClassMapBase::checkToExistProperty(const QString &property) {
-  int propertyIndex = classMetaObject.indexOfProperty(property.toStdString().data());
+  int propertyIndex =
+      classMetaObject.indexOfProperty(property.toStdString().data());
   if (propertyIndex == -1) {
-    QString message = QString("В классе %1 свойство %2 не найдено.").arg(classMetaObject.className()).arg(property);
-    throw new Exception(message);
+    QString message = QString::fromUtf8("Property %2 in class %1 not found")
+                          .arg(classMetaObject.className())
+                          .arg(property);
+    throw Exception(ErrorGroup::MetaData, message);
   }
 }
-QString ClassMapBase::getDeleteFunction() const {
-  return deleteFunction;
-}
+QString ClassMapBase::getDeleteFunction() const { return deleteFunction; }
 
 void ClassMapBase::setDeleteFunction(const QString &value) {
   deleteFunction = value;
 }
 
-QString ClassMapBase::getInsertFunction() const {
-  return insertFunction;
+OneToOne *
+ClassMapBase::findOneToOneByPropertyName(const QString &propertyName) {
+  for (OneToOne *oneToOne : oneToOneRelations) {
+    if (oneToOne->getProperty() == propertyName)
+      return oneToOne;
+  }
+
+  return nullptr;
 }
+
+OneToMany *
+ClassMapBase::findOneToManyByPropertyName(const QString &propertyName) {
+  for (OneToMany *oneToMany : oneToManyRelations) {
+    if (oneToMany->getProperty() == propertyName)
+      return oneToMany;
+  }
+
+  return nullptr;
+}
+
+QString ClassMapBase::getInsertFunction() const { return insertFunction; }
 
 void ClassMapBase::setInsertFunction(const QString &value) {
   insertFunction = value;
 }
 
-QString ClassMapBase::getContext() const {
-  return context;
-}
+QString ClassMapBase::getContext() const { return context; }
 
-void ClassMapBase::setContext(const QString &value) {
-  context = value;
-}
+void ClassMapBase::setContext(const QString &value) { context = value; }
 
-QMap<QString, OneToMany *> ClassMapBase::getOneToManyRelations() const {
+QList<OneToMany *> ClassMapBase::getOneToManyRelations() const {
   return oneToManyRelations;
 }
 
-QMap<QString, OneToOne *> ClassMapBase::getOneToOneRelations() const {
+QList<OneToOne *> ClassMapBase::getOneToOneRelations() const {
   return oneToOneRelations;
 }
 }

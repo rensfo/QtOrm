@@ -2,10 +2,10 @@
 
 extern QMap<Operation, QString> OperationSimbols;
 
-Filter::Filter(QObject *parent) : QObject(parent) {}
+Filter::Filter(QObject *parent) : QObject(parent) {
+}
 
-Filter::Filter(const QString &fieldName, const Operation &operation,
-               const QVariant &value, QObject *parent)
+Filter::Filter(const QString &fieldName, const Operation &operation, const QVariant &value, QObject *parent)
     : Filter(parent) {
   this->fieldName = fieldName;
   this->operation = operation;
@@ -18,20 +18,38 @@ Filter::Filter(const Filter &filter) : Filter(nullptr) {
   values = filter.getValues();
 }
 
-QString Filter::getFieldName() const { return fieldName; }
+QString Filter::getFieldName() const {
+  return fieldName;
+}
 
-void Filter::setFieldName(const QString &value) { fieldName = value; }
+void Filter::setFieldName(const QString &value) {
+  fieldName = value;
+}
 
-Operation Filter::getOperation() const { return operation; }
+Operation Filter::getOperation() const {
+  return operation;
+}
 
-void Filter::setOperation(const Operation &value) { operation = value; }
+void Filter::setOperation(const Operation &value) {
+  operation = value;
+}
 
-QList<QVariant> Filter::getValues() const { return values; }
+QList<QVariant> Filter::getValues() const {
+  return values;
+}
 
-void Filter::setValues(const QList<QVariant> &value) { values = value; }
+void Filter::setValues(const QList<QVariant> &value) {
+  values = value;
+}
 
-void Filter::setValue(const QVariant &value) { values.append(value); }
+void Filter::setValue(const QVariant &value) {
+  values.append(value);
+}
 
-void Filter::clearValues() { values.clear(); }
+void Filter::clearValues() {
+  values.clear();
+}
 
-void Filter::addValue(const QVariant &value) { values.append(value); }
+void Filter::addValue(const QVariant &value) {
+  values.append(value);
+}

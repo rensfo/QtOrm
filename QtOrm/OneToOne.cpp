@@ -3,35 +3,31 @@
 namespace QtOrm {
 namespace Mapping {
 
-OneToOne::OneToOne() {
-}
+OneToOne::OneToOne(QObject *parent) : Relation(parent) {}
 
-QString OneToOne::getProperty() const {
-  return property;
-}
+QString OneToOne::getProperty() const { return property; }
 
 OneToOne &OneToOne::setProperty(const QString &property) {
   this->property = property;
   return *this;
 }
 
-QString OneToOne::getValueProperty() const {
-  return valueProperty;
-}
+QString OneToOne::getValueProperty() const { return valueProperty; }
 
 OneToOne &OneToOne::setValueProperty(const QString &valueProperty) {
   this->valueProperty = valueProperty;
   return *this;
 }
-QString OneToOne::getTableColumn() const
-{
-    return tableColumn;
+QString OneToOne::getTableColumn() const { return tableColumn; }
+
+OneToOne &OneToOne::setTableColumn(const QString &value) {
+  tableColumn = value;
+  return *this;
 }
 
-void OneToOne::setTableColumn(const QString &value)
-{
-    tableColumn = value;
+OneToOne &OneToOne::setSaveCascade(bool value) {
+  saveCascade = value;
+  return *this;
 }
-
 }
 }

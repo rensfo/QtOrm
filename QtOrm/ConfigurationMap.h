@@ -1,5 +1,5 @@
-#ifndef CONFIGURATEMAP_H
-#define CONFIGURATEMAP_H
+#ifndef CONFIGURATIONMAP_H
+#define CONFIGURATIONMAP_H
 
 #include <QMap>
 
@@ -9,23 +9,35 @@ namespace QtOrm {
 namespace Config {
 using namespace QtOrm::Mapping;
 
-class ConfigurateMap {
+class ConfigurationMap {
 public:
-  ConfigurateMap();
-  template <class T> static void classRegister();
-  static ClassMapBase *getMappedClass(QString className);
-  static bool isRegisterClass(QString className);
+  ConfigurationMap();
+  template <class T> static void addMapping();
+  template <class T> static void removeMapping();
+  static ClassMapBase *getMappedClass(const QString &className);
+  static bool isRegisterClass(const QString &className);
+
+private:
+  static QMap<QString, QtOrm::Mapping::ClassMapBase *> mappedClass;
 };
 
-extern QMap<QString, ClassMapBase *> mappedClass;
+template <class T> void ConfigurationMap::addMapping() {
 
-template <class T> void ConfigurateMap::classRegister() {
   (void)static_cast<ClassMapBase *>((T *)0);
 
   T *classMap = new T();
   mappedClass.insert(classMap->getClassName(), classMap);
 }
+
+template <class T> void ConfigurationMap::removeMapping() {
+  (void)static_cast<ClassMapBase *>((T *)0);
+
+  T classMap;
+  QString className = classMap.getClassName();
+  mappedClass.value(className)->deleteLater();
+  mappedClass.remove(className);
+}
 }
 }
 
-#endif // CONFIGURATEMAP_H
+#endif // CONFIGURATIONMAP_H

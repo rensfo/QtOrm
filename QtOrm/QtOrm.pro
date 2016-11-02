@@ -4,9 +4,7 @@
 #
 #-------------------------------------------------
 
-FRAMEWORK = $$(FRAMEWORK)
 include(QtOrmBuild.pri)
-include($$FRAMEWORK/CommonInclude.pri)
 
 QT       += sql
 
@@ -18,33 +16,41 @@ TEMPLATE = lib
 DEFINES += QTORM_LIBRARY
 CONFIG += c++11
 
-HEADERS += $$PWD/PropertyMap.h \
-    $$PWD/ClassMap.h \
-    $$PWD/ConfigurateMap.h \
-    $$PWD/ClassMapBase.h \
-    $$PWD/Exception.h \
-    $$PWD/Session.h \
-    $$PWD/Configurate.h \
-    $$PWD/QtOrm \
-    $$PWD/SimpleSqlBuilder.h \
-    $$PWD/SqlBuilderBase.h \
-    $$PWD/OneToMany.h \
-    $$PWD/OneToOne.h \
-    $$PWD/FunctionSqlBuilder.h \
-    $$PWD/PostgreFunctionSqlBuilder.h \
+HEADERS += PropertyMap.h \
+    ClassMap.h \
+    ConfigurationMap.h \
+    ClassMapBase.h \
+    Exception.h \
+    Session.h \
+    QtOrm \
+    SimpleSqlBuilder.h \
+    SqlBuilderBase.h \
+    OneToMany.h \
+    OneToOne.h \
+    FunctionSqlBuilder.h \
+    PostgreFunctionSqlBuilder.h \
+    Query.h \
+    Relation.h \
+    Filter.h \
+    Group.h \
+    Operation.h
 
-SOURCES += $$PWD/PropertyMap.cpp \
-    $$PWD/ClassMap.cpp \
-    $$PWD/ConfigurateMap.cpp \
-    $$PWD/ClassMapBase.cpp \
-    $$PWD/Exception.cpp \
-    $$PWD/Session.cpp \
-    $$PWD/SimpleSqlBuilder.cpp \
-    $$PWD/SqlBuilderBase.cpp \
-    $$PWD/OneToMany.cpp \
-    $$PWD/OneToOne.cpp \
-    $$PWD/FunctionSqlBuilder.cpp \
-    $$PWD/PostgreFunctionSqlBuilder.cpp \
+SOURCES += PropertyMap.cpp \
+    ClassMap.cpp \
+    ConfigurationMap.cpp \
+    ClassMapBase.cpp \
+    Exception.cpp \
+    Session.cpp \
+    SimpleSqlBuilder.cpp \
+    SqlBuilderBase.cpp \
+    OneToMany.cpp \
+    OneToOne.cpp \
+    FunctionSqlBuilder.cpp \
+    PostgreFunctionSqlBuilder.cpp \
+    Query.cpp \
+    Relation.cpp \
+    Filter.cpp \
+    Group.cpp
 
 OTHER_FILES += QtOrmInclude.pri
 
@@ -52,7 +58,7 @@ qtormpri.files = QtOrmInclude.pri
 qtormpri.path =  $$FRAMEWORK
 INSTALLS += qtormpri \
 
-headers.files = $$PWD/*.h
+headers.files = *.h
 headers.path = $$QTORM_INSTALL_PATH
 INSTALLS += headers
 

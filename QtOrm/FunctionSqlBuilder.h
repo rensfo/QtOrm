@@ -9,11 +9,12 @@ class FunctionSqlBuilder : public SqlBuilderBase {
   Q_OBJECT
 
 public:
-  FunctionSqlBuilder(const QSqlDatabase &database, QObject *parent = 0);
+  FunctionSqlBuilder(QObject *parent = nullptr);
 
-  void insertObject(QObject &object);
-  void updateObject(const QObject &object);
-  void deleteObject(const QObject &object);
+  virtual QSqlQuery insertQuery() override;
+  virtual QSqlQuery updateQuery() override;
+  virtual QSqlQuery deleteQuery() override;
+  virtual QSqlQuery updateOneColumnQuery(const QString &property) override;
 
 private:
   SqlBuilderBase *functionBuilder;

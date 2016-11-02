@@ -4,6 +4,6 @@ SUBDIRS += \
     QtOrmTest
 
 QtOrm.subdir        = QtOrm
-QtOrmTest.subdir    = QtOrmTest
+QtOrmTest.subdir    = QtOrmTests
 
 QtOrmTest.depends   = QtOrm

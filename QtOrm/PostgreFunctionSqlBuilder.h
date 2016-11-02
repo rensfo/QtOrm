@@ -8,17 +8,25 @@ namespace Sql {
 
 class PostgreFunctionSqlBuilder : public SqlBuilderBase {
   Q_OBJECT
-
 public:
-  PostgreFunctionSqlBuilder(const QSqlDatabase &database, QObject *parent);
+  explicit PostgreFunctionSqlBuilder(QObject *parent = nullptr);
+  virtual QSqlQuery insertQuery() override;
+  virtual QSqlQuery updateQuery() override;
+  virtual QSqlQuery deleteQuery() override;
+  virtual QSqlQuery updateOneColumnQuery(const QString &property) override;
 
+  void deleteObject(QObject &object);
+
+protected:
   void insertObject(QObject &object);
-  void updateObject(const QObject &object);
-  void deleteObject(const QObject &object);
+  void updateObject(QObject &object);
 
 private:
-  QMap<Config::PropertyMap *, QString> *getUpdateColumnText(Mapping::ClassMapBase &classBase);
-  QString getUpdateFunctionText(const Mapping::PropertyMap &property, const QString &idParamName, const QString &context);
+  QMap<Config::PropertyMap *, QString> *
+  getUpdateColumnText(Mapping::ClassMapBase &classBase);
+  QString getUpdateFunctionText(const Mapping::PropertyMap &property,
+                                const QString &idParamName,
+                                const QString &context);
   QString getInsertFunctionText(Mapping::ClassMapBase &classBase);
   QString getDeleteFunctionText(Mapping::ClassMapBase &classBase);
   QString getFunctionText(const QString &functionName, const QString &context);
@@ -26,8 +34,6 @@ private:
   QVariant insertRecord(Mapping::ClassMapBase &classBase);
   void updateRecord(const QObject &object, Mapping::ClassMapBase &classBase);
   void deleteRecord(const QObject &object, Mapping::ClassMapBase &classBase);
-
-private:
 };
 }
 }

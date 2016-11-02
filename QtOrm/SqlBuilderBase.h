@@ -1,68 +1,95 @@
-#ifndef SQLMANAGERBASE_H
-#define SQLMANAGERBASE_H
+#ifndef SQLBUILDERBASE_H
+#define SQLBUILDERBASE_H
 
+#include <QHash>
 #include <QObject>
 #include <QSqlDatabase>
 #include <QSqlQuery>
 #include <QTextStream>
 #include <QVariant>
 
-#include "ConfigurateMap.h"
+#include "ConfigurationMap.h"
 #include "Group.h"
+#include "OneToOne.h"
 
 namespace QtOrm {
 namespace Sql {
 enum class SqlBuilderType { Simple, Setter };
 
+using namespace Mapping;
+
 class SqlBuilderBase : public QObject {
   Q_OBJECT
 public:
-  explicit SqlBuilderBase(const QSqlDatabase &database, QObject *parent = 0);
-  QObject *getById(const QString &className, const QVariant &id);
-  QList<QObject *> *getListObject(const QString &className, const QString property = QString(), const QVariant value = QVariant());
-  QList<QObject *> *getListObject(const QString &className, const Group &conditions);
-  virtual void insertObject(QObject &object) = 0;
-  virtual void updateObject(const QObject &object) = 0;
-  virtual void deleteObject(const QObject &object) = 0;
+  explicit SqlBuilderBase(QObject *parent = nullptr);
+  virtual QSqlQuery selectQuery();
+  virtual QSqlQuery selectQuery(const QString &queryText);
+  virtual QSqlQuery insertQuery() = 0;
+  virtual QSqlQuery updateQuery() = 0;
+  virtual QSqlQuery deleteQuery() = 0;
+  virtual QSqlQuery updateOneColumnQuery(const QString &property) = 0;
 
-//  QTextStream *getTextStream() const;
-//  void setTextStream(QTextStream *value);
+  Group getConditions() const;
+  void setConditions(const Group &value);
+
+  QString getTableAlias() const;
+  void setTableAlias(const QString &value);
+
+  ClassMapBase *getClassBase() const;
+  void setClassBase(ClassMapBase *value);
+
+  static QString getTypeNameOfProperty(const QObject &obj, const QString &prop);
+  static QString getTypeNameOfProperty(const QMetaObject &meta,
+                                       const QString &prop);
+
+  QObject *getObject() const;
+  void setObject(QObject *value);
+
+  QSqlDatabase getDatabase() const;
+  void setDatabase(const QSqlDatabase &value);
+
+  QMap<OneToOne *, QString> getOneToOneAlias() const;
+  void setOneToOneAlias(const QMap<OneToOne *, QString> &value);
+
+  QString generateTableAlias();
 
 protected:
-  QString generateTableAlias();
+  void fillOneToOneAlias();
+  void fillOneToOneAlias(const Mapping::ClassMapBase &classBase,
+                         OneToOne *oneToOne);
+
   QString getCurrentTableAlias() const;
   void resetTableNumber();
-  QString getPlaceHolder(const QString param);
-  QString getSqlTextWithBindParams(QSqlQuery &query);
-  QVariant prepareValue(QVariant &value);
-  virtual QString getLikeCondition(const QString &tableName, const QString &fieldName) const;
 
-private:
-  QString getSelect() const;
-  QString getFrom(const QString &tableName) const;
+  QString getPlaceHolder(const QString param);
+  QVariant prepareValue(QVariant &value);
+  virtual QString getLikeCondition(const QString &tableName,
+                                   const QString &fieldName) const;
+
+  QString getSelect(const Mapping::ClassMapBase &classBase);
+  QString getOneToOneSelect(const Mapping::ClassMapBase &classBase,
+                            OneToOne *oneToOne);
+  QString getFrom(const Mapping::ClassMapBase &classBase);
+  QString getOneToOneFrom(const Mapping::ClassMapBase &classBase,
+                          OneToOne *oneToOne, const QString &mainTableAlias);
   QString getWhere(const QString &tableName, const Group &conditions) const;
-  QString operationToString(Operation operation) const;
+  QString operationToString(const Filter &filter) const;
   QString groupOperationToString(GroupOperation groupOperation) const;
   void bindValues(QSqlQuery &query, const Group &conditions);
-  QList<QObject *> *getList(Mapping::ClassMapBase &classBase, QSqlQuery &query);
-  void checkClass(const QString &className);
-  void fillObject(const Mapping::ClassMapBase &classBase, const QSqlRecord &record, QObject &object);
-  void fillOneToMany(const QMap<QString, Mapping::OneToMany *> &relations, const QString &idProperty, QObject &object);
-  void fillOneToOne(Mapping::ClassMapBase &classBase, QObject &object);
-  void objectSetProperty(QObject &object, const char *propertyName, const QVariant &value);
-
-signals:
-  void executeSql(QString sqlText);
-
-public slots:
 
 protected:
   int tableNumber;
-  const QString sqlQueryTemplate = "%1 %2 %3";
   const QString tableAliasTemplate = "tb_%1";
+  const QString sqlQueryTemplate = "%1 %2 %3";
   QSqlDatabase database;
-//  QTextStream *textStream;
+  QMap<OneToOne *, QString> oneToOneAlias;
+  ClassMapBase *classBase = nullptr;
+  Group conditions;
+  QString tableAlias;
+  QObject *object;
 };
 }
 }
-#endif // SQLMANAGERBASE_H
+
+Q_DECLARE_METATYPE(QObjectList)
+#endif // SQLBUILDERBASE_H

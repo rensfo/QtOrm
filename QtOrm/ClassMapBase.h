@@ -1,23 +1,24 @@
 #ifndef CLASSMAPBASE_H
 #define CLASSMAPBASE_H
 
-#include <QObject>
-#include <QString>
+#include <QHash>
 #include <QMap>
 #include <QMetaObject>
+#include <QObject>
+#include <QString>
 
-#include "PropertyMap.h"
 #include "Exception.h"
 #include "OneToMany.h"
 #include "OneToOne.h"
+#include "PropertyMap.h"
 
 namespace QtOrm {
 namespace Mapping {
 
 class ClassMapBase : public QObject {
-    Q_OBJECT
+  Q_OBJECT
 public:
-  explicit ClassMapBase(QObject *parent = 0);
+  explicit ClassMapBase(QObject *parent = nullptr);
 
   QString getTable() const;
   void setTable(const QString &table);
@@ -33,14 +34,14 @@ public:
   QMetaObject getMetaObject() const;
   void setMetaObject(const QMetaObject &classMetaObject);
 
-  PropertyMap &getIdProperty();
+  PropertyMap &getIdProperty() const;
   PropertyMap &getProperty(const QString &property);
 
   OneToMany &oneToMany(const QString &property);
   OneToOne &oneToOne(const QString &property);
 
-  QMap<QString, OneToMany *> getOneToManyRelations() const;
-  QMap<QString, OneToOne *> getOneToOneRelations() const;
+  QList<OneToMany *> getOneToManyRelations() const;
+  QList<OneToOne *> getOneToOneRelations() const;
 
   QString getContext() const;
   void setContext(const QString &value);
@@ -51,6 +52,14 @@ public:
   QString getDeleteFunction() const;
   void setDeleteFunction(const QString &value);
 
+  virtual QVariant getVariantByObjectList(QList<QObject *> *value) = 0;
+  virtual QList<QObject *> *getObjectListByVariant(QVariant &value) = 0;
+  virtual QVariant getVariantByObject(QObject *value) = 0;
+  virtual QObject *getObjectByVariant(QVariant &value) = 0;
+
+  OneToOne *findOneToOneByPropertyName(const QString &propertyName);
+  OneToMany *findOneToManyByPropertyName(const QString &propertyName);
+
 private:
   PropertyMap &createProperty(QString propertyName);
   void checkToExistProperty(const QString &property);
@@ -58,8 +67,8 @@ private:
 private:
   QString table;
   QMap<QString, PropertyMap *> properties;
-  QMap<QString, OneToMany *> oneToManyRelations;
-  QMap<QString, OneToOne *> oneToOneRelations;
+  QList<OneToMany *> oneToManyRelations;
+  QList<OneToOne *> oneToOneRelations;
 
   QString idProperty;
 

@@ -1,31 +1,23 @@
-#include "FunctionSqlBuilder.h"
 #include "Session.h"
+#include "FunctionSqlBuilder.h"
+#include "SqlBuilderBase.h"
+
+#include <QDebug>
 
 namespace QtOrm {
-Session::Session(const QSqlDatabase &database, Sql::SqlBuilderType sqlManagerType, QObject *parent)
-    : QObject(parent), database(database), sqlBuilder(nullptr), textStream(nullptr) {
-  //Должна быть фабрика, если потребуется
-  switch (sqlManagerType) {
-  case Sql::SqlBuilderType::Simple:
-    sqlBuilder = new Sql::SimpleSqlBuilder(database);
-    break;
-  case Sql::SqlBuilderType::Setter:
-    sqlBuilder = new Sql::FunctionSqlBuilder(database);
-    break;
-  }
-  connect(sqlBuilder, SIGNAL(executeSql(QString)), SIGNAL(executeSql(QString)));
+Session::Session(QObject *parent) : QObject(parent) {
 }
 
-void Session::insertObject(QObject &object) {
-  sqlBuilder->insertObject(object);
+void Session::saveObject(QObject &object) {
+  query.saveObject(object);
 }
 
-void Session::updateObject(const QObject &object) {
-  sqlBuilder->updateObject(object);
+void Session::deleteObject(QObject &object) {
+  query.deleteObject(object);
 }
 
-void Session::deleteObject(const QObject &object) {
-  sqlBuilder->deleteObject(object);
+void Session::refresh(QObject &value) {
+  query.refresh(value);
 }
 
 QSqlDatabase Session::getDatabase() const {
@@ -34,13 +26,37 @@ QSqlDatabase Session::getDatabase() const {
 
 void Session::setDatabase(const QSqlDatabase &database) {
   this->database = database;
+  query.setDatabase(this->database);
+}
+Sql::SqlBuilderType Session::getSqlBuilderType() const {
+  return sqlBuilderType;
 }
 
-//QTextStream *Session::getTextStream() const {
-//  return sqlBuilder->getTextStream();
-//}
+void Session::setSqlBuilderType(const Sql::SqlBuilderType &value) {
+  sqlBuilderType = value;
+  //Должна быть фабрика, если потребуется
+  switch (value) {
+  case SqlBuilderType::Simple: {
+    auto simpleSqlBuilder = new SimpleSqlBuilder();
+    simpleSqlBuilder->setDatabase(database);
+    query.setSqlBuilder(simpleSqlBuilder);
+    break;
+  }
+  case Sql::SqlBuilderType::Setter: {
+    auto setterSqlBuilder = new FunctionSqlBuilder();
+    setterSqlBuilder->setDatabase(database);
+    query.setSqlBuilder(setterSqlBuilder);
+    break;
+  }
+  }
+  connect(&query, SIGNAL(executeSql(QString)), SIGNAL(executeSql(QString)));
+}
 
-//void Session::setTextStream(QTextStream *value) {
-//  sqlBuilder->setTextStream(value);
-//}
+bool Session::getAutoUpdate() const {
+  return query.getAutoUpdate();
+}
+
+void Session::setAutoUpdate(bool value) {
+  query.setAutoUpdate(value);
+}
 }

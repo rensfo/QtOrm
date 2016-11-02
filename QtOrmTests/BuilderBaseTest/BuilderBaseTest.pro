@@ -4,8 +4,8 @@
 #
 #-------------------------------------------------
 
-ADVENT_DEV = $$(ADVENT_DEV)
-include($$ADVENT_DEV/CommonInclude.pri)
+FRAMEWORK = $$(FRAMEWORK)
+include($$FRAMEWORK/CommonInclude.pri)
 
 QT       += sql testlib
 
@@ -18,31 +18,31 @@ CONFIG += c++11
 QMAKE_CXXFLAGS += -std=c++11
 TEMPLATE = app
 
+SIMPLE_SQL_BUILDER_TEST_PATH = $$PWD/../SimpleSqlBuilderTest
+
 SOURCES += tst_BuilderBaseTest.cpp \
-    A.cpp \
-    TypeA.cpp \
-    KindA.cpp \
-    B.cpp \
-    SqlBuilderTest.cpp
-
-
-
-DEFINES += SRCDIR=\\\"$$PWD/\\\"
+    $$SIMPLE_SQL_BUILDER_TEST_PATH/A.cpp \
+    $$SIMPLE_SQL_BUILDER_TEST_PATH/TypeA.cpp \
+    $$SIMPLE_SQL_BUILDER_TEST_PATH/KindA.cpp \
+    $$SIMPLE_SQL_BUILDER_TEST_PATH/B.cpp
 
 HEADERS += \
-    A.h \
-    TypeA.h \
-    KindA.h \
-    B.h \
-    AMap.h \
-    KindAMap.h \
-    TypeAMap.h \
-    Sql.h \
-    SqlBuilderTest.h \
-    BMap.h
+    $$SIMPLE_SQL_BUILDER_TEST_PATH/A.h \
+    $$SIMPLE_SQL_BUILDER_TEST_PATH/TypeA.h \
+    $$SIMPLE_SQL_BUILDER_TEST_PATH/KindA.h \
+    $$SIMPLE_SQL_BUILDER_TEST_PATH/B.h \
+    $$SIMPLE_SQL_BUILDER_TEST_PATH/AMap.h \
+    $$SIMPLE_SQL_BUILDER_TEST_PATH/KindAMap.h \
+    $$SIMPLE_SQL_BUILDER_TEST_PATH/TypeAMap.h \
+    $$SIMPLE_SQL_BUILDER_TEST_PATH/BMap.h \
+    dml.h
 
-HEADERS += $$PWD/../../QtOrm/*.h
-SOURCES += $$PWD/../../QtOrm/*.cpp
+QTORM_PATH = $$PWD/../../QtOrm
+
+HEADERS += $$QTORM_PATH/*.h
+SOURCES += $$QTORM_PATH/*.cpp
+
+DEFINES += SRCDIR=\\\"$$PWD/\\\"
 
 INCLUDEPATH += ../../QtOrm
 DEPENDPATH += $$INCLUDEPATH

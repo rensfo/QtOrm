@@ -1,6 +1,10 @@
 #include "Relation.h"
 
-Relation::Relation()
-{
+namespace QtOrm {
+namespace Mapping {
 
+Relation::Relation(QObject *parent) : QObject(parent) {}
+
+bool Relation::getSaveCascade() const { return saveCascade; }
+}
 }

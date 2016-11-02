@@ -6,12 +6,11 @@
 
 #include "Operation.h"
 
-class Filter : public QObject
-{
+class Filter : public QObject {
   Q_OBJECT
 public:
   explicit Filter(QObject *parent = nullptr);
-  Filter(const QString &fieldName, const Operation &operation, const QVariant &value, QObject *parent = 0);
+  Filter(const QString &fieldName, const Operation &operation, const QVariant &value, QObject *parent = nullptr);
   Filter(const Filter &filter);
 
   QString getFieldName() const;

@@ -1,14 +1,17 @@
 #ifndef ONETOMANY_H
 #define ONETOMANY_H
 
+#include "Relation.h"
+
 #include <QString>
 
 namespace QtOrm {
 namespace Mapping {
 
-class OneToMany {
+class OneToMany : public Relation {
+  Q_OBJECT
 public:
-  OneToMany();
+  explicit OneToMany(QObject *parent = nullptr);
 
   QString getProperty() const;
   OneToMany &setProperty(const QString &property);
@@ -18,6 +21,8 @@ public:
 
   QString getRefProperty() const;
   OneToMany &setRefProperty(const QString &refProperty);
+
+  OneToMany &setSaveCascade(bool value);
 
 private:
   QString property;

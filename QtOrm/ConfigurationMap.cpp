@@ -1,4 +1,4 @@
-#include "ConfigurateMap.h"
+#include "ConfigurationMap.h"
 
 #include <QMap>
 #include <QString>
@@ -6,14 +6,20 @@
 namespace QtOrm {
 namespace Config {
 
-ConfigurateMap::ConfigurateMap() {
-}
+QMap<QString, QtOrm::Mapping::ClassMapBase *> ConfigurationMap::mappedClass;
 
-ClassMapBase *ConfigurateMap::getMappedClass(QString className) {
+ConfigurationMap::ConfigurationMap() {}
+
+ClassMapBase *ConfigurationMap::getMappedClass(const QString &className) {
+  if (!isRegisterClass(className))
+    throw Exception(
+        ErrorGroup::MetaData,
+        QString::fromUtf8("Class '%1' do not registed.").arg(className));
+
   return mappedClass.value(className);
 }
 
-bool ConfigurateMap::isRegisterClass(QString className) {
+bool ConfigurationMap::isRegisterClass(const QString &className) {
   return mappedClass.contains(className);
 }
 }
