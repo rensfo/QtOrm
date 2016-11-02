@@ -4,7 +4,7 @@
 #
 #-------------------------------------------------
 
-QT       += testlib
+QT       += sql testlib
 
 QT       -= gui
 
@@ -14,6 +14,28 @@ CONFIG   -= app_bundle
 
 TEMPLATE = app
 
+HEADERS += A.h \
+    TypeA.h \
+    KindA.h \
+    B.h \
+    AMap.h \
+    KindAMap.h \
+    TypeAMap.h \
+    Sql.h \
+    SqlBuilderTest.h \
+    BMap.h
 
-SOURCES += tst_SimpleSqlBuilderTestTest.cpp
+SOURCES += tst_SimpleSqlBuilderTestTest.cpp \
+    A.cpp \
+    TypeA.cpp \
+    KindA.cpp \
+    B.cpp \
+    SqlBuilderTest.cpp
+
+HEADERS += $$PWD/../../QtOrm/*.h
+SOURCES += $$PWD/../../QtOrm/*.cpp
+
+INCLUDEPATH += ../../QtOrm
+DEPENDPATH += $$INCLUDEPATH
+
 DEFINES += SRCDIR=\\\"$$PWD/\\\"
