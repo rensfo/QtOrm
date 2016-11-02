@@ -4,9 +4,6 @@
 #
 #-------------------------------------------------
 
-FRAMEWORK = $$(FRAMEWORK)
-include($$FRAMEWORK/CommonInclude.pri)
-
 QT       += sql testlib
 
 QT       -= gui

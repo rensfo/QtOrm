@@ -47,7 +47,8 @@ private:
   QString dbName = "UnitTests.sqlite";
 };
 
-BuilderBaseTest::BuilderBaseTest(QObject *parent) : QObject(parent) {}
+BuilderBaseTest::BuilderBaseTest(QObject *parent) : QObject(parent) {
+}
 
 void BuilderBaseTest::initTestCase() {
   QVERIFY(openConnection());
@@ -71,7 +72,9 @@ bool BuilderBaseTest::createTables() {
   return executeListCommand(sqlCreateSqlite);
 }
 
-bool BuilderBaseTest::fillData() { return executeListCommand(sqlFill); }
+bool BuilderBaseTest::fillData() {
+  return executeListCommand(sqlFill);
+}
 
 bool BuilderBaseTest::executeListCommand(const QStringList &commands) {
   for (QString command : commands) {
@@ -104,7 +107,9 @@ bool BuilderBaseTest::dropDatabase(const QString &dbName) {
   return QFile::remove(dbName);
 }
 
-void BuilderBaseTest::closeConnection() { db.close(); }
+void BuilderBaseTest::closeConnection() {
+  db.close();
+}
 
 void BuilderBaseTest::unregisterClass() {
   try {
@@ -119,9 +124,15 @@ void BuilderBaseTest::unregisterClass() {
 
 void BuilderBaseTest::tests() {
   try {
+    qDebug() << connect(&session, &Session::executeSql, [](QString sql){
+      qDebug() << sql;
+    });
+    registerClasses();
     A *a = session.getById<A>(1);
     KindA *kind = session.getById<KindA>(2);
     a->setKindA(kind);
+
+    auto a1 = session.getById<A>(1);
   } catch (Exception &ex) {
     qDebug() << ex.getMessage();
   } catch (...) {

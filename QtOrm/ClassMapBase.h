@@ -43,15 +43,6 @@ public:
   QList<OneToMany *> getOneToManyRelations() const;
   QList<OneToOne *> getOneToOneRelations() const;
 
-  QString getContext() const;
-  void setContext(const QString &value);
-
-  QString getInsertFunction() const;
-  void setInsertFunction(const QString &value);
-
-  QString getDeleteFunction() const;
-  void setDeleteFunction(const QString &value);
-
   virtual QVariant getVariantByObjectList(QList<QObject *> *value) = 0;
   virtual QList<QObject *> *getObjectListByVariant(QVariant &value) = 0;
   virtual QVariant getVariantByObject(QObject *value) = 0;
@@ -73,9 +64,6 @@ private:
   QString idProperty;
 
   QMetaObject classMetaObject;
-  QString context;
-  QString insertFunction;
-  QString deleteFunction;
 };
 }
 }

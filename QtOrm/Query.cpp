@@ -22,11 +22,13 @@ Query::Query(QObject *parent) : QObject(parent) {
 QObject *Query::getById(const QString &className, const QVariant &id) {
   Mapping::ClassMapBase *classBase = ConfigurationMap::getMappedClass(className);
 
+  if (reestr.contains(classBase->getTable(), id.toString()))
+    return reestr.value(classBase->getTable(), id.toString());
+
   auto list = getListObject(className, classBase->getIdProperty().getName(), id);
 
   if (list->size() == 0) {
     return nullptr;
-    //    throw Exception(ErrorGroup::Sql, QString::fromUtf8("Data not found"));
   }
 
   if (list->size() > 1)
@@ -133,7 +135,7 @@ void Query::refresh(QObject &object) {
   QString mainTableAlias = sqlBuilder->generateTableAlias();
   GroupConditions group;
   group.addConditionEqual(classBase->getIdProperty().getColumn(),
-                       object.property(classBase->getIdProperty().getName().toStdString().data()));
+                          object.property(classBase->getIdProperty().getName().toStdString().data()));
   sqlBuilder->setClassBase(classBase);
   sqlBuilder->setTableAlias(mainTableAlias);
   sqlBuilder->setConditions(group);
@@ -276,13 +278,15 @@ QObject *Query::createNewInstance(ClassMapBase &classBase) {
 }
 
 bool Query::reestrContainsObject(ClassMapBase &classBase, const QSqlRecord &record, const QString &tableAlias) {
-  auto reestrKey = getReestrKey(classBase, record, tableAlias);
-  return reestr.contains(reestrKey);
+  QString tableName = classBase.getTable();
+  QVariant idValue = getIdFromRecord(classBase, record, tableAlias);
+  return reestr.contains(tableName, idValue.toString());
 }
 
 QObject *Query::getObjectFromReestr(ClassMapBase &classBase, const QSqlRecord &record, const QString &tableAlias) {
-  auto reestrKey = getReestrKey(classBase, record, tableAlias);
-  return reestr[reestrKey];
+  QString tableName = classBase.getTable();
+  QVariant idValue = getIdFromRecord(classBase, record, tableAlias);
+  return reestr.value(tableName, idValue.toString());
 }
 
 void Query::insertObjectIntoReestr(ClassMapBase &classBase, const QSqlRecord &record, QObject *object,
@@ -300,22 +304,17 @@ void Query::insertObjectIntoReestr(ClassMapBase &classBase, const QSqlRecord &re
 
 void Query::insertObjectIntoReestr(ClassMapBase &classBase, QObject *object, QVariant idValue) {
   QString tableName = classBase.getTable();
-  QPair<QString, QString> reestrKey(tableName, idValue.toString());
 
-  reestr.insert(reestrKey, object);
+  reestr.insert(tableName, idValue.toString(), object);
 }
 
 void Query::removeObjectFromReestr(QObject *object) {
-  reestr.remove(reestr.key(object));
+  reestr.remove(object);
 }
 
-QPair<QString, QString> Query::getReestrKey(ClassMapBase &classBase, const QSqlRecord &record,
-                                            const QString &tableAlias) {
-  QString tableName = classBase.getTable();
+QVariant Query::getIdFromRecord(ClassMapBase &classBase, const QSqlRecord &record, const QString &tableAlias) {
   QString idColumn = tableAlias + "_" + classBase.getIdProperty().getColumn();
-  QString idValue = record.value(idColumn).toString();
-
-  return QPair<QString, QString>(tableName, idValue);
+  return record.value(idColumn);
 }
 
 void Query::refreshObjectData(QObject &object, const QSqlRecord &record, const QString tableAlias) {
@@ -365,6 +364,7 @@ void Query::saveOneToOne(QObject &object, OneToOne *oneToOne) {
 
   QVariant propertyVariant = object.property(oneToOne->getProperty().toStdString().data());
   QObject *propertyObject = refClassBase->getObjectByVariant(propertyVariant);
+
   if (propertyObject)
     saveObjectWoStartTransaction(*propertyObject);
 }
@@ -411,15 +411,9 @@ QMetaMethod Query::findOnObjectPropertyChangedMethod() {
   QMetaMethod result;
   for (int m = 0; m < this->metaObject()->methodCount(); m++) {
     QMetaMethod method = this->metaObject()->method(m);
-#if QT_VERSION >= 0x050000
     if (QString(method.name()) == "onObjectPropertyChanged" && method.parameterCount() == 0) {
       result = method;
     }
-#else
-    if (QString(method.signature()) == "onObjectPropertyChanged()") {
-      result = method;
-    }
-#endif
   }
 
   return result;
@@ -436,7 +430,7 @@ void Query::onObjectPropertyChanged() {
       saveOneToMany(*sender, oneToMany);
     } else {
       OneToOne *oneToOne = classBase->findOneToOneByPropertyName(senderPropertyName);
-      if (oneToOne) {
+      if (oneToOne && isIdOneToOneDefault(*sender, oneToOne)) {
         saveOneToOne(*sender, oneToOne);
       }
 
@@ -457,13 +451,7 @@ QString Query::getPropertyName(QObject *sender, int senderSignalIndex) {
   const QMetaObject *senderMeta = sender->metaObject();
   for (int i = 0; i < senderMeta->propertyCount(); i++) {
     if (senderMeta->property(i).hasNotifySignal()) {
-#if QT_VERSION >= 0x050000
-      if (senderMeta->property(i).notifySignal() == senderSignal)
-#else
-      QMetaMethod signal = senderMeta->property(i).notifySignal();
-      if (signal.signature() == senderSignal.signature())
-#endif
-      {
+      if (senderMeta->property(i).notifySignal() == senderSignal) {
         senderProperty = senderMeta->property(i);
         break;
       }
@@ -498,6 +486,16 @@ bool Query::isIdObjectDefault(QObject &object) {
   Mapping::ClassMapBase *classBase = ConfigurationMap::getMappedClass(object.metaObject()->className());
   QVariant idVal = object.property(classBase->getIdProperty().getName().toStdString().data());
   return idVal.value<ulong>() == 0;
+}
+
+bool Query::isIdOneToOneDefault(QObject &object, OneToOne *oneToOne) {
+  QString className = sqlBuilder->getTypeNameOfProperty(object, oneToOne->getProperty());
+  Mapping::ClassMapBase *refClassBase = ConfigurationMap::getMappedClass(className);
+
+  QVariant propertyVariant = object.property(oneToOne->getProperty().toStdString().data());
+  QObject *propertyObject = refClassBase->getObjectByVariant(propertyVariant);
+
+  return isIdObjectDefault(*propertyObject);
 }
 
 bool Query::getAutoUpdate() const {

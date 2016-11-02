@@ -4,16 +4,15 @@
 #include <QMap>
 #include <QMetaProperty>
 #include <QObject>
-#include <QPair>
 #include <QSignalMapper>
 #include <QSqlDatabase>
 
 #include "ClassMapBase.h"
 #include "OneToOne.h"
+#include "Reestr.h"
 #include "SqlBuilderBase.h"
 
 namespace QtOrm {
-
 namespace Sql {
 
 using namespace Mapping;
@@ -62,8 +61,7 @@ protected:
                               const QString &tableAlias);
   void insertObjectIntoReestr(Mapping::ClassMapBase &classBase, QObject *object, QVariant idValue);
   void removeObjectFromReestr(QObject *object);
-  QPair<QString, QString> getReestrKey(Mapping::ClassMapBase &classBase, const QSqlRecord &record,
-                                       const QString &tableAlias);
+  QVariant getIdFromRecord(Mapping::ClassMapBase &classBase, const QSqlRecord &record, const QString &tableAlias);
 
   void refreshObjectData(QObject &object, const QSqlRecord &record, const QString tableAlias);
 
@@ -85,12 +83,13 @@ protected:
   void commit();
   void rollback();
   bool isIdObjectDefault(QObject &object);
+  bool isIdOneToOneDefault(QObject &object, OneToOne *oneToOne);
 
 protected slots:
   void onObjectPropertyChanged();
 
 protected:
-  QMap<QPair<QString, QString>, QObject *> reestr;
+  Reestr reestr;
   QMap<OneToOne *, QString> oneToOneAlias;
   QSqlDatabase database;
   SqlBuilderBase *sqlBuilder = nullptr;
