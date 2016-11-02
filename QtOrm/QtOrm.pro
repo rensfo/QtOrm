@@ -27,8 +27,6 @@ HEADERS += PropertyMap.h \
     SqlBuilderBase.h \
     OneToMany.h \
     OneToOne.h \
-    FunctionSqlBuilder.h \
-    PostgreFunctionSqlBuilder.h \
     Query.h \
     Relation.h \
     Filter.h \
@@ -45,8 +43,6 @@ SOURCES += PropertyMap.cpp \
     SqlBuilderBase.cpp \
     OneToMany.cpp \
     OneToOne.cpp \
-    FunctionSqlBuilder.cpp \
-    PostgreFunctionSqlBuilder.cpp \
     Query.cpp \
     Relation.cpp \
     Filter.cpp \

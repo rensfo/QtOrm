@@ -41,9 +41,6 @@ public:
   QSqlDatabase getDatabase() const;
   void setDatabase(const QSqlDatabase &database);
 
-  SqlBuilderType getSqlBuilderType() const;
-  void setSqlBuilderType(const SqlBuilderType &value);
-
   bool getAutoUpdate() const;
   void setAutoUpdate(bool value);
 
@@ -53,7 +50,6 @@ signals:
 private:
   QSqlDatabase database;
   Query query;
-  SqlBuilderType sqlBuilderType;
 };
 
 template <class T> T *Session::getById(const QVariant &id) {

@@ -28,7 +28,6 @@ private:
   QString name;
   QString column;
   bool isId;
-  QString updateFunction;
 };
 }
 }
