@@ -14,7 +14,7 @@
 
 namespace QtOrm {
 namespace Sql {
-enum class SqlBuilderType { Simple, Setter };
+// enum class SqlBuilderType { Simple, Setter };
 
 using namespace Mapping;
 
@@ -38,10 +38,6 @@ public:
   ClassMapBase *getClassBase() const;
   void setClassBase(ClassMapBase *value);
 
-  static QString getTypeNameOfProperty(const QObject &obj, const QString &prop);
-  static QString getTypeNameOfProperty(const QMetaObject &meta,
-                                       const QString &prop);
-
   QObject *getObject() const;
   void setObject(QObject *value);
 
@@ -55,23 +51,18 @@ public:
 
 protected:
   void fillOneToOneAlias();
-  void fillOneToOneAlias(const Mapping::ClassMapBase &classBase,
-                         OneToOne *oneToOne);
+  void fillOneToOneAlias(const Mapping::ClassMapBase &classBase, OneToOne *oneToOne);
 
   QString getCurrentTableAlias() const;
   void resetTableNumber();
 
   QString getPlaceHolder(const QString param);
-  QVariant prepareValue(QVariant &value);
-  virtual QString getLikeCondition(const QString &tableName,
-                                   const QString &fieldName) const;
+  virtual QString getLikeCondition(const QString &tableName, const QString &fieldName) const;
 
   QString getSelect(const Mapping::ClassMapBase &classBase);
-  QString getOneToOneSelect(const Mapping::ClassMapBase &classBase,
-                            OneToOne *oneToOne);
+  QString getOneToOneSelect(const Mapping::ClassMapBase &classBase, OneToOne *oneToOne);
   QString getFrom(const Mapping::ClassMapBase &classBase);
-  QString getOneToOneFrom(const Mapping::ClassMapBase &classBase,
-                          OneToOne *oneToOne, const QString &mainTableAlias);
+  QString getOneToOneFrom(const Mapping::ClassMapBase &classBase, OneToOne *oneToOne, const QString &mainTableAlias);
   QString getWhere(const QString &tableName, const GroupConditions &conditions) const;
   QString operationToString(const Condition &filter) const;
   QString groupOperationToString(GroupOperation groupOperation) const;

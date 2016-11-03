@@ -1,5 +1,7 @@
 #include "ClassMapBase.h"
 
+#include <QMetaProperty>
+
 namespace QtOrm {
 namespace Mapping {
 
@@ -110,6 +112,20 @@ OneToMany *ClassMapBase::findOneToManyByPropertyName(const QString &propertyName
   }
 
   return nullptr;
+}
+
+QString ClassMapBase::getTypeNameOfProperty(const QObject &obj, const QString &prop) {
+  return getTypeNameOfProperty(*obj.metaObject(), prop);
+}
+
+QString ClassMapBase::getTypeNameOfProperty(const QMetaObject &meta, const QString &prop) {
+  int propertyIndex = meta.indexOfProperty(prop.toStdString().data());
+  QMetaProperty metaProperty = meta.property(propertyIndex);
+  QString refClass = metaProperty.typeName();
+  if (refClass.right(1) == "*")
+    refClass = refClass.left(refClass.size() - 1);
+
+  return refClass;
 }
 
 QList<OneToMany *> ClassMapBase::getOneToManyRelations() const {

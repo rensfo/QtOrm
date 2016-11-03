@@ -124,7 +124,7 @@ void BuilderBaseTest::unregisterClass() {
 
 void BuilderBaseTest::tests() {
   try {
-    qDebug() << connect(&session, &Session::executeSql, [](QString sql){
+    qDebug() << connect(&session, &Session::executedSql, [](QString sql){
       qDebug() << sql;
     });
     registerClasses();

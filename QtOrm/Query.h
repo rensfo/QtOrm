@@ -8,9 +8,9 @@
 #include <QSqlDatabase>
 
 #include "ClassMapBase.h"
+#include "GroupConditions.h"
 #include "OneToOne.h"
 #include "Reestr.h"
-#include "SqlBuilderBase.h"
 
 namespace QtOrm {
 namespace Sql {
@@ -21,6 +21,7 @@ class Query : public QObject {
   Q_OBJECT
 public:
   explicit Query(QObject *parent = nullptr);
+  Query(const Query &other);
   virtual QObject *getById(const QString &className, const QVariant &id);
   virtual QList<QObject *> *getListObject(const QString &className, const QString property = QString(),
                                           const QVariant value = QVariant());
@@ -28,20 +29,20 @@ public:
   virtual void saveObject(QObject &object);
   virtual void deleteObject(QObject &object);
   virtual void refresh(QObject &object);
+  virtual void saveOneField(QObject &object, const QString &propertyName);
 
   QSqlDatabase getDatabase() const;
   void setDatabase(const QSqlDatabase &value);
 
-  SqlBuilderBase *getSqlBuilder() const;
-  void setSqlBuilder(SqlBuilderBase *value);
-
   QMap<OneToOne *, QString> getOneToOneAlias() const;
 
-  bool getAutoUpdate() const;
-  void setAutoUpdate(bool value);
+  Reestr *getReestr() const;
+  void setReestr(Reestr *value);
+
+  Query &operator=(const Query &other);
 
 signals:
-  void executeSql(QString sqlText);
+  void executedSql(QString sqlText);
 
 protected:
   void insertObject(QObject &object);
@@ -73,10 +74,6 @@ protected:
   void saveAllOneToMany(QObject &object);
   void saveOneToMany(QObject &object, OneToMany *oneToMany);
 
-  void connectToProperties(QObject &object, const Mapping::ClassMapBase &classBase);
-  QMetaMethod findOnObjectPropertyChangedMethod();
-  QString getPropertyName(QObject *sender, int senderSignalIndex);
-
   void saveObjectWoStartTransaction(QObject &object);
 
   void startTransaction();
@@ -85,16 +82,10 @@ protected:
   bool isIdObjectDefault(QObject &object);
   bool isIdOneToOneDefault(QObject &object, OneToOne *oneToOne);
 
-protected slots:
-  void onObjectPropertyChanged();
-
 protected:
-  Reestr reestr;
+  Reestr *reestr = nullptr;
   QMap<OneToOne *, QString> oneToOneAlias;
   QSqlDatabase database;
-  SqlBuilderBase *sqlBuilder = nullptr;
-  bool autoUpdate = true;
-  QMetaMethod onObjectPropertyChangedMethod;
 };
 }
 }

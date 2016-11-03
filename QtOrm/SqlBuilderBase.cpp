@@ -1,6 +1,5 @@
 #include "SqlBuilderBase.h"
 
-#include <QMetaProperty>
 #include <QSqlError>
 #include <QSqlRecord>
 #include <QString>
@@ -57,13 +56,6 @@ QString SqlBuilderBase::getPlaceHolder(const QString param) {
   return QString(":%1").arg(param);
 }
 
-QVariant SqlBuilderBase::prepareValue(QVariant &value) {
-  // if (value.canConvert<NullableBase>())
-  //  return value.value<NullableBase>().getVariant();
-
-  return value;
-}
-
 QString SqlBuilderBase::getLikeCondition(const QString &tableName, const QString &fieldName) const {
   return QString("%1.%2 like '%' || :%2 || '%'").arg(tableName).arg(fieldName);
 }
@@ -90,7 +82,7 @@ QString SqlBuilderBase::getOneToOneSelect(const Mapping::ClassMapBase &classBase
   QString tableAlias = oneToOneAlias.value(oneToOne);
 
   QString property = oneToOne->getProperty();
-  QString refClass = getTypeNameOfProperty(classBase.getMetaObject(), property);
+  QString refClass = Mapping::ClassMapBase::getTypeNameOfProperty(classBase.getMetaObject(), property);
   Mapping::ClassMapBase *refClassBase = ConfigurationMap::getMappedClass(refClass);
   for (PropertyMap *propertyMap : refClassBase->getProperties())
     result += QString(", %1.%2 as %1_%2").arg(tableAlias, propertyMap->getColumn());
@@ -117,7 +109,7 @@ QString SqlBuilderBase::getOneToOneFrom(const Mapping::ClassMapBase &classBase, 
   QString tableAliasOneToOne = oneToOneAlias.value(oneToOne);
 
   QString property = oneToOne->getProperty();
-  QString refClass = getTypeNameOfProperty(classBase.getMetaObject(), property);
+  QString refClass = Mapping::ClassMapBase::getTypeNameOfProperty(classBase.getMetaObject(), property);
   Mapping::ClassMapBase *refClassBase = ConfigurationMap::getMappedClass(refClass);
 
   result += QString(" left join %1 %2 on %2.%3 = %4.%5")
@@ -212,7 +204,7 @@ void SqlBuilderBase::fillOneToOneAlias(const ClassMapBase &classBase, OneToOne *
     oneToOneAlias.insert(oneToOne, generateTableAlias());
 
   QString property = oneToOne->getProperty();
-  QString refClass = SqlBuilderBase::getTypeNameOfProperty(classBase.getMetaObject(), property);
+  QString refClass = Mapping::ClassMapBase::getTypeNameOfProperty(classBase.getMetaObject(), property);
   Mapping::ClassMapBase *refClassBase = ConfigurationMap::getMappedClass(refClass);
   for (OneToOne *oneToOne : refClassBase->getOneToOneRelations())
     fillOneToOneAlias(*refClassBase, oneToOne);
@@ -256,20 +248,6 @@ ClassMapBase *SqlBuilderBase::getClassBase() const {
 
 void SqlBuilderBase::setClassBase(ClassMapBase *value) {
   classBase = value;
-}
-
-QString SqlBuilderBase::getTypeNameOfProperty(const QObject &obj, const QString &prop) {
-  return getTypeNameOfProperty(*obj.metaObject(), prop);
-}
-
-QString SqlBuilderBase::getTypeNameOfProperty(const QMetaObject &meta, const QString &prop) {
-  int propertyIndex = meta.indexOfProperty(prop.toStdString().data());
-  QMetaProperty metaProperty = meta.property(propertyIndex);
-  QString refClass = metaProperty.typeName();
-  if (refClass.right(1) == "*")
-    refClass = refClass.left(refClass.size() - 1);
-
-  return refClass;
 }
 
 QString SqlBuilderBase::getTableAlias() const {

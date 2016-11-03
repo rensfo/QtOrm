@@ -51,6 +51,9 @@ public:
   OneToOne *findOneToOneByPropertyName(const QString &propertyName);
   OneToMany *findOneToManyByPropertyName(const QString &propertyName);
 
+  static QString getTypeNameOfProperty(const QObject &obj, const QString &prop);
+  static QString getTypeNameOfProperty(const QMetaObject &meta, const QString &prop);
+
 private:
   PropertyMap &createProperty(QString propertyName);
   void checkToExistProperty(const QString &property);

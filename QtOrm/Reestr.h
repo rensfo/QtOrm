@@ -16,6 +16,9 @@ public:
   void remove(QObject *object);
   QObject *value(const QString &table, const QString &id);
 
+signals:
+  void inserted(QObject *addedObject);
+
 protected:
   bool exists(const QString &table, const QString &id);
 

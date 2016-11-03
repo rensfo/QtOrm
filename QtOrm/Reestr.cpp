@@ -17,11 +17,15 @@ void Reestr::insert(const QString &table, const QString &id, QObject *object) {
   if (data.contains(table)) {
     if (!data.value(table).contains(id)) {
       data[table].insert(id, object);
+
+      emit inserted(object);
     }
   } else {
     QHash<QString, QObject *> ids;
     ids.insert(id, object);
     data.insert(table, ids);
+
+    emit inserted(object);
   }
 }
 

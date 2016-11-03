@@ -31,7 +31,8 @@ HEADERS += PropertyMap.h \
     Operation.h \
     Condition.h \
     GroupConditions.h \
-    Reestr.h
+    Reestr.h \
+    AutoUpdater.h
 
 SOURCES += PropertyMap.cpp \
     ClassMap.cpp \
@@ -47,7 +48,8 @@ SOURCES += PropertyMap.cpp \
     Relation.cpp \
     Condition.cpp \
     GroupConditions.cpp \
-    Reestr.cpp
+    Reestr.cpp \
+    AutoUpdater.cpp
 
 OTHER_FILES += QtOrmInclude.pri
 

@@ -9,6 +9,7 @@
 #include <QSqlRecord>
 #include <QVariant>
 
+#include "AutoUpdater.h"
 #include "ConfigurationMap.h"
 #include "Exception.h"
 #include "GroupConditions.h"
@@ -49,17 +50,23 @@ public:
   bool getAutoUpdate() const;
   void setAutoUpdate(bool value);
 
-signals:
-  void executeSql(QString sqlText);
+protected:
+  Query createQuery();
 
-private:
+signals:
+  void executedSql(QString sqlText);
+
+protected:
   QSqlDatabase database;
-  Query query;
+  Reestr *reestr = nullptr;
+  AutoUpdater updater;
+  bool autoUpdate = false;
 };
 
 template <class T>
 T *Session::getById(const QVariant &id) {
   QString className = T::staticMetaObject.className();
+  Query query = createQuery();
   QObject *selectedObj = query.getById(className, id);
 
   if (!selectedObj)
@@ -100,6 +107,7 @@ template <class T>
 QList<QObject *> *Session::getObjectList() {
   QString className = T::staticMetaObject.className();
   QList<QObject *> *result;
+  Query query = createQuery();
   result = query.getListObject(className, QString(), QVariant());
 
   return result;
@@ -109,6 +117,7 @@ template <class T>
 QList<QObject *> *Session::getObjectList(const QString &property, const QVariant &value) {
   QString className = T::staticMetaObject.className();
   QList<QObject *> *result;
+  Query query = createQuery();
   result = query.getListObject(className, property, value);
 
   return result;
@@ -118,6 +127,7 @@ template <class T>
 QList<QObject *> *Session::getObjectList(const GroupConditions &conditions) {
   QString className = T::staticMetaObject.className();
   QList<QObject *> *result;
+  Query query = createQuery();
   result = query.getListObject(className, conditions);
 
   return result;

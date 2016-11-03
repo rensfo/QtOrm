@@ -13,7 +13,8 @@ namespace QtOrm {
 namespace Sql {
 using namespace QtOrm::Config;
 
-SimpleSqlBuilder::SimpleSqlBuilder(QObject *parent) : SqlBuilderBase(parent) {}
+SimpleSqlBuilder::SimpleSqlBuilder(QObject *parent) : SqlBuilderBase(parent) {
+}
 
 /*void SimpleSqlBuilder::deleteChildren(QObject &object)
 {
@@ -93,8 +94,7 @@ QString SimpleSqlBuilder::getInsertText() {
   }
   QString fullSqlText;
 
-  if (database.driver()->hasFeature(QSqlDriver::LastInsertId) &&
-      database.driverName() != "QPSQL")
+  if (database.driver()->hasFeature(QSqlDriver::LastInsertId) && database.driverName() != "QPSQL")
     fullSqlText = QString("insert into %1(%2) values(%3)")
                       .arg(classBase->getTable())
                       .arg(columns.join(", "))
@@ -116,20 +116,13 @@ QString SimpleSqlBuilder::getUpdateText() {
     if (prop->getIsId())
       whereClause = QString("%1 = :%1").arg(prop->getColumn());
     else
-      setClause += QString("%1%2 = :%2")
-                       .arg(setClause.isEmpty() ? "" : ", ")
-                       .arg(prop->getColumn());
+      setClause += QString("%1%2 = :%2").arg(setClause.isEmpty() ? "" : ", ").arg(prop->getColumn());
   }
   for (auto prop : classBase->getOneToOneRelations()) {
-    setClause += QString("%1%2 = :%2")
-                     .arg(setClause.isEmpty() ? "" : ", ")
-                     .arg(prop->getTableColumn());
+    setClause += QString("%1%2 = :%2").arg(setClause.isEmpty() ? "" : ", ").arg(prop->getTableColumn());
   }
 
-  QString fullSqlText = QString("update %1 set %2 where %3")
-                            .arg(classBase->getTable())
-                            .arg(setClause)
-                            .arg(whereClause);
+  QString fullSqlText = QString("update %1 set %2 where %3").arg(classBase->getTable()).arg(setClause).arg(whereClause);
 
   return fullSqlText;
 }
@@ -149,10 +142,7 @@ QString SimpleSqlBuilder::getUpdateOneColumnText(const QString &propertyName) {
   PropertyMap &idProperty = classBase->getIdProperty();
   QString whereClause = QString("%1 = :%1").arg(idProperty.getColumn());
 
-  QString fullSqlText = QString("update %1 set %2 where %3")
-                            .arg(classBase->getTable())
-                            .arg(setClause)
-                            .arg(whereClause);
+  QString fullSqlText = QString("update %1 set %2 where %3").arg(classBase->getTable()).arg(setClause).arg(whereClause);
 
   return fullSqlText;
 }
@@ -160,10 +150,8 @@ QString SimpleSqlBuilder::getUpdateOneColumnText(const QString &propertyName) {
 QString SimpleSqlBuilder::getDeleteText() {
   QString idColumnName = classBase->getIdProperty().getColumn();
   QString idPlaceHolder = getPlaceHolder(idColumnName);
-  QString fullSqlText = QString("delete from %1 where %2 = %3")
-                            .arg(classBase->getTable())
-                            .arg(idColumnName)
-                            .arg(idPlaceHolder);
+  QString fullSqlText =
+      QString("delete from %1 where %2 = %3").arg(classBase->getTable()).arg(idColumnName).arg(idPlaceHolder);
 
   return fullSqlText;
 }
@@ -172,17 +160,13 @@ void SimpleSqlBuilder::bindInsert(QSqlQuery &query) {
   for (auto prop : classBase->getProperties()) {
     if (prop->getIsId())
       continue;
-    query.bindValue(getPlaceHolder(prop->getColumn()),
-                    object->property(prop->getName().toStdString().c_str()));
+    query.bindValue(getPlaceHolder(prop->getColumn()), object->property(prop->getName().toStdString().c_str()));
   }
 
   for (auto oneToOne : classBase->getOneToOneRelations()) {
-    QVariant valFromProp =
-        object->property(oneToOne->getProperty().toStdString().c_str());
-    QString refClassName =
-        getTypeNameOfProperty(*object, oneToOne->getProperty());
-    Mapping::ClassMapBase *refClassBase =
-        ConfigurationMap::getMappedClass(refClassName);
+    QVariant valFromProp = object->property(oneToOne->getProperty().toStdString().c_str());
+    QString refClassName = Mapping::ClassMapBase::getTypeNameOfProperty(*object, oneToOne->getProperty());
+    Mapping::ClassMapBase *refClassBase = ConfigurationMap::getMappedClass(refClassName);
     QObject *objFromProp = refClassBase->getObjectByVariant(valFromProp);
     QVariant val;
     if (objFromProp) {
@@ -202,8 +186,7 @@ void SimpleSqlBuilder::bindUpdate(QSqlQuery &query) {
   }
 }
 
-void SimpleSqlBuilder::bindOneColumnUpdate(QSqlQuery &query,
-                                           const QString &propertyName) {
+void SimpleSqlBuilder::bindOneColumnUpdate(QSqlQuery &query, const QString &propertyName) {
   PropertyMap &idProperty = classBase->getIdProperty();
   bind(query, idProperty);
   if (propertiesContains(propertyName)) {
@@ -215,8 +198,7 @@ void SimpleSqlBuilder::bindOneColumnUpdate(QSqlQuery &query,
 }
 
 void SimpleSqlBuilder::bindDelete(QSqlQuery &query) {
-  QVariant idPropertyValue = object->property(
-      classBase->getIdProperty().getName().toStdString().c_str());
+  QVariant idPropertyValue = object->property(classBase->getIdProperty().getName().toStdString().c_str());
   QString idColumnName = classBase->getIdProperty().getColumn();
   QString idPlaceHolder = getPlaceHolder(idColumnName);
   query.bindValue(idPlaceHolder, idPropertyValue);
@@ -224,17 +206,14 @@ void SimpleSqlBuilder::bindDelete(QSqlQuery &query) {
 
 void SimpleSqlBuilder::bind(QSqlQuery &query, const PropertyMap &property) {
   QString placeHolder = getPlaceHolder(property.getColumn());
-  QVariant propertyValue =
-      object->property(property.getName().toStdString().c_str());
-  query.bindValue(placeHolder, prepareValue(propertyValue));
+  QVariant propertyValue = object->property(property.getName().toStdString().c_str());
+  query.bindValue(placeHolder, propertyValue);
 }
 
 void SimpleSqlBuilder::bind(QSqlQuery &query, const OneToOne &oneToOne) {
-  QVariant valFromProp =
-      object->property(oneToOne.getProperty().toStdString().c_str());
-  QString refClassName = getTypeNameOfProperty(*object, oneToOne.getProperty());
-  Mapping::ClassMapBase *refClassBase =
-      ConfigurationMap::getMappedClass(refClassName);
+  QVariant valFromProp = object->property(oneToOne.getProperty().toStdString().c_str());
+  QString refClassName = Mapping::ClassMapBase::getTypeNameOfProperty(*object, oneToOne.getProperty());
+  Mapping::ClassMapBase *refClassBase = ConfigurationMap::getMappedClass(refClassName);
   QObject *objFromProp = refClassBase->getObjectByVariant(valFromProp);
   QVariant valToQuery;
   if (objFromProp) {
@@ -249,8 +228,7 @@ bool SimpleSqlBuilder::propertiesContains(const QString &propertyName) {
   return classBase->getProperties().contains(propertyName);
 }
 
-OneToOne *
-SimpleSqlBuilder::findOneToOneByPropertyName(const QString &propertyName) {
+OneToOne *SimpleSqlBuilder::findOneToOneByPropertyName(const QString &propertyName) {
   for (OneToOne *oneToOne : classBase->getOneToOneRelations()) {
     if (oneToOne->getProperty() == propertyName) {
       return oneToOne;
