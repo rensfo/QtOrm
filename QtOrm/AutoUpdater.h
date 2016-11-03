@@ -10,8 +10,7 @@
 
 namespace QtOrm {
 
-class AutoUpdater : public QObject
-{
+class AutoUpdater : public QObject {
   Q_OBJECT
 public:
   explicit AutoUpdater(QObject *parent = nullptr);
@@ -26,7 +25,7 @@ protected:
   QString getPropertyName(QObject *sender, int senderSignalIndex);
 
 signals:
-    void executedSql(QString);
+  void executedSql(QString);
 
 public slots:
   void connectToAllProperties(QObject *object);

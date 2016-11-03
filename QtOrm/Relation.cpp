@@ -3,8 +3,11 @@
 namespace QtOrm {
 namespace Mapping {
 
-Relation::Relation(QObject *parent) : QObject(parent) {}
+Relation::Relation(QObject *parent) : QObject(parent) {
+}
 
-bool Relation::getSaveCascade() const { return saveCascade; }
+bool Relation::getSaveCascade() const {
+  return saveCascade;
+}
 }
 }

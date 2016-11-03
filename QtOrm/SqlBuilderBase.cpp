@@ -12,6 +12,7 @@ namespace Sql {
 using namespace Config;
 
 SqlBuilderBase::SqlBuilderBase(QObject *parent) : QObject(parent), tableNumber(0) {
+  tableAlias = generateTableAlias();
 }
 
 QSqlQuery SqlBuilderBase::selectQuery() {

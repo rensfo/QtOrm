@@ -2,7 +2,8 @@
 
 namespace QtOrm {
 Exception::Exception(ErrorGroup code, const QString &message, QObject *parent)
-    : QObject(parent), group(code), message(message) {}
+    : QObject(parent), group(code), message(message) {
+}
 
 Exception::Exception(const Exception &exception) : QObject(nullptr) {
   setParent(exception.parent());
@@ -10,7 +11,11 @@ Exception::Exception(const Exception &exception) : QObject(nullptr) {
   message = exception.getMessage();
 }
 
-QString Exception::getMessage() const { return message; }
+QString Exception::getMessage() const {
+  return message;
+}
 
-ErrorGroup Exception::getGroup() const { return group; }
+ErrorGroup Exception::getGroup() const {
+  return group;
+}
 }

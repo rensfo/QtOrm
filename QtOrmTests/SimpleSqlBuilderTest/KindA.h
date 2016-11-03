@@ -5,8 +5,7 @@
 
 #include <QObject>
 
-class KindA : public QObject
-{
+class KindA : public QObject {
   Q_OBJECT
   Q_PROPERTY(long id READ getId WRITE setId)
   Q_PROPERTY(QString code READ getCode WRITE setCode NOTIFY codeChanged)
@@ -31,7 +30,6 @@ signals:
   void codeChanged();
   void nameChanged();
   void typeAChanged();
-
 
 protected:
   long id;

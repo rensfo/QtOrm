@@ -4,11 +4,9 @@
 #include "ClassMap.h"
 #include "KindA.h"
 
-class KindAMap : public QtOrm::Mapping::ClassMap<KindA>
-{
+class KindAMap : public QtOrm::Mapping::ClassMap<KindA> {
 public:
-  KindAMap()
-  {
+  KindAMap() {
     setTable("KindA");
     id("id");
     map("code");
@@ -16,8 +14,5 @@ public:
     oneToOne("typeA").setTableColumn("idTypeA");
   }
 };
-
-Q_DECLARE_METATYPE(KindA *)
-Q_DECLARE_METATYPE(QList<KindA *>)
 
 #endif // KINDAMAP_H

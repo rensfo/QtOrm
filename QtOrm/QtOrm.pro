@@ -35,7 +35,6 @@ HEADERS += PropertyMap.h \
     AutoUpdater.h
 
 SOURCES += PropertyMap.cpp \
-    ClassMap.cpp \
     ConfigurationMap.cpp \
     ClassMapBase.cpp \
     Exception.cpp \

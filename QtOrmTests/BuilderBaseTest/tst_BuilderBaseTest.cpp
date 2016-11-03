@@ -124,9 +124,7 @@ void BuilderBaseTest::unregisterClass() {
 
 void BuilderBaseTest::tests() {
   try {
-    qDebug() << connect(&session, &Session::executedSql, [](QString sql){
-      qDebug() << sql;
-    });
+    qDebug() << connect(&session, &Session::executedSql, [](QString sql) { qDebug() << sql; });
     registerClasses();
     A *a = session.getById<A>(1);
     KindA *kind = session.getById<KindA>(2);

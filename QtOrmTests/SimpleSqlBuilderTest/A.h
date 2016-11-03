@@ -6,8 +6,7 @@
 #include "B.h"
 #include "KindA.h"
 
-class A : public QObject
-{
+class A : public QObject {
   Q_OBJECT
   Q_PROPERTY(long id READ getId WRITE setId)
   Q_PROPERTY(QString code READ getCode WRITE setCode NOTIFY codeChanged)

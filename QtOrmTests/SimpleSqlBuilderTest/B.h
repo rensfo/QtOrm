@@ -3,8 +3,7 @@
 
 #include <QObject>
 
-class B : public QObject
-{
+class B : public QObject {
   Q_OBJECT
   Q_PROPERTY(long id READ getId WRITE setId)
   Q_PROPERTY(long idA READ getIdA WRITE setIdA NOTIFY idAChanged)

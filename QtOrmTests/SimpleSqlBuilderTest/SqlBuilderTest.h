@@ -5,8 +5,7 @@
 
 using namespace QtOrm::Sql;
 
-class SqlBuilderTest : public SimpleSqlBuilder
-{
+class SqlBuilderTest : public SimpleSqlBuilder {
 public:
   explicit SqlBuilderTest(QObject *parent = nullptr);
   QString buildSelectClause(const QString &className);

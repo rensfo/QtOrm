@@ -8,13 +8,12 @@ namespace Config {
 
 QMap<QString, QtOrm::Mapping::ClassMapBase *> ConfigurationMap::mappedClass;
 
-ConfigurationMap::ConfigurationMap() {}
+ConfigurationMap::ConfigurationMap() {
+}
 
 ClassMapBase *ConfigurationMap::getMappedClass(const QString &className) {
   if (!isRegisterClass(className))
-    throw Exception(
-        ErrorGroup::MetaData,
-        QString::fromUtf8("Class '%1' do not registed.").arg(className));
+    throw Exception(ErrorGroup::MetaData, QString::fromUtf8("Class '%1' do not registed.").arg(className));
 
   return mappedClass.value(className);
 }

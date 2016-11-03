@@ -1,23 +1,30 @@
 #include "TypeA.h"
 
-TypeA::TypeA(QObject *parent) : QObject(parent) {}
+TypeA::TypeA(QObject *parent) : QObject(parent) {
+}
 
-long TypeA::getId() const { return id; }
+long TypeA::getId() const {
+  return id;
+}
 
-void TypeA::setId(long value) { id = value; }
+void TypeA::setId(long value) {
+  id = value;
+}
 
-QString TypeA::getCode() const { return code; }
+QString TypeA::getCode() const {
+  return code;
+}
 
-void TypeA::setCode(const QString &value)
-{
+void TypeA::setCode(const QString &value) {
   code = value;
   emit codeChanged(code);
 }
 
-QString TypeA::getName() const { return name; }
+QString TypeA::getName() const {
+  return name;
+}
 
-void TypeA::setName(const QString &value)
-{
+void TypeA::setName(const QString &value) {
   name = value;
   emit nameChanged(name);
 }

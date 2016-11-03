@@ -79,23 +79,19 @@ QMetaMethod AutoUpdater::findOnObjectPropertyChangedMethod() {
   return result;
 }
 
-QSqlDatabase AutoUpdater::getDatabase() const
-{
+QSqlDatabase AutoUpdater::getDatabase() const {
   return database;
 }
 
-void AutoUpdater::setDatabase(const QSqlDatabase &value)
-{
+void AutoUpdater::setDatabase(const QSqlDatabase &value) {
   database = value;
 }
 
-Reestr *AutoUpdater::getReestr() const
-{
+Reestr *AutoUpdater::getReestr() const {
   return reestr;
 }
 
-void AutoUpdater::setReestr(Reestr *value)
-{
+void AutoUpdater::setReestr(Reestr *value) {
   reestr = value;
 }
 }

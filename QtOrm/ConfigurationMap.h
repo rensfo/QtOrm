@@ -12,8 +12,10 @@ using namespace QtOrm::Mapping;
 class ConfigurationMap {
 public:
   ConfigurationMap();
-  template <class T> static void addMapping();
-  template <class T> static void removeMapping();
+  template <class T>
+  static void addMapping();
+  template <class T>
+  static void removeMapping();
   static ClassMapBase *getMappedClass(const QString &className);
   static bool isRegisterClass(const QString &className);
 
@@ -21,7 +23,8 @@ private:
   static QMap<QString, QtOrm::Mapping::ClassMapBase *> mappedClass;
 };
 
-template <class T> void ConfigurationMap::addMapping() {
+template <class T>
+void ConfigurationMap::addMapping() {
 
   (void)static_cast<ClassMapBase *>((T *)0);
 
@@ -29,7 +32,8 @@ template <class T> void ConfigurationMap::addMapping() {
   mappedClass.insert(classMap->getClassName(), classMap);
 }
 
-template <class T> void ConfigurationMap::removeMapping() {
+template <class T>
+void ConfigurationMap::removeMapping() {
   (void)static_cast<ClassMapBase *>((T *)0);
 
   T classMap;

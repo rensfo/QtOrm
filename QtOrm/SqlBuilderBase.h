@@ -33,7 +33,6 @@ public:
   void setConditions(const GroupConditions &value);
 
   QString getTableAlias() const;
-  void setTableAlias(const QString &value);
 
   ClassMapBase *getClassBase() const;
   void setClassBase(ClassMapBase *value);
@@ -47,9 +46,11 @@ public:
   QMap<OneToOne *, QString> getOneToOneAlias() const;
   void setOneToOneAlias(const QMap<OneToOne *, QString> &value);
 
+protected:
+  void setTableAlias(const QString &value);
+
   QString generateTableAlias();
 
-protected:
   void fillOneToOneAlias();
   void fillOneToOneAlias(const Mapping::ClassMapBase &classBase, OneToOne *oneToOne);
 

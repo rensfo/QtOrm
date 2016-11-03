@@ -62,9 +62,8 @@ QList<QObject *> *Query::getListObject(const QString &className, const GroupCond
 
   SimpleSqlBuilder sqlBuilder;
   sqlBuilder.setDatabase(database);
-  QString mainTableAlias = sqlBuilder.generateTableAlias();
+  QString mainTableAlias = sqlBuilder.getTableAlias();
   sqlBuilder.setClassBase(classBase);
-  sqlBuilder.setTableAlias(mainTableAlias);
   sqlBuilder.setConditions(conditions);
   QSqlQuery query = sqlBuilder.selectQuery();
   oneToOneAlias = sqlBuilder.getOneToOneAlias();
@@ -87,9 +86,7 @@ void Query::insertObject(QObject &object) {
 
   SimpleSqlBuilder sqlBuilder;
   sqlBuilder.setDatabase(database);
-  QString mainTableAlias = sqlBuilder.generateTableAlias();
   sqlBuilder.setClassBase(classBase);
-  sqlBuilder.setTableAlias(mainTableAlias);
   sqlBuilder.setObject(&object);
   QSqlQuery query = sqlBuilder.insertQuery();
 
@@ -115,9 +112,7 @@ void Query::updateObject(QObject &object) {
 
   SimpleSqlBuilder sqlBuilder;
   sqlBuilder.setDatabase(database);
-  QString mainTableAlias = sqlBuilder.generateTableAlias();
   sqlBuilder.setClassBase(classBase);
-  sqlBuilder.setTableAlias(mainTableAlias);
   sqlBuilder.setObject(&object);
   QSqlQuery query = sqlBuilder.updateQuery();
 
@@ -131,9 +126,7 @@ void Query::deleteObject(QObject &object) {
 
   SimpleSqlBuilder sqlBuilder;
   sqlBuilder.setDatabase(database);
-  QString mainTableAlias = sqlBuilder.generateTableAlias();
   sqlBuilder.setClassBase(classBase);
-  sqlBuilder.setTableAlias(mainTableAlias);
   sqlBuilder.setObject(&object);
   QSqlQuery query = sqlBuilder.deleteQuery();
 
@@ -147,12 +140,11 @@ void Query::refresh(QObject &object) {
 
   SimpleSqlBuilder sqlBuilder;
   sqlBuilder.setDatabase(database);
-  QString mainTableAlias = sqlBuilder.generateTableAlias();
+  QString mainTableAlias = sqlBuilder.getTableAlias();
   GroupConditions group;
   group.addConditionEqual(classBase->getIdProperty().getColumn(),
                           object.property(classBase->getIdProperty().getName().toStdString().data()));
   sqlBuilder.setClassBase(classBase);
-  sqlBuilder.setTableAlias(mainTableAlias);
   sqlBuilder.setConditions(group);
   QSqlQuery query = sqlBuilder.selectQuery();
   query.next();
@@ -173,9 +165,9 @@ void Query::saveOneField(QObject &object, const QString &propertyName) {
 
     SimpleSqlBuilder sqlBuilder;
     sqlBuilder.setDatabase(database);
-    QString mainTableAlias = sqlBuilder.generateTableAlias();
+    QString mainTableAlias = sqlBuilder.getTableAlias();
     sqlBuilder.setClassBase(classBase);
-    sqlBuilder.setTableAlias(mainTableAlias);
+    //    sqlBuilder.setTableAlias(mainTableAlias);
     sqlBuilder.setObject(&object);
     QSqlQuery query = sqlBuilder.updateOneColumnQuery(propertyName);
 
@@ -189,8 +181,6 @@ QSqlDatabase Query::getDatabase() const {
 
 void Query::setDatabase(const QSqlDatabase &value) {
   database = value;
-  //  if (sqlBuilder)
-  //    sqlBuilder->setDatabase(database);
 }
 
 void Query::executeQuery(QSqlQuery &query) {

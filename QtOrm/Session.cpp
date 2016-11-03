@@ -32,7 +32,6 @@ QSqlDatabase Session::getDatabase() const {
 void Session::setDatabase(const QSqlDatabase &database) {
   this->database = database;
   updater.setDatabase(this->database);
-//  query.setDatabase(this->database);
 }
 
 bool Session::getAutoUpdate() const {
@@ -50,8 +49,7 @@ void Session::setAutoUpdate(bool value) {
   }
 }
 
-Query Session::createQuery()
-{
+Query Session::createQuery() {
   Query query;
   query.setDatabase(database);
   query.setReestr(reestr);

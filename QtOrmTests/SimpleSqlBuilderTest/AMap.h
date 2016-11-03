@@ -1,14 +1,12 @@
 #ifndef AMAP_H
 #define AMAP_H
 
-#include "ClassMap.h"
 #include "A.h"
+#include "ClassMap.h"
 
-class AMap : public QtOrm::Mapping::ClassMap<A>
-{
+class AMap : public QtOrm::Mapping::ClassMap<A> {
 public:
-  AMap()
-  {
+  AMap() {
     setTable("A");
     id("id");
     map("code");
@@ -16,8 +14,5 @@ public:
     oneToMany("child").setRefClass("B").setRefProperty("idA");
   }
 };
-
-Q_DECLARE_METATYPE(A*)
-Q_DECLARE_METATYPE(QList<A*>)
 
 #endif // AMAP_H

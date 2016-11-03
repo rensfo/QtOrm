@@ -8,7 +8,8 @@
 namespace QtOrm {
 namespace Mapping {
 
-template <class T> class ClassMap : public ClassMapBase {
+template <class T>
+class ClassMap : public ClassMapBase {
 public:
   ClassMap();
   QVariant getVariantByObjectList(QList<QObject *> *value) override;
@@ -17,7 +18,8 @@ public:
   QList<QObject *> *getObjectListByVariant(QVariant &value) override;
 };
 
-template <class T> ClassMap<T>::ClassMap() : ClassMapBase() {
+template <class T>
+ClassMap<T>::ClassMap() : ClassMapBase() {
   (void)static_cast<QObject *>((T *)0);
   qRegisterMetaType<T *>();
   setMetaObject(T::staticMetaObject);
@@ -32,11 +34,13 @@ QVariant ClassMap<T>::getVariantByObjectList(QList<QObject *> *value) {
   return QVariant::fromValue<QList<T *>>(*lst);
 }
 
-template <class T> QVariant ClassMap<T>::getVariantByObject(QObject *value) {
+template <class T>
+QVariant ClassMap<T>::getVariantByObject(QObject *value) {
   return QVariant::fromValue(qobject_cast<T *>(value));
 }
 
-template <class T> QObject *ClassMap<T>::getObjectByVariant(QVariant &value) {
+template <class T>
+QObject *ClassMap<T>::getObjectByVariant(QVariant &value) {
   return value.value<T *>();
 }
 

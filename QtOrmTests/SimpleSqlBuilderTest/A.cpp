@@ -1,48 +1,38 @@
 #include "A.h"
 
-A::A(QObject *parent) : QObject(parent)
-{
-
+A::A(QObject *parent) : QObject(parent) {
 }
 
-long A::getId() const
-{
+long A::getId() const {
   return id;
 }
 
-void A::setId(long value)
-{
+void A::setId(long value) {
   id = value;
 }
 
-QString A::getCode() const
-{
+QString A::getCode() const {
   return code;
 }
 
-void A::setCode(const QString &value)
-{
+void A::setCode(const QString &value) {
   code = value;
   emit codeChanged();
 }
 
-QList<B *> A::getChild() const
-{
+QList<B *> A::getChild() const {
   return child;
 }
 
-void A::setChild(const QList<B *> &value)
-{
+void A::setChild(const QList<B *> &value) {
   child = value;
 }
 
-KindA *A::getKindA() const
-{
+KindA *A::getKindA() const {
   return kindA;
 }
 
-void A::setKindA(KindA *value)
-{
+void A::setKindA(KindA *value) {
   kindA = value;
   emit kindAChanged();
 }
