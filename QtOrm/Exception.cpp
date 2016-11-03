@@ -1,21 +1,27 @@
 #include "Exception.h"
 
 namespace QtOrm {
-Exception::Exception(ErrorGroup code, const QString &message, QObject *parent)
-    : QObject(parent), group(code), message(message) {
+Exception::Exception(ErrorCode code, const QString &message) : QException(), code(code), message(message) {
 }
 
-Exception::Exception(const Exception &exception) : QObject(nullptr) {
-  setParent(exception.parent());
-  group = exception.getGroup();
-  message = exception.getMessage();
+Exception::Exception(const Exception &other) : Exception(other.getCode(), other.getMessage()) {
+}
+
+void Exception::raise() const
+{
+  throw *this;
+}
+
+QException *Exception::clone() const
+{
+  return new Exception(*this);
 }
 
 QString Exception::getMessage() const {
   return message;
 }
 
-ErrorGroup Exception::getGroup() const {
-  return group;
+ErrorCode Exception::getCode() const {
+  return code;
 }
 }

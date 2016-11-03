@@ -36,7 +36,7 @@ QObject *Query::getById(const QString &className, const QVariant &id) {
   }
 
   if (list->size() > 1)
-    throw Exception(ErrorGroup::Sql,
+    throw Exception(ErrorCode::FindMoreThatOneRecord,
                     QString::fromUtf8("Found %1 records has id equal %2").arg(list->size()).arg(id.toString()));
 
   return list->takeFirst();
@@ -165,9 +165,7 @@ void Query::saveOneField(QObject &object, const QString &propertyName) {
 
     SimpleSqlBuilder sqlBuilder;
     sqlBuilder.setDatabase(database);
-    QString mainTableAlias = sqlBuilder.getTableAlias();
     sqlBuilder.setClassBase(classBase);
-    //    sqlBuilder.setTableAlias(mainTableAlias);
     sqlBuilder.setObject(&object);
     QSqlQuery query = sqlBuilder.updateOneColumnQuery(propertyName);
 
@@ -189,7 +187,7 @@ void Query::executeQuery(QSqlQuery &query) {
     emit executedSql(executedQuery);
     QString errorMsg = QString("Query: %1 \nError: %2").arg(executedQuery).arg(query.lastError().text());
     qDebug() << errorMsg;
-    throw QtOrm::Exception(ErrorGroup::Sql, errorMsg);
+    throw QtOrm::Exception(ErrorCode::Sql, errorMsg);
   }
   emit executedSql(executedQuery);
 }
@@ -286,14 +284,14 @@ void Query::objectSetProperty(QObject &object, const QString &propertyName, cons
   if (!object.setProperty(propertyName.toStdString().data(), value)) {
     QString textError =
         QString::fromUtf8("Unable to place value in %1.%2").arg(object.metaObject()->className()).arg(propertyName);
-    throw Exception(ErrorGroup::MetaData, textError);
+    throw Exception(ErrorCode::UnableToSetValue, textError);
   }
 }
 
 QObject *Query::createNewInstance(ClassMapBase &classBase) {
   QObject *newObject = classBase.getMetaObject().newInstance();
   if (!newObject) {
-    throw Exception(ErrorGroup::MetaData, "Object instance is not created(Missing Q_INVOKABLE in constructor?)");
+    throw Exception(ErrorCode::InstanceNotCreated, "Object instance is not created(Missing Q_INVOKABLE in constructor?)");
   }
   return newObject;
 }

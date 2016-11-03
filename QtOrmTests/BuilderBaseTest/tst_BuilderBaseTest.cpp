@@ -116,7 +116,7 @@ void BuilderBaseTest::unregisterClass() {
     auto res = session.getList<A>();
     Q_UNUSED(res)
   } catch (Exception ex) {
-    QVERIFY(ex.getGroup() == ErrorGroup::MetaData);
+    QVERIFY(ex.getCode() == ErrorCode::NotRegistredClass);
     return;
   }
   QVERIFY(false);

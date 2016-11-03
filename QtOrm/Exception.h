@@ -1,24 +1,35 @@
 #ifndef EXEPTION_H
 #define EXEPTION_H
 
-#include <QObject>
+#include <QException>
 #include <QString>
 
 namespace QtOrm {
 
-enum class ErrorGroup { Sql, MetaData };
+enum class ErrorCode {
+  FindMoreThatOneRecord,
+  Sql,
+  NotRegistredClass,
+  IdPropertyAlreadyRegistred,
+  PropertyNotFound,
+  UnableToSetValue,
+  InstanceNotCreated
+};
 
-class Exception : public QObject {
-  Q_OBJECT
+class Exception : public QException {
 public:
-  explicit Exception(ErrorGroup group, const QString &message, QObject *parent = nullptr);
+  explicit Exception(ErrorCode code, const QString &message);
   Exception(const Exception &exception);
+
+  virtual void raise() const override;
+  virtual QException *clone() const override;
+
   QString getMessage() const;
 
-  ErrorGroup getGroup() const;
+  ErrorCode getCode() const;
 
-private:
-  ErrorGroup group;
+protected:
+  ErrorCode code;
   QString message;
 };
 }
