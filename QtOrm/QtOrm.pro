@@ -53,12 +53,12 @@ SOURCES += PropertyMap.cpp \
 OTHER_FILES += QtOrmInclude.pri
 
 qtormpri.files = QtOrmInclude.pri
-qtormpri.path =  $$FRAMEWORK
+qtormpri.path =  $$INSTALL_PATH
 INSTALLS += qtormpri \
 
 headers.files = *.h
 headers.path = $$QTORM_INSTALL_PATH
 INSTALLS += headers
 
-target.path = $$FRAMEWORK/libs
+target.path = $$INSTALL_PATH/lib
 INSTALLS += target

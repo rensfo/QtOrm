@@ -121,8 +121,7 @@ void BuilderBaseTest::unregisteredClass() {
   QVERIFY(false);
 }
 
-void BuilderBaseTest::objectFromReestr()
-{
+void BuilderBaseTest::objectFromReestr() {
   registerClasses();
   A *a = session.getById<A>(1);
   A *aFromReestr = session.getById<A>(1);
