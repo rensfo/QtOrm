@@ -25,9 +25,8 @@ public:
 private Q_SLOTS:
   void initTestCase();
   void cleanupTestCase();
-  void unregisterClass();
-
-  void tests();
+  void unregisteredClass();
+  void objectFromReestr();
 
 private:
   bool openConnection();
@@ -111,7 +110,7 @@ void BuilderBaseTest::closeConnection() {
   db.close();
 }
 
-void BuilderBaseTest::unregisterClass() {
+void BuilderBaseTest::unregisteredClass() {
   try {
     auto res = session.getList<A>();
     Q_UNUSED(res)
@@ -122,20 +121,13 @@ void BuilderBaseTest::unregisterClass() {
   QVERIFY(false);
 }
 
-void BuilderBaseTest::tests() {
-  try {
-    qDebug() << connect(&session, &Session::executedSql, [](QString sql) { qDebug() << sql; });
-    registerClasses();
-    A *a = session.getById<A>(1);
-    KindA *kind = session.getById<KindA>(2);
-    a->setKindA(kind);
+void BuilderBaseTest::objectFromReestr()
+{
+  registerClasses();
+  A *a = session.getById<A>(1);
+  A *aFromReestr = session.getById<A>(1);
 
-    auto a1 = session.getById<A>(1);
-  } catch (Exception &ex) {
-    qDebug() << ex.getMessage();
-  } catch (...) {
-    qDebug() << "other";
-  }
+  QVERIFY(a == aFromReestr);
 }
 
 QTEST_MAIN(BuilderBaseTest)
