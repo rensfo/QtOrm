@@ -1,5 +1,5 @@
 TEMPLATE = subdirs
 
 SUBDIRS += \
-    BuilderBaseTest \
-    SimpleSqlBuilderTest
+    QueryModelsTest \
+    QueryResultTest

@@ -32,10 +32,10 @@ signals:
   void typeAChanged();
 
 protected:
-  long id;
+  long id = 0;
   QString code;
   QString name;
-  TypeA *typeA;
+  TypeA *typeA = nullptr;
 };
 
 #endif // KINDA_H

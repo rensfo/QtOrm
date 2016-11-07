@@ -9,7 +9,7 @@ class B : public QObject {
   Q_PROPERTY(long idA READ getIdA WRITE setIdA NOTIFY idAChanged)
   Q_PROPERTY(QString code READ getCode WRITE setCode NOTIFY codeChanged)
 public:
-  Q_INVOKABLE explicit B(QObject *parent = 0);
+  Q_INVOKABLE explicit B(QObject *parent = nullptr);
 
   long getId() const;
   void setId(long value);
@@ -24,8 +24,8 @@ signals:
   void codeChanged();
 
 protected:
-  long id;
-  long idA;
+  long id = 0;
+  long idA = 0;
   QString code;
 };
 

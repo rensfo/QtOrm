@@ -1,6 +1,6 @@
 #-------------------------------------------------
 #
-# Project created by QtCreator 2016-10-31T11:11:27
+# Project created by QtCreator 2016-11-07T19:13:58
 #
 #-------------------------------------------------
 
@@ -8,29 +8,37 @@ QT       += sql testlib
 
 QT       -= gui
 
-TARGET = tst_SimpleSqlBuilderTestTest
+TARGET = tst_QueryModelsTestTest
 CONFIG   += console
 CONFIG   -= app_bundle
 
 TEMPLATE = app
 
 HEADERS += A.h \
-    TypeA.h \
-    KindA.h \
     B.h \
+    C.h \
+    D.h \
+    E.h \
+    KindA.h \
+    TypeA.h \
     AMap.h \
+    BMap.h \
+    CMap.h \
+    DMap.h \
+    EMap.h \
     KindAMap.h \
     TypeAMap.h \
-    Sql.h \
-    SqlBuilderTest.h \
-    BMap.h
+    dml.h \
+    Sql.h
 
-SOURCES += tst_SimpleSqlBuilderTestTest.cpp \
+SOURCES += tst_QueryModelsTestTest.cpp \
     A.cpp \
-    TypeA.cpp \
-    KindA.cpp \
     B.cpp \
-    SqlBuilderTest.cpp
+    C.cpp \
+    D.cpp \
+    E.cpp \
+    KindA.cpp \
+    TypeA.cpp
 
 HEADERS += $$PWD/../../QtOrm/*.h
 SOURCES += $$PWD/../../QtOrm/*.cpp

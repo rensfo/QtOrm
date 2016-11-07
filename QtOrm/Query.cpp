@@ -62,15 +62,13 @@ QList<QObject *> *Query::getListObject(const QString &className, const GroupCond
 
   SimpleSqlBuilder sqlBuilder;
   sqlBuilder.setDatabase(database);
-  QString mainTableAlias = sqlBuilder.getTableAlias();
   sqlBuilder.setClassBase(classBase);
   sqlBuilder.setConditions(conditions);
   QSqlQuery query = sqlBuilder.selectQuery();
-  oneToOneAlias = sqlBuilder.getOneToOneAlias();
 
   executeQuery(query);
 
-  return getList(*classBase, query, mainTableAlias);
+  return getList(query, *sqlBuilder.getQueryModel());
 }
 
 void Query::saveObject(QObject &object) {
@@ -138,18 +136,21 @@ void Query::deleteObject(QObject &object) {
 void Query::refresh(QObject &object) {
   Mapping::ClassMapBase *classBase = ConfigurationMap::getMappedClass(object.metaObject()->className());
 
+  GroupConditions group;
+  QString idPropertyName = classBase->getIdProperty().getName();
+  QVariant idPropertyValue = object.property(idPropertyName.toStdString().data());
+  group.addConditionEqual(idPropertyName, idPropertyValue);
+
   SimpleSqlBuilder sqlBuilder;
   sqlBuilder.setDatabase(database);
-  QString mainTableAlias = sqlBuilder.getTableAlias();
-  GroupConditions group;
-  group.addConditionEqual(classBase->getIdProperty().getColumn(),
-                          object.property(classBase->getIdProperty().getName().toStdString().data()));
   sqlBuilder.setClassBase(classBase);
   sqlBuilder.setConditions(group);
+
   QSqlQuery query = sqlBuilder.selectQuery();
   query.next();
   QSqlRecord record = query.record();
-  refreshObjectData(object, record, mainTableAlias);
+
+  refreshObjectData(object, sqlBuilder.getQueryModel()->getMainTableModel(), record);
 }
 
 void Query::saveOneField(QObject &object, const QString &propertyName) {
@@ -192,22 +193,23 @@ void Query::executeQuery(QSqlQuery &query) {
   emit executedSql(executedQuery);
 }
 
-QList<QObject *> *Query::getList(ClassMapBase &classBase, QSqlQuery &query, const QString &mainTableAlias) {
+QList<QObject *> *Query::getList(QSqlQuery &query, const QueryModel &queryModel) {
   QList<QObject *> *objects = new QList<QObject *>();
+  ClassMapBase *classBase = queryModel.getClassBase();
+  QString mainTableAlias = queryModel.getMainTableModel()->getName();
   while (query.next()) {
     QObject *obj = nullptr;
-    if (reestrContainsObject(classBase, query.record(), mainTableAlias)) {
-      obj = getObjectFromReestr(classBase, query.record(), mainTableAlias);
+    if (reestrContainsObject(*classBase, query.record(), mainTableAlias)) {
+      obj = getObjectFromReestr(*classBase, query.record(), mainTableAlias);
     } else {
-      obj = createNewInstance(classBase);
-      insertObjectIntoReestr(classBase, query.record(), obj, mainTableAlias);
+      obj = createNewInstance(*classBase);
+      insertObjectIntoReestr(*classBase, query.record(), obj, mainTableAlias);
 
-      fillObject(classBase, query.record(), mainTableAlias, *obj);
+      fillObject(*obj, queryModel.getMainTableModel(), query.record());
 
-      auto oneToOneRelations = classBase.getOneToOneRelations();
-      fillOneToOne(oneToOneRelations, *obj, query.record());
+      fillOneToOne(*obj, queryModel.getMainTableModel(), query.record());
 
-      fillOneToMany(classBase.getOneToManyRelations(), classBase.getIdProperty().getName(), *obj);
+      fillOneToMany(classBase->getOneToManyRelations(), classBase->getIdProperty().getName(), *obj);
     }
     objects->append(obj);
   }
@@ -215,15 +217,12 @@ QList<QObject *> *Query::getList(ClassMapBase &classBase, QSqlQuery &query, cons
   return objects;
 }
 
-void Query::fillObject(const ClassMapBase &classBase, const QSqlRecord &record, const QString tableAlias,
-                       QObject &object) {
-  auto properties = classBase.getProperties();
+void Query::fillObject(QObject &object, QueryTableModel *queryTableModel, const QSqlRecord &record) {
+  ClassMapBase *classBase = ConfigurationMap::getMappedClass(object.metaObject()->className());
+  auto properties = classBase->getProperties();
   for (auto prop : properties) {
-    QString queryColumn;
-    if (tableAlias.isEmpty())
-      queryColumn = prop->getColumn();
-    else
-      queryColumn = QString("%1_%2").arg(tableAlias).arg(prop->getColumn());
+    QString queryColumn = QString("%1_%2").arg(queryTableModel->getAlias()).arg(prop->getColumn());
+    ;
     QVariant value = record.value(queryColumn);
     if (value.isValid() && !value.isNull())
       objectSetProperty(object, prop->getName(), value);
@@ -245,38 +244,29 @@ void Query::fillOneToMany(const QList<OneToMany *> &relations, const QString &id
   }
 }
 
-void Query::fillOneToOne(QList<OneToOne *> &relations, QObject &object, const QSqlRecord &record) {
-  for (OneToOne *oneToOne : relations) {
+void Query::fillOneToOne(QObject &object, QueryTableModel *queryTableModel, const QSqlRecord &record) {
+  ClassMapBase *classBase = ConfigurationMap::getMappedClass(object.metaObject()->className());
+  for (OneToOne *oneToOne : classBase->getOneToOneRelations()) {
     QString property = oneToOne->getProperty();
     QString refClass = Mapping::ClassMapBase::getTypeNameOfProperty(object, property);
 
     Mapping::ClassMapBase *refClassBase = ConfigurationMap::getMappedClass(refClass);
-    QString queryColumn;
-    if (oneToOneAlias.contains(oneToOne)) {
-      queryColumn = QString("%1_%2").arg(oneToOneAlias.value(oneToOne)).arg(refClassBase->getIdProperty().getColumn());
+    QObject *newObject = nullptr;
+
+    QueryJoin *join = queryTableModel->findJoinByColumnName(oneToOne->getTableColumn());
+    QString tableAlias = join->getQueryTableModel()->getAlias();
+    if (reestrContainsObject(*refClassBase, record, tableAlias)) {
+      newObject = getObjectFromReestr(*refClassBase, record, tableAlias);
     } else {
-      queryColumn = refClassBase->getIdProperty().getColumn();
+      newObject = createNewInstance(*refClassBase);
+      insertObjectIntoReestr(*refClassBase, record, newObject, tableAlias);
+
+      fillObject(*newObject, join->getQueryTableModel(), record);
+      fillOneToOne(*newObject, join->getQueryTableModel(), record);
+      fillOneToMany(refClassBase->getOneToManyRelations(), refClassBase->getIdProperty().getName(), *newObject);
     }
-
-    if (!record.field(queryColumn).isNull()) {
-      QObject *newObject = nullptr;
-      QString tableAlias = oneToOneAlias.value(oneToOne);
-
-      if (reestrContainsObject(*refClassBase, record, tableAlias)) {
-        newObject = getObjectFromReestr(*refClassBase, record, oneToOneAlias.value(oneToOne));
-      } else {
-        newObject = createNewInstance(*refClassBase);
-        insertObjectIntoReestr(*refClassBase, record, newObject, tableAlias);
-
-        fillObject(*refClassBase, record, tableAlias, *newObject);
-
-        auto oneToOneRelations = refClassBase->getOneToOneRelations();
-        fillOneToOne(oneToOneRelations, *newObject, record);
-        fillOneToMany(refClassBase->getOneToManyRelations(), refClassBase->getIdProperty().getName(), *newObject);
-      }
-      QVariant var = refClassBase->getVariantByObject(newObject);
-      objectSetProperty(object, property, var);
-    }
+    QVariant var = refClassBase->getVariantByObject(newObject);
+    objectSetProperty(object, property, var);
   }
 }
 
@@ -291,7 +281,8 @@ void Query::objectSetProperty(QObject &object, const QString &propertyName, cons
 QObject *Query::createNewInstance(ClassMapBase &classBase) {
   QObject *newObject = classBase.getMetaObject().newInstance();
   if (!newObject) {
-    throw Exception(ErrorCode::InstanceNotCreated, "Object instance is not created(Missing Q_INVOKABLE in constructor?)");
+    throw Exception(ErrorCode::InstanceNotCreated,
+                    "Object instance is not created(Missing Q_INVOKABLE in constructor?)");
   }
   return newObject;
 }
@@ -337,16 +328,17 @@ QVariant Query::getIdFromRecord(ClassMapBase &classBase, const QSqlRecord &recor
   return record.value(idColumn);
 }
 
-void Query::refreshObjectData(QObject &object, const QSqlRecord &record, const QString tableAlias) {
+void Query::refreshObjectData(QObject &object, QueryTableModel *queryTableModel, const QSqlRecord &record) {
   Mapping::ClassMapBase *classBase = ConfigurationMap::getMappedClass(object.metaObject()->className());
-  fillObject(*classBase, record, tableAlias, object);
+  fillObject(object, queryTableModel, record);
 
   for (OneToOne *oneToOne : classBase->getOneToOneRelations()) {
-    Mapping::ClassMapBase *refClassBase =
-        ConfigurationMap::getMappedClass(Mapping::ClassMapBase::getTypeNameOfProperty(object, oneToOne->getProperty()));
+    QString oneToOnePropertyTypeName = Mapping::ClassMapBase::getTypeNameOfProperty(object, oneToOne->getProperty());
+    Mapping::ClassMapBase *refClassBase = ConfigurationMap::getMappedClass(oneToOnePropertyTypeName);
     QVariant propertyValue = object.property(oneToOne->getProperty().toStdString().data());
     QObject *oneToOneObj = refClassBase->getObjectByVariant(propertyValue);
-    refreshObjectData(*oneToOneObj, record, oneToOneAlias[oneToOne]);
+    QueryJoin *join = queryTableModel->findJoinByColumnName(oneToOne->getTableColumn());
+    refreshObjectData(*oneToOneObj, join->getQueryTableModel(), record);
   }
 
   for (OneToMany *oneToMany : classBase->getOneToManyRelations()) {
@@ -461,10 +453,6 @@ bool Query::isIdOneToOneDefault(QObject &object, OneToOne *oneToOne) {
   QObject *propertyObject = refClassBase->getObjectByVariant(propertyVariant);
 
   return isIdObjectDefault(*propertyObject);
-}
-
-QMap<OneToOne *, QString> Query::getOneToOneAlias() const {
-  return oneToOneAlias;
 }
 }
 }

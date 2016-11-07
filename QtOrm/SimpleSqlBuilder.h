@@ -13,7 +13,6 @@ public:
   virtual QSqlQuery updateQuery() override;
   virtual QSqlQuery updateOneColumnQuery(const QString &property) override;
   virtual QSqlQuery deleteQuery() override;
-  //  void deleteChildren(QObject &object);
 
 protected:
   virtual QString getInsertText();

@@ -12,11 +12,11 @@ void A::setId(long value) {
 }
 
 QString A::getCode() const {
-  return code;
+  return code_1;
 }
 
 void A::setCode(const QString &value) {
-  code = value;
+  code_1 = value;
   emit codeChanged();
 }
 
@@ -29,7 +29,7 @@ void A::setChild(const QList<B *> &value) {
 }
 
 KindA *A::getKindA() const {
-  return kindA;
+    return kindA;
 }
 
 void A::setKindA(KindA *value) {

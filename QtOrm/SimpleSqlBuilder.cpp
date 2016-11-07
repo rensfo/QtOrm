@@ -7,6 +7,7 @@
 #include <QStringList>
 
 #include "ConfigurationMap.h"
+#include "InsertQueryModel.h"
 #include "OneToMany.h"
 
 namespace QtOrm {
@@ -16,34 +17,12 @@ using namespace QtOrm::Config;
 SimpleSqlBuilder::SimpleSqlBuilder(QObject *parent) : SqlBuilderBase(parent) {
 }
 
-/*void SimpleSqlBuilder::deleteChildren(QObject &object)
-{
-  for (Mapping::OneToMany *oneToMany : classBase->getOneToManyRelations())
-  {
-    Mapping::ClassMapBase *refClassBase =
-ConfigurateMap::getMappedClass(oneToMany->getRefClass());
-    QVariant val =
-object.property(oneToMany->getProperty().toStdString().data());
-    QList<QObject *> *lst = refClassBase->getObjectListByVariant(val);
-    for (QObject *obj : *lst)
-      deleteObject(*obj);
-  }
-
-  for (Mapping::OneToOne *oneToOne : classBase->getOneToOneRelations())
-  {
-    QString className = getTypeNameOfProperty(object, oneToOne->getProperty());
-    Mapping::ClassMapBase *refClassBase =
-ConfigurateMap::getMappedClass(className);
-
-    QVariant val =
-object.property(oneToOne->getProperty().toStdString().data());
-    QObject *obj = refClassBase->getObjectByVariant(val);
-    deleteObject(*obj);
-  }
-}*/
-
 QSqlQuery SimpleSqlBuilder::insertQuery() {
-  QString fullSqlText = getInsertText();
+  InsertQueryModel *insertQueryModel = new InsertQueryModel();
+  insertQueryModel->setClassBase(classBase);
+
+  queryModel = insertQueryModel;
+  QString fullSqlText = insertQueryModel->getSqlText();
 
   QSqlQuery query(database);
   query.prepare(fullSqlText);

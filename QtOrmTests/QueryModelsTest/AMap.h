@@ -9,8 +9,10 @@ public:
   AMap() {
     setTable("A");
     id("id");
-    map("code");
+    map("code_1").setColumn("code");
+
     oneToOne("kindA").setTableColumn("idKindA");
+
     oneToMany("child").setRefClass("B").setRefProperty("idA");
   }
 };

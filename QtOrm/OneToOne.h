@@ -12,11 +12,9 @@ class OneToOne : public Relation {
   Q_OBJECT
 public:
   explicit OneToOne(QObject *parent = nullptr);
+
   QString getProperty() const;
   OneToOne &setProperty(const QString &property);
-
-  QString getValueProperty() const;
-  OneToOne &setValueProperty(const QString &column);
 
   QString getTableColumn() const;
   OneToOne &setTableColumn(const QString &value);
@@ -25,7 +23,6 @@ public:
 
 private:
   QString property;
-  QString valueProperty;
   QString tableColumn;
 };
 }

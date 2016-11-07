@@ -32,7 +32,12 @@ HEADERS += PropertyMap.h \
     Condition.h \
     GroupConditions.h \
     Reestr.h \
-    AutoUpdater.h
+    AutoUpdater.h \
+    QueryModel.h \
+    QueryTableModel.h \
+    QueryJoin.h \
+    SelectQueryModel.h \
+    InsertQueryModel.h
 
 SOURCES += PropertyMap.cpp \
     ConfigurationMap.cpp \
@@ -48,7 +53,12 @@ SOURCES += PropertyMap.cpp \
     Condition.cpp \
     GroupConditions.cpp \
     Reestr.cpp \
-    AutoUpdater.cpp
+    AutoUpdater.cpp \
+    QueryModel.cpp \
+    QueryTableModel.cpp \
+    QueryJoin.cpp \
+    SelectQueryModel.cpp \
+    InsertQueryModel.cpp
 
 OTHER_FILES += QtOrmInclude.pri
 

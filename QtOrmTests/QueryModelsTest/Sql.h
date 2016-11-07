@@ -10,7 +10,7 @@ QString expectedSelectClause = "select tb_1.code as tb_1_code, tb_1.id as tb_1_i
 QString expectedFromClause = "from A tb_1 left join KindA tb_2 on tb_2.id = tb_1.idKindA "
                              "left join TypeA tb_3 on tb_3.id = tb_2.idTypeA";
 
-QString expectedWhereClause = " A.id = :id and A.code = :code ";
+QString expectedWhereClause = "where tb_1.id = :id and tb_1.code = :code ";
 
 QString expectedInsertText = "insert into A(code, idKindA) "
                              "values(:code, :idKindA) "

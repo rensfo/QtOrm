@@ -10,6 +10,7 @@
 #include "ClassMapBase.h"
 #include "GroupConditions.h"
 #include "OneToOne.h"
+#include "QueryModel.h"
 #include "Reestr.h"
 
 namespace QtOrm {
@@ -34,8 +35,6 @@ public:
   QSqlDatabase getDatabase() const;
   void setDatabase(const QSqlDatabase &value);
 
-  QMap<OneToOne *, QString> getOneToOneAlias() const;
-
   Reestr *getReestr() const;
   void setReestr(Reestr *value);
 
@@ -48,12 +47,11 @@ protected:
   void insertObject(QObject &object);
   void updateObject(QObject &object);
   virtual void executeQuery(QSqlQuery &query);
-  QList<QObject *> *getList(Mapping::ClassMapBase &classBase, QSqlQuery &query, const QString &mainTableAlias);
+  QList<QObject *> *getList(QSqlQuery &query, const QueryModel &queryModel);
 
-  void fillObject(const Mapping::ClassMapBase &classBase, const QSqlRecord &record, const QString tableAlias,
-                  QObject &object);
+  void fillObject(QObject &object, QueryTableModel *queryTableModel, const QSqlRecord &record);
   void fillOneToMany(const QList<OneToMany *> &relations, const QString &idProperty, QObject &object);
-  void fillOneToOne(QList<OneToOne *> &relations, QObject &object, const QSqlRecord &record);
+  void fillOneToOne(QObject &object, QueryTableModel *queryTableModel, const QSqlRecord &record);
   void objectSetProperty(QObject &object, const QString &propertyName, const QVariant &value);
   QObject *createNewInstance(Mapping::ClassMapBase &classBase);
   bool reestrContainsObject(Mapping::ClassMapBase &classBase, const QSqlRecord &record, const QString &tableAlias);
@@ -64,7 +62,7 @@ protected:
   void removeObjectFromReestr(QObject *object);
   QVariant getIdFromRecord(Mapping::ClassMapBase &classBase, const QSqlRecord &record, const QString &tableAlias);
 
-  void refreshObjectData(QObject &object, const QSqlRecord &record, const QString tableAlias);
+  void refreshObjectData(QObject &object, QueryTableModel *queryTableModel, const QSqlRecord &record);
 
   QString getSqlTextWithBindParams(QSqlQuery &query);
 
@@ -84,7 +82,7 @@ protected:
 
 protected:
   Reestr *reestr = nullptr;
-  QMap<OneToOne *, QString> oneToOneAlias;
+//  QMap<OneToOne *, QString> oneToOneAlias;
   QSqlDatabase database;
 };
 }

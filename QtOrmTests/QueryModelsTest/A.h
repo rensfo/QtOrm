@@ -9,7 +9,7 @@
 class A : public QObject {
   Q_OBJECT
   Q_PROPERTY(long id READ getId WRITE setId)
-  Q_PROPERTY(QString code READ getCode WRITE setCode NOTIFY codeChanged)
+  Q_PROPERTY(QString code_1 READ getCode WRITE setCode NOTIFY codeChanged)
   Q_PROPERTY(KindA *kindA READ getKindA WRITE setKindA NOTIFY kindAChanged)
   Q_PROPERTY(QList<B *> child READ getChild WRITE setChild)
 public:
@@ -32,9 +32,9 @@ signals:
   void kindAChanged();
 
 protected:
-  long id;
-  QString code;
-  KindA *kindA;
+  long id = 0;
+  QString code_1;
+  KindA *kindA = nullptr;
   QList<B *> child;
 };
 
