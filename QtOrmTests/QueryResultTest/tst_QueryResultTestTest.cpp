@@ -30,6 +30,7 @@ private Q_SLOTS:
   void unregisteredClass();
   void objectFromReestr();
   void oneTableTwoTimesInQuery();
+  void insertObject();
   void where();
 
 private:
@@ -105,6 +106,18 @@ void QueryResultTestTest::oneTableTwoTimesInQuery() {
   }
 }
 
+void QueryResultTestTest::insertObject() {
+  try {
+    A *a = new A();
+    a->setCode("code10");
+    session.saveObject(*a);
+    QVERIFY(true);
+  } catch (QtOrm::Exception &e) {
+    qDebug() << e.getMessage();
+    QVERIFY(false);
+  }
+}
+
 void QueryResultTestTest::where() {
   GroupConditions where;
   where.addConditionEqual("code_1", "code1");
@@ -162,7 +175,6 @@ bool QueryResultTestTest::dropDatabase(const QString &dbName) {
 }
 
 void QueryResultTestTest::closeConnection() {
-  query.clear();
   db.close();
 }
 

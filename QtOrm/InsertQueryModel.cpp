@@ -46,7 +46,20 @@ QString InsertQueryModel::buildSql() {
       placeholders += ", :" + column;
   }
 
+  if(hasLastInsertedIdFeature)
+    return insertTemplateWithLastInsertedId.arg(mainTableModel->getName()).arg(columns).arg(placeholders);
+
   return insertTemplate.arg(mainTableModel->getName()).arg(columns).arg(placeholders).arg(idColumn);
+}
+
+bool InsertQueryModel::getHasLastInsertedIdFeature() const
+{
+    return hasLastInsertedIdFeature;
+}
+
+void InsertQueryModel::setHasLastInsertedIdFeature(bool value)
+{
+    hasLastInsertedIdFeature = value;
 }
 }
 }

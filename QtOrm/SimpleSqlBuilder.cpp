@@ -19,6 +19,7 @@ SimpleSqlBuilder::SimpleSqlBuilder(QObject *parent) : SqlBuilderBase(parent) {
 
 QSqlQuery SimpleSqlBuilder::insertQuery() {
   InsertQueryModel *insertQueryModel = new InsertQueryModel();
+  insertQueryModel->setHasLastInsertedIdFeature(hasLastInsertedIdFeature());
   insertQueryModel->setClassBase(classBase);
 
   queryModel = insertQueryModel;
@@ -73,7 +74,7 @@ QString SimpleSqlBuilder::getInsertText() {
   }
   QString fullSqlText;
 
-  if (database.driver()->hasFeature(QSqlDriver::LastInsertId) && database.driverName() != "QPSQL")
+  if (hasLastInsertedIdFeature())
     fullSqlText = QString("insert into %1(%2) values(%3)")
                       .arg(classBase->getTable())
                       .arg(columns.join(", "))
@@ -215,6 +216,10 @@ OneToOne *SimpleSqlBuilder::findOneToOneByPropertyName(const QString &propertyNa
   }
 
   return nullptr;
+}
+
+bool SimpleSqlBuilder::hasLastInsertedIdFeature() {
+  return database.driver()->hasFeature(QSqlDriver::LastInsertId) && database.driverName() != "QPSQL";
 }
 }
 }

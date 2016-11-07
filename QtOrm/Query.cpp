@@ -187,7 +187,6 @@ void Query::executeQuery(QSqlQuery &query) {
   if (!query.exec()) {
     emit executedSql(executedQuery);
     QString errorMsg = QString("Query: %1 \nError: %2").arg(executedQuery).arg(query.lastError().text());
-    qDebug() << errorMsg;
     throw QtOrm::Exception(ErrorCode::Sql, errorMsg);
   }
   emit executedSql(executedQuery);

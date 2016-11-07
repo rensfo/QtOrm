@@ -27,6 +27,7 @@ protected:
   void bind(QSqlQuery &query, const OneToOne &oneToOne);
   bool propertiesContains(const QString &propertyName);
   OneToOne *findOneToOneByPropertyName(const QString &propertyName);
+  bool hasLastInsertedIdFeature();
 };
 }
 }
