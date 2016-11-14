@@ -1,5 +1,6 @@
 #include <QString>
 #include <QtTest>
+#include <UpdateQueryModel.h>
 
 #include "SelectQueryModel.h"
 
@@ -28,6 +29,7 @@ private Q_SLOTS:
   void fromClause();
   void whereClause();
   void emptyWhereClause();
+  void updateClause();
 
 private:
   void registerClasses();
@@ -78,6 +80,15 @@ void QueryModelsTestTest::emptyWhereClause() {
   query.setConditions(group);
 
   QCOMPARE(query.getWhere(), QString());
+}
+
+void QueryModelsTestTest::updateClause()
+{
+  ClassMapBase *classBase = ConfigurationMap::getMappedClass("A");
+  UpdateQueryModel query;
+  query.setClassBase(classBase);
+
+  QCOMPARE(query.getSqlText(), expectedUpdateText);
 }
 
 void QueryModelsTestTest::registerClasses() {

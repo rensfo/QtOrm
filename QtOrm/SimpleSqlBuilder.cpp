@@ -9,6 +9,7 @@
 #include "ConfigurationMap.h"
 #include "InsertQueryModel.h"
 #include "OneToMany.h"
+#include "UpdateQueryModel.h"
 
 namespace QtOrm {
 namespace Sql {
@@ -33,7 +34,12 @@ QSqlQuery SimpleSqlBuilder::insertQuery() {
 }
 
 QSqlQuery SimpleSqlBuilder::updateQuery() {
-  QString fullSqlText = getUpdateText();
+  UpdateQueryModel *updateQueryModel = new UpdateQueryModel();
+  updateQueryModel->setClassBase(classBase);
+
+  queryModel = updateQueryModel;
+
+  QString fullSqlText = updateQueryModel->getSqlText();
   QSqlQuery query(database);
   query.prepare(fullSqlText);
   bindUpdate(query);
