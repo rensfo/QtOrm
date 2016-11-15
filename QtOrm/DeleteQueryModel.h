@@ -3,15 +3,26 @@
 
 #include <QObject>
 
-class DeleteQueryModel : public QObject
+#include "QueryModel.h"
+
+namespace QtOrm {
+namespace Sql {
+
+class DeleteQueryModel : public QueryModel
 {
   Q_OBJECT
 public:
-  explicit DeleteQueryModel(QObject *parent = 0);
+  explicit DeleteQueryModel(QObject *parent = nullptr);
+  virtual void buildModel() override;
 
-signals:
+protected:
+  QueryTableModel *buildQueryTableModel();
+  QString buildSql();
 
-public slots:
+protected:
+  const QString deleteTemplate = "delete from %1 where %2 = :%2";
+  QString idColumn;
 };
-
+}
+}
 #endif // DELETEQUERYMODEL_H

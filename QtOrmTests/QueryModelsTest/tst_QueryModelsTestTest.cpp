@@ -1,3 +1,4 @@
+#include <DeleteQueryModel.h>
 #include <QString>
 #include <QtTest>
 #include <UpdateQueryModel.h>
@@ -30,6 +31,7 @@ private Q_SLOTS:
   void whereClause();
   void emptyWhereClause();
   void updateClause();
+  void deleteClause();
 
 private:
   void registerClasses();
@@ -89,6 +91,15 @@ void QueryModelsTestTest::updateClause()
   query.setClassBase(classBase);
 
   QCOMPARE(query.getSqlText(), expectedUpdateText);
+}
+
+void QueryModelsTestTest::deleteClause()
+{
+  ClassMapBase *classBase = ConfigurationMap::getMappedClass("A");
+  DeleteQueryModel query;
+  query.setClassBase(classBase);
+
+  QCOMPARE(query.getSqlText(), expectedDeleteText);
 }
 
 void QueryModelsTestTest::registerClasses() {
