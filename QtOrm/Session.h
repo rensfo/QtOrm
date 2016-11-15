@@ -31,6 +31,8 @@ public:
   template <class T>
   T *get(const Condition &filter);
   template <class T>
+  T *get(const QString &property, const QVariant &value);
+  template <class T>
   QList<T *> *getList();
   template <class T>
   QList<T *> *getList(const QString &property, const QVariant &value);
@@ -49,6 +51,8 @@ public:
 
   bool getAutoUpdate() const;
   void setAutoUpdate(bool value);
+
+  void clearReestr();
 
 protected:
   Query createQuery();
@@ -86,6 +90,12 @@ T *Session::get(const Condition &filter) {
   }
 
   return list->first();
+}
+
+template <class T>
+T *Session::get(const QString &property, const QVariant &value) {
+  Condition c(property, Operation::Equal, value);
+  return this->get<T>(c);
 }
 
 template <class T>

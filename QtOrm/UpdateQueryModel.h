@@ -8,8 +8,7 @@
 namespace QtOrm {
 namespace Sql {
 
-class UpdateQueryModel : public QueryModel
-{
+class UpdateQueryModel : public QueryModel {
 public:
   explicit UpdateQueryModel(QObject *parent = nullptr);
   virtual void buildModel() override;
@@ -22,7 +21,6 @@ protected:
   const QString updateTemplate = "update %1 set %2 where %3 = :%3";
   QString idColumn;
 };
-
 }
 }
 #endif // UPDATEQUERYMODEL_H

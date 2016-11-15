@@ -31,6 +31,7 @@ private Q_SLOTS:
   void objectFromReestr();
   void oneTableTwoTimesInQuery();
   void insertObject();
+  void deleteObject();
   void where();
 
 private:
@@ -111,7 +112,35 @@ void QueryResultTestTest::insertObject() {
     A *a = new A();
     a->setCode("code10");
     session.saveObject(*a);
-    QVERIFY(true);
+
+    session.clearReestr();
+
+    a->deleteLater();
+
+    a = nullptr;
+    a = session.get<A>("code_1", "code10");
+
+    a->deleteLater();
+
+    QVERIFY(a);
+  } catch (QtOrm::Exception &e) {
+    qDebug() << e.getMessage();
+    QVERIFY(false);
+  }
+}
+
+void QueryResultTestTest::deleteObject() {
+  try {
+    A *a = session.getById<A>(1);
+    session.deleteObject(*a);
+
+    a->deleteLater();
+    a = nullptr;
+
+    a = session.getById<A>(1);
+
+    QVERIFY(!a);
+
   } catch (QtOrm::Exception &e) {
     qDebug() << e.getMessage();
     QVERIFY(false);
@@ -120,7 +149,7 @@ void QueryResultTestTest::insertObject() {
 
 void QueryResultTestTest::where() {
   GroupConditions where;
-  where.addConditionEqual("code_1", "code1");
+  where.addConditionEqual("code_1", "code2");
   auto a = session.getList<A>(where);
 
   QCOMPARE(a->count(), 1);

@@ -26,7 +26,7 @@ QueryTableModel *InsertQueryModel::buildQueryTableModel() {
     queryTableModel->addColumn(property->getColumn());
   }
 
-  for(OneToOne *oneToOne : classBase->getOneToOneRelations())
+  for (OneToOne *oneToOne : classBase->getOneToOneRelations())
     queryTableModel->addColumn(oneToOne->getTableColumn());
 
   return queryTableModel;
@@ -46,20 +46,18 @@ QString InsertQueryModel::buildSql() {
       placeholders += ", :" + column;
   }
 
-  if(hasLastInsertedIdFeature)
+  if (hasLastInsertedIdFeature)
     return insertTemplateWithLastInsertedId.arg(mainTableModel->getName()).arg(columns).arg(placeholders);
 
   return insertTemplate.arg(mainTableModel->getName()).arg(columns).arg(placeholders).arg(idColumn);
 }
 
-bool InsertQueryModel::getHasLastInsertedIdFeature() const
-{
-    return hasLastInsertedIdFeature;
+bool InsertQueryModel::getHasLastInsertedIdFeature() const {
+  return hasLastInsertedIdFeature;
 }
 
-void InsertQueryModel::setHasLastInsertedIdFeature(bool value)
-{
-    hasLastInsertedIdFeature = value;
+void InsertQueryModel::setHasLastInsertedIdFeature(bool value) {
+  hasLastInsertedIdFeature = value;
 }
 }
 }

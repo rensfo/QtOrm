@@ -16,6 +16,8 @@ public:
   void remove(QObject *object);
   QObject *value(const QString &table, const QString &id);
 
+  void clear();
+
 signals:
   void inserted(QObject *addedObject);
 

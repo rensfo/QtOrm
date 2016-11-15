@@ -195,7 +195,7 @@ void Query::executeQuery(QSqlQuery &query) {
 QList<QObject *> *Query::getList(QSqlQuery &query, const QueryModel &queryModel) {
   QList<QObject *> *objects = new QList<QObject *>();
   ClassMapBase *classBase = queryModel.getClassBase();
-  QString mainTableAlias = queryModel.getMainTableModel()->getName();
+  QString mainTableAlias = queryModel.getMainTableModel()->getAlias();
   while (query.next()) {
     QObject *obj = nullptr;
     if (reestrContainsObject(*classBase, query.record(), mainTableAlias)) {

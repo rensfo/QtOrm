@@ -49,6 +49,10 @@ void Session::setAutoUpdate(bool value) {
   }
 }
 
+void Session::clearReestr() {
+  reestr->clear();
+}
+
 Query Session::createQuery() {
   Query query;
   query.setDatabase(database);

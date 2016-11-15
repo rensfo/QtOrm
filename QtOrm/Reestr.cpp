@@ -36,7 +36,7 @@ void Reestr::remove(const QString &table, const QString &id) {
 }
 
 void Reestr::remove(QObject *object) {
-  for (QHash<QString, QObject *> ids : data) {
+  for (QHash<QString, QObject *> &ids : data) {
     for (QObject *reestrObject : ids) {
       if (reestrObject == object) {
         QString key = ids.key(object);
@@ -53,6 +53,10 @@ QObject *Reestr::value(const QString &table, const QString &id) {
   }
 
   return nullptr;
+}
+
+void Reestr::clear() {
+  data.clear();
 }
 
 bool Reestr::exists(const QString &table, const QString &id) {

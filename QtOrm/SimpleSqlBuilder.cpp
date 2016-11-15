@@ -7,6 +7,7 @@
 #include <QStringList>
 
 #include "ConfigurationMap.h"
+#include "DeleteQueryModel.h"
 #include "InsertQueryModel.h"
 #include "OneToMany.h"
 #include "UpdateQueryModel.h"
@@ -57,7 +58,12 @@ QSqlQuery SimpleSqlBuilder::updateOneColumnQuery(const QString &property) {
 }
 
 QSqlQuery SimpleSqlBuilder::deleteQuery() {
-  QString fullSqlText = getDeleteText();
+  DeleteQueryModel *deleteQueryModel = new DeleteQueryModel();
+  deleteQueryModel->setClassBase(classBase);
+
+  queryModel = deleteQueryModel;
+
+  QString fullSqlText = deleteQueryModel->getSqlText();
   QSqlQuery query(database);
   query.prepare(fullSqlText);
   bindDelete(query);
