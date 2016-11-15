@@ -7,11 +7,7 @@ class DeleteQueryModel : public QObject
 {
   Q_OBJECT
 public:
-  explicit DeleteQueryModel(QObject *parent = 0);
-
-signals:
-
-public slots:
+  explicit DeleteQueryModel(QObject *parent = nullptr);
 };
 
 #endif // DELETEQUERYMODEL_H
