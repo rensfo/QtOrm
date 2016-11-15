@@ -1,10 +1,5 @@
-#include <DeleteQueryModel.h>
-#include <InsertQueryModel.h>
 #include <QString>
 #include <QtTest>
-#include <UpdateQueryModel.h>
-
-#include "SelectQueryModel.h"
 
 #include "A.h"
 #include "AMap.h"
@@ -15,6 +10,11 @@
 #include "TypeAMap.h"
 
 #include "Sql.h"
+
+#include "SelectQueryModel.h"
+#include "DeleteQueryModel.h"
+#include "InsertQueryModel.h"
+#include "UpdateQueryModel.h"
 
 using namespace QtOrm;
 using namespace Sql;

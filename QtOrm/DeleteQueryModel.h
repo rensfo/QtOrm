@@ -19,8 +19,8 @@ protected:
   QString buildSql();
 
 protected:
-  QString idColumn;
   const QString deleteTemplate = "delete from %1 where %2 = :%2";
+  QString idColumn;
 };
 }
 }
