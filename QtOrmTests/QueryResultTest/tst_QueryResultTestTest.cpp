@@ -32,6 +32,7 @@ private Q_SLOTS:
   void oneTableTwoTimesInQuery();
   void insertObject();
   void deleteObject();
+  void updateObject();
   void where();
 
 private:
@@ -140,6 +141,32 @@ void QueryResultTestTest::deleteObject() {
     a = session.getById<A>(1);
 
     QVERIFY(!a);
+
+  } catch (QtOrm::Exception &e) {
+    qDebug() << e.getMessage();
+    QVERIFY(false);
+  }
+}
+
+void QueryResultTestTest::updateObject()
+{
+  try {
+    session.clearReestr();
+    session.setAutoUpdate(false);
+
+    A *a = session.getById<A>(3);
+
+    a->setCode("x");
+    session.saveObject(*a);
+
+    session.clearReestr();
+
+    a->deleteLater();
+    a = nullptr;
+
+    a = session.getById<A>(3);
+
+    QCOMPARE(a->getCode(), QString("x"));
 
   } catch (QtOrm::Exception &e) {
     qDebug() << e.getMessage();
