@@ -235,10 +235,10 @@ void Query::fillOneToMany(const QList<OneToMany *> &relations, const QString &id
     QString refProperty = oneToMany->getRefProperty();
     QVariant value = object.property(idProperty.toStdString().data());
 
-    QObjectList *l = getListObject(refClass, refProperty, value);
+    QObjectList *qobjectList = getListObject(refClass, refProperty, value);
 
     Mapping::ClassMapBase *refClassBase = ConfigurationMap::getMappedClass(oneToMany->getRefClass());
-    QVariant var = refClassBase->getVariantByObjectList(l);
+    QVariant var = refClassBase->getVariantByObjectList(qobjectList);
     objectSetProperty(object, property, var);
   }
 }
@@ -281,7 +281,7 @@ QObject *Query::createNewInstance(ClassMapBase &classBase) {
   QObject *newObject = classBase.getMetaObject().newInstance();
   if (!newObject) {
     throw Exception(ErrorCode::InstanceNotCreated,
-                    "Object instance is not created(Missing Q_INVOKABLE in constructor?)");
+                    "Object instance was not created(Missing Q_INVOKABLE in constructor?)");
   }
   return newObject;
 }

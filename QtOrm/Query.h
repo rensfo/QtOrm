@@ -82,7 +82,6 @@ protected:
 
 protected:
   Reestr *reestr = nullptr;
-//  QMap<OneToOne *, QString> oneToOneAlias;
   QSqlDatabase database;
 };
 }

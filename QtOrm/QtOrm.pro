@@ -39,7 +39,8 @@ HEADERS += PropertyMap.h \
     SelectQueryModel.h \
     InsertQueryModel.h \
     DeleteQueryModel.h \
-    UpdateQueryModel.h
+    UpdateQueryModel.h \
+    QueryCache.h
 
 SOURCES += PropertyMap.cpp \
     ConfigurationMap.cpp \
@@ -62,7 +63,8 @@ SOURCES += PropertyMap.cpp \
     SelectQueryModel.cpp \
     InsertQueryModel.cpp \
     DeleteQueryModel.cpp \
-    UpdateQueryModel.cpp
+    UpdateQueryModel.cpp \
+    QueryCache.cpp
 
 OTHER_FILES += QtOrmInclude.pri
 
