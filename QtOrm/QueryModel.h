@@ -12,6 +12,14 @@ namespace Sql {
 
 using Mapping::ClassMapBase;
 
+enum class QueryModelType : int {
+  Select,
+  Insert,
+  Update,
+  Delete,
+  UpdateColumn
+};
+
 class QueryModel : public QObject {
   Q_OBJECT
 public:
@@ -22,10 +30,11 @@ public:
 
   ClassMapBase *getClassBase() const;
   void setClassBase(ClassMapBase *value);
+  virtual void buildModel() = 0;
 
 protected:
   void setMainTableModel(QueryTableModel *value);
-  virtual void buildModel() = 0;
+
   QueryTableModel *buildQueryTableModel(ClassMapBase *classBase);
 
 protected:

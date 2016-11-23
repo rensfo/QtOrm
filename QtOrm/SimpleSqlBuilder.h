@@ -15,10 +15,7 @@ public:
   virtual QSqlQuery deleteQuery() override;
 
 protected:
-  virtual QString getInsertText();
-  virtual QString getUpdateText();
   virtual QString getUpdateOneColumnText(const QString &propertyName);
-  virtual QString getDeleteText();
   virtual void bindInsert(QSqlQuery &query);
   virtual void bindUpdate(QSqlQuery &query);
   virtual void bindOneColumnUpdate(QSqlQuery &query, const QString &propertyName);

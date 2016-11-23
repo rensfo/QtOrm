@@ -5,6 +5,35 @@ namespace QtOrm
 
 QueryCache::QueryCache(QObject *parent) : QObject(parent) {}
 
+void QueryCache::addModel(QueryModelType type, QueryModel *model, const QString &className, const QString &columnName)
+{
+  switch (type)
+  {
+    case QueryModelType::Select:
+      addSelectModel(className, model);
+    break;
+    case QueryModelType::Insert:
+      addInsertModel(className, model);
+    break;
+    case QueryModelType::Update:
+      addUpdateModel(className, model);
+    break;
+    case QueryModelType::UpdateColumn:
+      addColumnUpdateModel(className, columnName, model);
+    break;
+    case QueryModelType::Delete:
+      addDeleteModel(className, model);
+    break;
+    //thrown exception
+  }
+}
+
+void QueryCache::addSelectModel(const QString &className, QtOrm::Sql::QueryModel *model)
+{
+  createCacheIfNotExists(className);
+  data[className].selectModel = model;
+}
+
 void QueryCache::addInsertModel(const QString &className, QtOrm::Sql::QueryModel *model)
 {
   createCacheIfNotExists(className);
@@ -29,7 +58,41 @@ void QueryCache::addColumnUpdateModel(const QString &className, const QString &c
   data[className].columnsUpdateModels[column] = model;
 }
 
-QtOrm::Sql::QueryModel *QueryCache::getInsertModel(const QString &className)
+QueryModel *QueryCache::getModel(QueryModelType type, const QString &className, const QString &columnName)
+{
+  QueryModel *result = nullptr;
+  switch (type)
+  {
+    case QueryModelType::Select:
+      result = getSelectModel(className);
+    break;
+    case QueryModelType::Insert:
+      result = getInsertModel(className);
+    break;
+    case QueryModelType::Update:
+      result = getUpdateModel(className);
+    break;
+    case QueryModelType::UpdateColumn:
+      result = getColumnUpdateModel(className, columnName);
+    break;
+    case QueryModelType::Delete:
+      result = getDeleteModel(className);
+    break;
+    //thrown exception
+  }
+
+  return result;
+}
+
+QueryModel *QueryCache::getSelectModel(const QString &className)
+{
+  if (!existsClassInCache(className))
+    return nullptr;
+
+  return data[className].selectModel;
+}
+
+QueryModel *QueryCache::getInsertModel(const QString &className)
 {
   if (!existsClassInCache(className))
     return nullptr;
@@ -37,7 +100,7 @@ QtOrm::Sql::QueryModel *QueryCache::getInsertModel(const QString &className)
   return data[className].insertModel;
 }
 
-QtOrm::Sql::QueryModel *QueryCache::getUpdateModel(const QString &className)
+QueryModel *QueryCache::getUpdateModel(const QString &className)
 {
   if (!existsClassInCache(className))
     return nullptr;
@@ -45,7 +108,7 @@ QtOrm::Sql::QueryModel *QueryCache::getUpdateModel(const QString &className)
   return data[className].updateModel;
 }
 
-QtOrm::Sql::QueryModel *QueryCache::getDeleteModel(const QString &className)
+QueryModel *QueryCache::getDeleteModel(const QString &className)
 {
   if (!existsClassInCache(className))
     return nullptr;
@@ -53,7 +116,7 @@ QtOrm::Sql::QueryModel *QueryCache::getDeleteModel(const QString &className)
   return data[className].deleteModel;
 }
 
-QtOrm::Sql::QueryModel *QueryCache::getColumnUpdateModel(const QString &className, const QString &column)
+QueryModel *QueryCache::getColumnUpdateModel(const QString &className, const QString &column)
 {
   if (!existColumnInCache(className, column))
     return nullptr;

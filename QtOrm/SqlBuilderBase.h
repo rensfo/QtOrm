@@ -11,6 +11,7 @@
 #include "ConfigurationMap.h"
 #include "GroupConditions.h"
 #include "OneToOne.h"
+#include "QueryCache.h"
 #include "QueryModel.h"
 
 namespace QtOrm {
@@ -20,6 +21,7 @@ using namespace Mapping;
 
 class SqlBuilderBase : public QObject {
   Q_OBJECT
+
 public:
   explicit SqlBuilderBase(QObject *parent = nullptr);
   virtual QSqlQuery selectQuery();
@@ -42,9 +44,15 @@ public:
 
   QueryModel *getQueryModel() const;
 
+  QueryCache *getQueryCache() const;
+  void setQueryCache(QueryCache *value);
+
 protected:
   QString getPlaceHolder(const QString param);
-  void bindValues(QSqlQuery &query, const GroupConditions &conditions);
+  void bindValues(QSqlQuery &query, const GroupConditions &conditions, const QMap<Condition *, QString> &placeHolders);
+  QueryModel *getQueryModel(QueryModelType queryType, const QString &columnName = QString());
+  QueryModel *createModelAndAddToCache(QueryModelType queryType, const QString &className, const QString &columnName = QString());
+  QueryModel *createModel(QueryModelType queryType);
 
 protected:
   QSqlDatabase database;
@@ -52,6 +60,7 @@ protected:
   GroupConditions conditions;
   QObject *object = nullptr;
   QueryModel *queryModel = nullptr;
+  QueryCache *queryCache = nullptr;
 };
 }
 }

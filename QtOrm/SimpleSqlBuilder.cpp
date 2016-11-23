@@ -20,11 +20,11 @@ SimpleSqlBuilder::SimpleSqlBuilder(QObject *parent) : SqlBuilderBase(parent) {
 }
 
 QSqlQuery SimpleSqlBuilder::insertQuery() {
-  InsertQueryModel *insertQueryModel = new InsertQueryModel();
+  queryModel = getQueryModel(QueryModelType::Insert);
+  InsertQueryModel *insertQueryModel = dynamic_cast<InsertQueryModel *>(queryModel);
   insertQueryModel->setHasLastInsertedIdFeature(hasLastInsertedIdFeature());
-  insertQueryModel->setClassBase(classBase);
+  insertQueryModel->buildModel();
 
-  queryModel = insertQueryModel;
   QString fullSqlText = insertQueryModel->getSqlText();
 
   QSqlQuery query(database);
@@ -35,10 +35,9 @@ QSqlQuery SimpleSqlBuilder::insertQuery() {
 }
 
 QSqlQuery SimpleSqlBuilder::updateQuery() {
-  UpdateQueryModel *updateQueryModel = new UpdateQueryModel();
-  updateQueryModel->setClassBase(classBase);
-
-  queryModel = updateQueryModel;
+  queryModel = getQueryModel(QueryModelType::Update);
+  UpdateQueryModel *updateQueryModel = dynamic_cast<UpdateQueryModel *>(queryModel);
+  updateQueryModel->buildModel();
 
   QString fullSqlText = updateQueryModel->getSqlText();
   QSqlQuery query(database);
@@ -58,10 +57,9 @@ QSqlQuery SimpleSqlBuilder::updateOneColumnQuery(const QString &property) {
 }
 
 QSqlQuery SimpleSqlBuilder::deleteQuery() {
-  DeleteQueryModel *deleteQueryModel = new DeleteQueryModel();
-  deleteQueryModel->setClassBase(classBase);
-
-  queryModel = deleteQueryModel;
+  queryModel = getQueryModel(QueryModelType::Delete);
+  DeleteQueryModel *deleteQueryModel = dynamic_cast<DeleteQueryModel *>(queryModel);
+  deleteQueryModel->buildModel();
 
   QString fullSqlText = deleteQueryModel->getSqlText();
   QSqlQuery query(database);
@@ -69,54 +67,6 @@ QSqlQuery SimpleSqlBuilder::deleteQuery() {
   bindDelete(query);
 
   return query;
-}
-
-QString SimpleSqlBuilder::getInsertText() {
-  QStringList columns;
-  QStringList values;
-  for (auto prop : classBase->getProperties()) {
-    if (prop->getIsId())
-      continue;
-    columns.append(prop->getColumn());
-    values.append(getPlaceHolder(prop->getColumn()));
-  }
-  for (auto prop : classBase->getOneToOneRelations()) {
-    columns.append(prop->getTableColumn());
-    values.append(getPlaceHolder(prop->getTableColumn()));
-  }
-  QString fullSqlText;
-
-  if (hasLastInsertedIdFeature())
-    fullSqlText = QString("insert into %1(%2) values(%3)")
-                      .arg(classBase->getTable())
-                      .arg(columns.join(", "))
-                      .arg(values.join(", "));
-  else
-    fullSqlText = QString("insert into %1(%2) values(%3) returning %4")
-                      .arg(classBase->getTable())
-                      .arg(columns.join(", "))
-                      .arg(values.join(", "))
-                      .arg(classBase->getIdProperty().getColumn());
-
-  return fullSqlText;
-}
-
-QString SimpleSqlBuilder::getUpdateText() {
-  QString setClause;
-  QString whereClause;
-  for (auto prop : classBase->getProperties()) {
-    if (prop->getIsId())
-      whereClause = QString("%1 = :%1").arg(prop->getColumn());
-    else
-      setClause += QString("%1%2 = :%2").arg(setClause.isEmpty() ? "" : ", ").arg(prop->getColumn());
-  }
-  for (auto prop : classBase->getOneToOneRelations()) {
-    setClause += QString("%1%2 = :%2").arg(setClause.isEmpty() ? "" : ", ").arg(prop->getTableColumn());
-  }
-
-  QString fullSqlText = QString("update %1 set %2 where %3").arg(classBase->getTable()).arg(setClause).arg(whereClause);
-
-  return fullSqlText;
 }
 
 QString SimpleSqlBuilder::getUpdateOneColumnText(const QString &propertyName) {
@@ -135,15 +85,6 @@ QString SimpleSqlBuilder::getUpdateOneColumnText(const QString &propertyName) {
   QString whereClause = QString("%1 = :%1").arg(idProperty.getColumn());
 
   QString fullSqlText = QString("update %1 set %2 where %3").arg(classBase->getTable()).arg(setClause).arg(whereClause);
-
-  return fullSqlText;
-}
-
-QString SimpleSqlBuilder::getDeleteText() {
-  QString idColumnName = classBase->getIdProperty().getColumn();
-  QString idPlaceHolder = getPlaceHolder(idColumnName);
-  QString fullSqlText =
-      QString("delete from %1 where %2 = %3").arg(classBase->getTable()).arg(idColumnName).arg(idPlaceHolder);
 
   return fullSqlText;
 }

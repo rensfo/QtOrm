@@ -31,6 +31,7 @@ private Q_SLOTS:
   void fromClause();
   void whereClause();
   void emptyWhereClause();
+  void oneColumnTwoTimes();
   void updateSql();
   void insertSql();
   void deleteSql();
@@ -84,6 +85,22 @@ void QueryModelsTestTest::emptyWhereClause() {
   query.setConditions(group);
 
   QCOMPARE(query.getWhere(), QString());
+}
+
+void QueryModelsTestTest::oneColumnTwoTimes()
+{
+  ClassMapBase *classBase = ConfigurationMap::getMappedClass("A");
+  SelectQueryModel query;
+  query.setClassBase(classBase);
+
+  GroupConditions group;
+  group.setOperation(GroupOperation::Or);
+  group.addConditionEqual("code_1", "code1");
+  group.addConditionEqual("code_1", "code2");
+
+  query.setConditions(group);
+
+  QCOMPARE(query.getWhere(), expectedOneColumnTwoTimesWhereClause);
 }
 
 void QueryModelsTestTest::updateSql() {

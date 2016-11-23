@@ -9,6 +9,7 @@ namespace QtOrm
 {
 
 using Sql::QueryModel;
+using Sql::QueryModelType;
 
 class QueryCache : public QObject
 {
@@ -16,6 +17,7 @@ class QueryCache : public QObject
 
   struct CacheData
   {
+    QueryModel *selectModel;
     QueryModel *insertModel;
     QueryModel *updateModel;
     QueryModel *deleteModel;
@@ -25,11 +27,15 @@ class QueryCache : public QObject
 public:
   explicit QueryCache(QObject *parent = nullptr);
 
+  void addModel(QueryModelType type, QueryModel *model, const QString &className, const QString &columnName);
+  void addSelectModel(const QString &className, QueryModel *model);
   void addInsertModel(const QString &className, QueryModel *model);
   void addUpdateModel(const QString &className, QueryModel *model);
   void addDeleteModel(const QString &className, QueryModel *model);
   void addColumnUpdateModel(const QString &className, const QString &column, QueryModel *model);
 
+  QueryModel *getModel(QueryModelType type, const QString &className, const QString &columnName = QString());
+  QueryModel *getSelectModel(const QString &className);
   QueryModel *getInsertModel(const QString &className);
   QueryModel *getUpdateModel(const QString &className);
   QueryModel *getDeleteModel(const QString &className);

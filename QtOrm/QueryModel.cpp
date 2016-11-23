@@ -25,7 +25,6 @@ ClassMapBase *QueryModel::getClassBase() const {
 void QueryModel::setClassBase(ClassMapBase *value) {
   if (classBase != value) {
     classBase = value;
-    buildModel();
   }
 }
 }

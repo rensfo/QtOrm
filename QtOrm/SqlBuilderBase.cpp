@@ -6,7 +6,10 @@
 
 #include "ClassMapBase.h"
 #include "ConfigurationMap.h"
+#include "DeleteQueryModel.h"
+#include "InsertQueryModel.h"
 #include "SelectQueryModel.h"
+#include "UpdateQueryModel.h"
 
 namespace QtOrm {
 namespace Sql {
@@ -16,15 +19,16 @@ SqlBuilderBase::SqlBuilderBase(QObject *parent) : QObject(parent) {
 }
 
 QSqlQuery SqlBuilderBase::selectQuery() {
-  SelectQueryModel *selectQueryModel = new SelectQueryModel();
-  selectQueryModel->setClassBase(classBase);
+  queryModel = getQueryModel(QueryModelType::Select);
+  SelectQueryModel *selectQueryModel = dynamic_cast<SelectQueryModel *>(queryModel);
+  selectQueryModel->buildModel();
   selectQueryModel->setConditions(conditions);
-
-  queryModel = selectQueryModel;
 
   QSqlQuery query(database);
   query.prepare(selectQueryModel->getSqlText());
-  bindValues(query, conditions);
+  bindValues(query, conditions, selectQueryModel->getConditionPlaceholder());
+
+  selectQueryModel->clearPlaceHolders();
 
   return query;
 }
@@ -33,16 +37,84 @@ QString SqlBuilderBase::getPlaceHolder(const QString param) {
   return QString(":%1").arg(param);
 }
 
-void SqlBuilderBase::bindValues(QSqlQuery &query, const GroupConditions &conditions) {
+void SqlBuilderBase::bindValues(QSqlQuery &query, const GroupConditions &conditions, const QMap<Condition *, QString> &placeHolders) {
   for (Condition *f : conditions.getConditions()) {
     if (!f->getValues().isEmpty()) {
       QString columnName = classBase->getProperty(f->getPropertyName()).getColumn();
-      query.bindValue(getPlaceHolder(columnName), f->getValues().first());
+      QString placeHolder = placeHolders[f];
+      query.bindValue(getPlaceHolder(placeHolder), f->getValues().first());
     }
   }
   for (GroupConditions *g : conditions.getGroups()) {
-    bindValues(query, *g);
+    bindValues(query, *g, placeHolders);
   }
+}
+
+QueryModel *SqlBuilderBase::getQueryModel(QueryModelType queryType, const QString &columnName)
+{
+  QString className = classBase->getClassName();
+  if(queryCache)
+  {
+    if(QueryModel *model = queryCache->getModel(queryType, className, columnName))
+    {
+      return model;
+    }
+    else
+    {
+      return createModelAndAddToCache(queryType, className, columnName);
+    }
+  }
+
+  return createModelAndAddToCache(queryType, className, columnName);
+}
+
+QueryModel *SqlBuilderBase::createModelAndAddToCache(QueryModelType queryType, const QString &className, const QString &columnName)
+{
+  QueryModel *newModel = createModel(queryType);
+  if(queryCache)
+  {
+    queryCache->addModel(queryType, newModel, className, columnName);
+  }
+
+  return newModel;
+}
+
+QueryModel *SqlBuilderBase::createModel(QueryModelType queryType)
+{
+  QueryModel *result = nullptr;
+
+  switch (queryType)
+  {
+    case QueryModelType::Select:
+      result = new SelectQueryModel();
+    break;
+    case QueryModelType::Insert:
+      result = new InsertQueryModel();
+    break;
+    case QueryModelType::Update:
+      result = new UpdateQueryModel();
+    break;
+    case QueryModelType::UpdateColumn:
+      throw std::string("update column not defined");
+    break;
+    case QueryModelType::Delete:
+      result = new DeleteQueryModel();
+    break;
+    //throw exception
+  }
+  result->setClassBase(classBase);
+
+  return result;
+}
+
+QueryCache *SqlBuilderBase::getQueryCache() const
+{
+  return queryCache;
+}
+
+void SqlBuilderBase::setQueryCache(QueryCache *value)
+{
+  queryCache = value;
 }
 
 QueryModel *SqlBuilderBase::getQueryModel() const

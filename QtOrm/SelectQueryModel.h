@@ -1,6 +1,8 @@
 #ifndef SELECTQUERYMODEL_H
 #define SELECTQUERYMODEL_H
 
+#include <QMap>
+
 #include "QueryModel.h"
 
 namespace QtOrm {
@@ -21,10 +23,14 @@ public:
 
   QueryTableModel *buildQueryTableModel(ClassMapBase *classBase);
 
-  virtual QString getSqlText();
+  virtual QString getSqlText() override;
+
+  QMap<Condition *, QString> getConditionPlaceholder() const;
+  void clearPlaceHolders();
+
+  virtual void buildModel() override;
 
 protected:
-  virtual void buildModel() override;
   void buildSelectAndFromClause();
   void setAliases(QueryTableModel *tableModel);
   QString generateTableAlias();
@@ -36,6 +42,8 @@ protected:
   QString groupOperationToString(GroupOperation groupOperation) const;
   virtual QString getLikeCondition(const QString &fieldName) const;
   QString operationToString(const Condition &filter) const;
+  QString conditionToString(Condition *condition);
+  short calculateCountUsedColumn(const QString &value);
 
 protected:
   int tableNumber = 0;
@@ -44,6 +52,7 @@ protected:
   QString from;
   QString where;
   GroupConditions conditions;
+  QMap<Condition *, QString> conditionPlaceholder;
 };
 }
 }

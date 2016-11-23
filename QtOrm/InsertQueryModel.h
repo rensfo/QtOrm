@@ -13,9 +13,9 @@ public:
 
   bool getHasLastInsertedIdFeature() const;
   void setHasLastInsertedIdFeature(bool value);
+  virtual void buildModel() override;
 
 protected:
-  virtual void buildModel() override;
   QueryTableModel *buildQueryTableModel();
   QString buildSql();
 

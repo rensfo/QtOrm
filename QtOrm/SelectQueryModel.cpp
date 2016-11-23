@@ -45,33 +45,16 @@ QString SelectQueryModel::buildWhereClause() {
 QString SelectQueryModel::GroupConditionToString(const GroupConditions &groupConditions) {
   QString tableName = mainTableModel->getAlias();
   QString whereClause;
-  for (Condition *f : groupConditions.getConditions()) {
-    QString groupOp = whereClause.isEmpty() ? "" : groupOperationToString(groupConditions.getOperation());
-
-    QString columnName = classBase->getProperty(f->getPropertyName()).getColumn();
-
-    if (f->getOperation() == Operation::Like) {
-      whereClause += QString("%1 %2 ").arg(groupOp).arg(getLikeCondition(columnName));
-    } else {
-      if (f->getOperation() == Operation::NotEqual &&
-          (f->getValues().first().isNull() || !f->getValues().first().isValid())) {
-        if (tableName.isEmpty())
-          whereClause += QString("%1 %2 is not null ").arg(groupOp).arg(columnName);
-        else
-          whereClause += QString("%1 %2.%3 is not null ").arg(groupOp).arg(tableName).arg(columnName);
-      } else if (tableName.isEmpty())
-        whereClause += QString("%1 %2 %4 :%2 ").arg(groupOp).arg(columnName).arg(operationToString(*f));
-      else {
-        if (groupOp.isEmpty()) {
-          whereClause += QString("%1.%2 %3 :%2 ").arg(tableName).arg(columnName).arg(operationToString(*f));
-        } else {
-          whereClause += QString("%1 %2.%3 %4 :%3 ")
-                             .arg(groupOp)
-                             .arg(tableName)
-                             .arg(columnName)
-                             .arg(operationToString(*f));
-        }
-      }
+  for (Condition *condition : groupConditions.getConditions()) {
+    QString groupOp = groupOperationToString(groupConditions.getOperation());
+    QString conditionText = conditionToString(condition);
+    if(whereClause.isEmpty())
+    {
+      whereClause = conditionText;
+    }
+    else
+    {
+      whereClause += QString(" %1 %2").arg(groupOp).arg(conditionText);
     }
   }
 
@@ -108,6 +91,80 @@ QString SelectQueryModel::operationToString(const Condition &filter) const {
     operationString = "like";
   }
   return operationString;
+}
+
+QString SelectQueryModel::conditionToString(Condition *condition)
+{
+  QString conditionString;
+  QString columnName = classBase->getProperty(condition->getPropertyName()).getColumn();
+
+  Operation operation = condition->getOperation();
+
+  if(condition->getValues().first().isNull() || !condition->getValues().first().isValid())
+  {
+    if(operation == Operation::Equal)
+    {
+      operation = Operation::IsNull;
+    }
+    else
+    {
+      operation = Operation::IsNotNull;
+    }
+  }
+
+  QString tableAlias = mainTableModel->getAlias();
+  QString placeHolder = columnName;
+  QString fullColumnName = QString("%1.%2").arg(tableAlias).arg(columnName);
+
+  short count = calculateCountUsedColumn(columnName);
+
+  if(count)
+  {
+    placeHolder = QString("%1_%2").arg(columnName).arg(count);
+  }
+
+  switch(operation)
+  {
+    case Operation::Like:
+      conditionString = QString("%1 %2 '%' || :%3 || '%'").arg(fullColumnName).arg(OperationSimbols[operation]);
+      conditionPlaceholder.insert(condition, placeHolder);
+    break;
+    case Operation::IsNull:
+    case Operation::IsNotNull:
+      conditionString = QString("%1 %2").arg(fullColumnName).arg(OperationSimbols[operation]);
+    break;
+    default:
+      conditionString = QString("%1 %2 :%3").arg(fullColumnName).arg(OperationSimbols[operation]).arg(placeHolder);
+      conditionPlaceholder.insert(condition, placeHolder);
+  }
+
+  return conditionString;
+}
+
+short SelectQueryModel::calculateCountUsedColumn(const QString &value)
+{
+  short count = 0;
+
+  for(Condition *condition : conditionPlaceholder.keys())
+  {
+    QString columnName = classBase->getProperty(condition->getPropertyName()).getColumn();
+    if(columnName == value)
+    {
+      count++;
+    }
+  }
+
+  return count;
+}
+
+QMap<Condition *, QString> SelectQueryModel::getConditionPlaceholder() const
+{
+  return conditionPlaceholder;
+}
+
+void SelectQueryModel::clearPlaceHolders()
+{
+  conditionPlaceholder.clear();
 }
 
 QString SelectQueryModel::getWhere() const {

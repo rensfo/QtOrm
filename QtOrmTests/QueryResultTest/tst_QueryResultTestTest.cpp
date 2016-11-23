@@ -30,6 +30,7 @@ private Q_SLOTS:
   void unregisteredClass();
   void objectFromReestr();
   void oneTableTwoTimesInQuery();
+  void oneColumnTwoTimesInWhere();
   void insertObject();
   void deleteObject();
   void updateObject();
@@ -108,6 +109,25 @@ void QueryResultTestTest::oneTableTwoTimesInQuery() {
   }
 }
 
+void QueryResultTestTest::oneColumnTwoTimesInWhere()
+{
+  try {
+
+    GroupConditions gc;
+    gc.setOperation(GroupOperation::Or);
+    gc.addConditionEqual("code_1", "code1");
+    gc.addConditionEqual("code_1", "code2");
+
+    QList<A *> *listA = session.getList<A>(gc);
+
+    QCOMPARE(listA->count(), 2);
+  } catch (QtOrm::Exception &e) {
+    Q_UNUSED(e)
+
+    QVERIFY(false);
+  }
+}
+
 void QueryResultTestTest::insertObject() {
   try {
     A *a = new A();
@@ -125,7 +145,7 @@ void QueryResultTestTest::insertObject() {
 
     QVERIFY(a);
   } catch (QtOrm::Exception &e) {
-    qDebug() << e.getMessage();
+    qDebug().noquote() << e.getMessage();
     QVERIFY(false);
   }
 }

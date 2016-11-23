@@ -355,7 +355,18 @@ QString Query::getSqlTextWithBindParams(QSqlQuery &query) {
 
   auto boundValues = query.boundValues();
   for (auto it = boundValues.begin(); it != boundValues.end(); ++it)
-    text += QString("%1 = %2\n").arg(it.key()).arg(it.value().toString());
+  {
+    QString value;
+    if(!it.value().isNull() || it.value().isValid())
+    {
+      value = it.value().toString();
+    }
+    else
+    {
+      value = "null";
+    }
+    text += QString("%1 = %2\n").arg(it.key()).arg(value);
+  }
 
   return text;
 }
