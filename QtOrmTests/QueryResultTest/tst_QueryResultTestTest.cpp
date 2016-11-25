@@ -35,6 +35,7 @@ private Q_SLOTS:
   void deleteObject();
   void updateObject();
   void where();
+  void queryFromCache();
 
 private:
   bool openConnection();
@@ -200,6 +201,11 @@ void QueryResultTestTest::where() {
   auto a = session.getList<A>(where);
 
   QCOMPARE(a->count(), 1);
+}
+
+void QueryResultTestTest::queryFromCache()
+{
+
 }
 
 bool QueryResultTestTest::openConnection() {

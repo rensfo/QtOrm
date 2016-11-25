@@ -62,7 +62,9 @@ QList<QObject *> *Query::getListObject(const QString &className, const GroupCond
 
   SimpleSqlBuilder sqlBuilder;
   sqlBuilder.setDatabase(database);
+  sqlBuilder.setQueryCache(queryCache);
   sqlBuilder.setClassBase(classBase);
+
   sqlBuilder.setConditions(conditions);
   QSqlQuery query = sqlBuilder.selectQuery();
 
@@ -424,6 +426,7 @@ void Query::setReestr(Reestr *value) {
 Query &Query::operator=(const Query &other) {
   reestr = other.getReestr();
   database = other.getDatabase();
+  queryCache = other.getQueryCache();
 
   return *this;
 }
@@ -463,6 +466,16 @@ bool Query::isIdOneToOneDefault(QObject &object, OneToOne *oneToOne) {
   QObject *propertyObject = refClassBase->getObjectByVariant(propertyVariant);
 
   return isIdObjectDefault(*propertyObject);
+}
+
+QueryCache *Query::getQueryCache() const
+{
+  return queryCache;
+}
+
+void Query::setQueryCache(QueryCache *value)
+{
+  queryCache = value;
 }
 }
 }

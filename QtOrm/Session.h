@@ -53,6 +53,7 @@ public:
   void setAutoUpdate(bool value);
 
   void clearReestr();
+  void clearQueryCache();
 
 protected:
   Query createQuery();
@@ -65,6 +66,7 @@ protected:
   Reestr *reestr = nullptr;
   AutoUpdater updater;
   bool autoUpdate = false;
+  QueryCache *queryCache = nullptr;
 };
 
 template <class T>

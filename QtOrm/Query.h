@@ -10,6 +10,7 @@
 #include "ClassMapBase.h"
 #include "GroupConditions.h"
 #include "OneToOne.h"
+#include "QueryCache.h"
 #include "QueryModel.h"
 #include "Reestr.h"
 
@@ -39,6 +40,9 @@ public:
   void setReestr(Reestr *value);
 
   Query &operator=(const Query &other);
+
+  QueryCache *getQueryCache() const;
+  void setQueryCache(QueryCache *value);
 
 signals:
   void executedSql(QString sqlText);
@@ -83,6 +87,7 @@ protected:
 protected:
   Reestr *reestr = nullptr;
   QSqlDatabase database;
+  QueryCache *queryCache = nullptr;
 };
 }
 }
