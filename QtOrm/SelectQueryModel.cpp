@@ -98,23 +98,10 @@ QString SelectQueryModel::conditionToString(Condition *condition)
   QString conditionString;
   QString columnName = classBase->getProperty(condition->getPropertyName()).getColumn();
 
-  Operation operation = condition->getOperation();
-
-  if(condition->getValues().first().isNull() || !condition->getValues().first().isValid())
-  {
-    if(operation == Operation::Equal)
-    {
-      operation = Operation::IsNull;
-    }
-    else
-    {
-      operation = Operation::IsNotNull;
-    }
-  }
+  Operation operation = operationToSqlStandart(condition);
 
   QString tableAlias = mainTableModel->getAlias();
   QString placeHolder = columnName;
-  QString fullColumnName = QString("%1.%2").arg(tableAlias).arg(columnName);
 
   short count = calculateCountUsedColumn(columnName);
 
@@ -123,6 +110,7 @@ QString SelectQueryModel::conditionToString(Condition *condition)
     placeHolder = QString("%1_%2").arg(columnName).arg(count);
   }
 
+  QString fullColumnName = QString("%1.%2").arg(tableAlias).arg(columnName);
   switch(operation)
   {
     case Operation::Like:
@@ -133,12 +121,44 @@ QString SelectQueryModel::conditionToString(Condition *condition)
     case Operation::IsNotNull:
       conditionString = QString("%1 %2").arg(fullColumnName).arg(OperationStrings[operation]);
     break;
+    case Operation::In:
+    {
+      QStringList placeHolders;
+      for(int i = 1; i <= condition->getValues().count(); ++i)
+      {
+        placeHolders.append(QString(":%1_%2").arg(placeHolder).arg(i));
+      }
+      conditionString = QString("%1 %2 (%3)").arg(fullColumnName).arg(OperationStrings[operation]).arg(placeHolders.join(", "));
+    }
+    break;
+    case Operation::Between:
+    {
+      conditionString = QString("%1 %2 :%3_1 and %3_2 ").arg(fullColumnName).arg(OperationStrings[operation]).append(placeHolder);
+    }
+    break;
     default:
       conditionString = QString("%1 %2 :%3").arg(fullColumnName).arg(OperationStrings[operation]).arg(placeHolder);
       conditionPlaceholder.insert(condition, placeHolder);
   }
 
   return conditionString;
+}
+
+Operation SelectQueryModel::operationToSqlStandart(Condition *condition)
+{
+  Operation operation = condition->getOperation();
+  bool conditionIsNull = condition->getValues().first().isNull();
+  if(operation == Operation::Equal && conditionIsNull)
+  {
+    return Operation::IsNull;
+  }
+
+  if(operation == Operation::NotEqual && conditionIsNull)
+  {
+    return Operation::IsNotNull;
+  }
+
+  return operation;
 }
 
 short SelectQueryModel::calculateCountUsedColumn(const QString &value)

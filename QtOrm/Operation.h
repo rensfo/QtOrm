@@ -16,7 +16,7 @@ static QMap<Operation, QString> OperationStrings = {
     {Operation::Equal, "="},
     {Operation::NotEqual, "!="},
     {Operation::IsNull, "is null"},
-    {Operation::IsNotNull, "is null"},
+    {Operation::IsNotNull, "is not null"},
     {Operation::In, "in"},
     {Operation::Between, "between"}
 };

@@ -40,7 +40,7 @@ QString SqlBuilderBase::getPlaceHolder(const QString param) {
 void SqlBuilderBase::bindValues(QSqlQuery &query, const GroupConditions &conditions, const QMap<Condition *, QString> &placeHolders) {
   for (Condition *f : conditions.getConditions()) {
     if (!f->getValues().isEmpty()) {
-      QString columnName = classBase->getProperty(f->getPropertyName()).getColumn();
+//      QString columnName = classBase->getProperty(f->getPropertyName()).getColumn();
       QString placeHolder = placeHolders[f];
       query.bindValue(getPlaceHolder(placeHolder), f->getValues().first());
     }

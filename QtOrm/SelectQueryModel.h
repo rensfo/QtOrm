@@ -43,6 +43,7 @@ protected:
   virtual QString getLikeCondition(const QString &fieldName) const;
   QString operationToString(const Condition &filter) const;
   QString conditionToString(Condition *condition);
+  Operation operationToSqlStandart(Condition *condition);
   short calculateCountUsedColumn(const QString &value);
 
 protected:
