@@ -6,6 +6,9 @@
 
 #include "Operation.h"
 
+namespace QtOrm {
+namespace Sql {
+
 class Condition : public QObject {
   Q_OBJECT
 public:
@@ -32,4 +35,6 @@ private:
   QList<QVariant> values;
 };
 
+}
+}
 #endif // CONDITION_H

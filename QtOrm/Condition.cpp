@@ -1,6 +1,8 @@
 #include "Condition.h"
 
-extern QMap<Operation, QString> OperationSimbols;
+namespace QtOrm {
+namespace Sql {
+extern QMap<Operation, QString> OperationStrings;
 
 Condition::Condition(QObject *parent) : QObject(parent) {
 }
@@ -52,4 +54,6 @@ void Condition::clearValues() {
 
 void Condition::addValue(const QVariant &value) {
   values.append(value);
+}
+}
 }

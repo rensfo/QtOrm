@@ -5,6 +5,9 @@
 
 #include "Condition.h"
 
+namespace QtOrm {
+namespace Sql {
+
 enum class GroupOperation { And, Or };
 
 class GroupConditions : public QObject {
@@ -39,5 +42,6 @@ private:
   QList<Condition *> conditions;
   QList<GroupConditions *> groups;
 };
-
+}
+}
 #endif // GROUPCONDITIONS_H

@@ -1,5 +1,8 @@
 #include "GroupConditions.h"
 
+namespace QtOrm {
+namespace Sql {
+
 GroupConditions::GroupConditions(QObject *parent) : QObject(parent) {
 }
 
@@ -79,4 +82,6 @@ GroupConditions &GroupConditions::operator=(const GroupConditions &group) {
   groups = group.getGroups();
 
   return *this;
+}
+}
 }

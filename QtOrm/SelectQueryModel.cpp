@@ -126,15 +126,15 @@ QString SelectQueryModel::conditionToString(Condition *condition)
   switch(operation)
   {
     case Operation::Like:
-      conditionString = QString("%1 %2 '%' || :%3 || '%'").arg(fullColumnName).arg(OperationSimbols[operation]);
+      conditionString = QString("%1 %2 '%' || :%3 || '%'").arg(fullColumnName).arg(OperationStrings[operation]);
       conditionPlaceholder.insert(condition, placeHolder);
     break;
     case Operation::IsNull:
     case Operation::IsNotNull:
-      conditionString = QString("%1 %2").arg(fullColumnName).arg(OperationSimbols[operation]);
+      conditionString = QString("%1 %2").arg(fullColumnName).arg(OperationStrings[operation]);
     break;
     default:
-      conditionString = QString("%1 %2 :%3").arg(fullColumnName).arg(OperationSimbols[operation]).arg(placeHolder);
+      conditionString = QString("%1 %2 :%3").arg(fullColumnName).arg(OperationStrings[operation]).arg(placeHolder);
       conditionPlaceholder.insert(condition, placeHolder);
   }
 
