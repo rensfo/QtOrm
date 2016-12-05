@@ -21,12 +21,12 @@ OneToMany &OneToMany::setRefClass(const QString &refClass) {
   this->refClass = refClass;
   return *this;
 }
-QString OneToMany::getRefProperty() const {
-  return refProperty;
+QString OneToMany::getColumn() const {
+  return column;
 }
 
-OneToMany &OneToMany::setRefProperty(const QString &refProperty) {
-  this->refProperty = refProperty;
+OneToMany &OneToMany::setColumn(const QString &column) {
+  this->column = column;
   return *this;
 }
 

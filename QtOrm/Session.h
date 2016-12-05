@@ -120,7 +120,7 @@ QList<QObject *> *Session::getObjectList() {
   QString className = T::staticMetaObject.className();
   QList<QObject *> *result;
   Query query = createQuery();
-  result = query.getListObject(className, QString(), QVariant());
+  result = query.getListObject(className, QString(), QString(), QVariant());
 
   return result;
 }
@@ -130,7 +130,7 @@ QList<QObject *> *Session::getObjectList(const QString &property, const QVariant
   QString className = T::staticMetaObject.className();
   QList<QObject *> *result;
   Query query = createQuery();
-  result = query.getListObject(className, property, value);
+  result = query.getListObject(className, property, QString(), value);
 
   return result;
 }

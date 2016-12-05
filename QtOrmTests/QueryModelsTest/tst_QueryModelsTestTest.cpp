@@ -48,6 +48,7 @@ void QueryModelsTestTest::selectClause() {
   ClassMapBase *classBase = ConfigurationMap::getMappedClass("A");
   SelectQueryModel query;
   query.setClassBase(classBase);
+  query.buildModel();
 
   QCOMPARE(query.getSelect(), expectedSelectClause);
 }
@@ -56,6 +57,7 @@ void QueryModelsTestTest::fromClause() {
   ClassMapBase *classBase = ConfigurationMap::getMappedClass("A");
   SelectQueryModel query;
   query.setClassBase(classBase);
+  query.buildModel();
 
   QCOMPARE(query.getFrom(), expectedFromClause);
 }
@@ -64,6 +66,7 @@ void QueryModelsTestTest::whereClause() {
   ClassMapBase *classBase = ConfigurationMap::getMappedClass("A");
   SelectQueryModel query;
   query.setClassBase(classBase);
+  query.buildModel();
 
   GroupConditions group;
   group.setOperation(GroupOperation::And);
@@ -79,6 +82,7 @@ void QueryModelsTestTest::emptyWhereClause() {
   ClassMapBase *classBase = ConfigurationMap::getMappedClass("A");
   SelectQueryModel query;
   query.setClassBase(classBase);
+  query.buildModel();
 
   GroupConditions group;
 
@@ -92,6 +96,7 @@ void QueryModelsTestTest::oneColumnTwoTimes()
   ClassMapBase *classBase = ConfigurationMap::getMappedClass("A");
   SelectQueryModel query;
   query.setClassBase(classBase);
+  query.buildModel();
 
   GroupConditions group;
   group.setOperation(GroupOperation::Or);
@@ -107,6 +112,7 @@ void QueryModelsTestTest::updateSql() {
   ClassMapBase *classBase = ConfigurationMap::getMappedClass("A");
   UpdateQueryModel query;
   query.setClassBase(classBase);
+  query.buildModel();
 
   QCOMPARE(query.getSqlText(), expectedUpdateText);
 }
@@ -115,6 +121,7 @@ void QueryModelsTestTest::insertSql() {
   ClassMapBase *classBase = ConfigurationMap::getMappedClass("A");
   InsertQueryModel query;
   query.setClassBase(classBase);
+  query.buildModel();
 
   QCOMPARE(query.getSqlText(), expectedInsertText);
 }
@@ -123,6 +130,7 @@ void QueryModelsTestTest::deleteSql() {
   ClassMapBase *classBase = ConfigurationMap::getMappedClass("A");
   DeleteQueryModel query;
   query.setClassBase(classBase);
+  query.buildModel();
 
   QCOMPARE(query.getSqlText(), expectedDeleteText);
 }

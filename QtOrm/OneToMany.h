@@ -19,15 +19,15 @@ public:
   QString getRefClass() const;
   OneToMany &setRefClass(const QString &refClass);
 
-  QString getRefProperty() const;
-  OneToMany &setRefProperty(const QString &refProperty);
+  QString getColumn() const;
+  OneToMany &setColumn(const QString &column);
 
   OneToMany &setSaveCascade(bool value);
 
 private:
   QString property;
   QString refClass;
-  QString refProperty;
+  QString column;
 };
 }
 }

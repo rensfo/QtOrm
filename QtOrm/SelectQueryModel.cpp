@@ -43,7 +43,6 @@ QString SelectQueryModel::buildWhereClause() {
 }
 
 QString SelectQueryModel::GroupConditionToString(const GroupConditions &groupConditions) {
-  QString tableName = mainTableModel->getAlias();
   QString whereClause;
   for (Condition *condition : groupConditions.getConditions()) {
     QString groupOp = groupOperationToString(groupConditions.getOperation());
@@ -96,7 +95,15 @@ QString SelectQueryModel::operationToString(const Condition &filter) const {
 QString SelectQueryModel::conditionToString(Condition *condition)
 {
   QString conditionString;
-  QString columnName = classBase->getProperty(condition->getPropertyName()).getColumn();
+  QString columnName;
+  if(condition->getPropertyName().isEmpty())
+  {
+    columnName = condition->getColumn();
+  }
+  else
+  {
+    columnName = classBase->getProperty(condition->getPropertyName()).getColumn();
+  }
 
   Operation operation = operationToSqlStandart(condition);
 

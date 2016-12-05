@@ -23,6 +23,7 @@ QSqlQuery SqlBuilderBase::selectQuery() {
   SelectQueryModel *selectQueryModel = dynamic_cast<SelectQueryModel *>(queryModel);
   selectQueryModel->buildModel();
   selectQueryModel->setConditions(conditions);
+  selectQueryModel->buildModel();
 
   QSqlQuery query(database);
   query.prepare(selectQueryModel->getSqlText());

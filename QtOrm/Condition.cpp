@@ -18,6 +18,7 @@ Condition::Condition(const Condition &filter) : Condition(nullptr) {
   propertyName = filter.getPropertyName();
   operation = filter.getOperation();
   values = filter.getValues();
+  column = filter.getColumn();
 }
 
 QString Condition::getPropertyName() const {
@@ -54,6 +55,16 @@ void Condition::clearValues() {
 
 void Condition::addValue(const QVariant &value) {
   values.append(value);
+}
+
+QString Condition::getColumn() const
+{
+  return column;
+}
+
+void Condition::setColumn(const QString &value)
+{
+  column = value;
 }
 }
 }

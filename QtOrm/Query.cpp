@@ -29,7 +29,7 @@ QObject *Query::getById(const QString &className, const QVariant &id) {
   if (reestr->contains(classBase->getTable(), id.toString()))
     return reestr->value(classBase->getTable(), id.toString());
 
-  auto list = getListObject(className, classBase->getIdProperty().getName(), id);
+  auto list = getListObject(className, classBase->getIdProperty().getName(), QString(), id);
 
   if (list->size() == 0) {
     return nullptr;
@@ -42,13 +42,18 @@ QObject *Query::getById(const QString &className, const QVariant &id) {
   return list->takeFirst();
 }
 
-QList<QObject *> *Query::getListObject(const QString &className, const QString property, const QVariant value) {
+QList<QObject *> *Query::getListObject(const QString &className, const QString &property, const QString &column, const QVariant value) {
   GroupConditions group;
-  Mapping::ClassMapBase *classBase = ConfigurationMap::getMappedClass(className);
-  if (!property.isEmpty()) {
-    QString column = classBase->getProperty(property).getColumn();
+  if (!property.isEmpty() || !column.isEmpty()) {
     Condition filter(this);
-    filter.setPropertyName(column);
+    if(property.isEmpty())
+    {
+      filter.setColumn(column);
+    }
+    else
+    {
+      filter.setPropertyName(property);
+    }
     filter.setOperation(Operation::Equal);
     filter.setValue(value);
     group.addCondition(filter);
@@ -234,10 +239,10 @@ void Query::fillOneToMany(const QList<OneToMany *> &relations, const QString &id
   for (auto oneToMany : relations) {
     QString refClass = oneToMany->getRefClass();
     QString property = oneToMany->getProperty();
-    QString refProperty = oneToMany->getRefProperty();
+    QString column = oneToMany->getColumn();
     QVariant value = object.property(idProperty.toStdString().data());
 
-    QObjectList *qobjectList = getListObject(refClass, refProperty, value);
+    QObjectList *qobjectList = getListObject(refClass, QString(), column, value);
 
     Mapping::ClassMapBase *refClassBase = ConfigurationMap::getMappedClass(oneToMany->getRefClass());
     QVariant var = refClassBase->getVariantByObjectList(qobjectList);

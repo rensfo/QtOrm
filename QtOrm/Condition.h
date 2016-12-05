@@ -29,7 +29,11 @@ public:
 
   void addValue(const QVariant &value);
 
+  QString getColumn() const;
+  void setColumn(const QString &value);
+
 private:
+  QString column;
   QString propertyName;
   Operation operation = Operation::None;
   QList<QVariant> values;

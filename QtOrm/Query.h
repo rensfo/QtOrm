@@ -25,7 +25,7 @@ public:
   explicit Query(QObject *parent = nullptr);
   Query(const Query &other);
   virtual QObject *getById(const QString &className, const QVariant &id);
-  virtual QList<QObject *> *getListObject(const QString &className, const QString property = QString(),
+  virtual QList<QObject *> *getListObject(const QString &className, const QString &property = QString(), const QString &column = QString(),
                                           const QVariant value = QVariant());
   virtual QList<QObject *> *getListObject(const QString &className, const GroupConditions &conditions);
   virtual void saveObject(QObject &object);
