@@ -30,6 +30,7 @@ private Q_SLOTS:
   void selectClause();
   void fromClause();
   void whereClause();
+  void whereClauseUseColumn();
   void emptyWhereClause();
   void oneColumnTwoTimes();
   void updateSql();
@@ -70,8 +71,31 @@ void QueryModelsTestTest::whereClause() {
 
   GroupConditions group;
   group.setOperation(GroupOperation::And);
-  group.addConditionEqual(classBase->getIdProperty().getColumn(), 1);
+  group.addConditionEqual(classBase->getIdProperty().getName(), 1);
   group.addConditionEqual("code_1", "code1");
+
+  query.setConditions(group);
+
+  QCOMPARE(query.getWhere(), expectedWhereClause);
+}
+
+void QueryModelsTestTest::whereClauseUseColumn()
+{
+  ClassMapBase *classBase = ConfigurationMap::getMappedClass("A");
+  SelectQueryModel query;
+  query.setClassBase(classBase);
+  query.buildModel();
+
+  GroupConditions group;
+  group.setOperation(GroupOperation::And);
+
+  group.addConditionEqual(classBase->getIdProperty().getColumn(), 1);
+
+  Condition condition;
+  condition.setColumn("code");
+  condition.setValue("code1");
+  condition.setOperation(Operation::Equal);
+  group.addCondition(condition);
 
   query.setConditions(group);
 
