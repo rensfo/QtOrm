@@ -79,8 +79,7 @@ void QueryModelsTestTest::whereClause() {
   QCOMPARE(query.getWhere(), expectedWhereClause);
 }
 
-void QueryModelsTestTest::whereClauseUseColumn()
-{
+void QueryModelsTestTest::whereClauseUseColumn() {
   ClassMapBase *classBase = ConfigurationMap::getMappedClass("A");
   SelectQueryModel query;
   query.setClassBase(classBase);
@@ -115,8 +114,7 @@ void QueryModelsTestTest::emptyWhereClause() {
   QCOMPARE(query.getWhere(), QString());
 }
 
-void QueryModelsTestTest::oneColumnTwoTimes()
-{
+void QueryModelsTestTest::oneColumnTwoTimes() {
   ClassMapBase *classBase = ConfigurationMap::getMappedClass("A");
   SelectQueryModel query;
   query.setClassBase(classBase);

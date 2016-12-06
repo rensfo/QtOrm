@@ -110,8 +110,7 @@ void QueryResultTestTest::oneTableTwoTimesInQuery() {
   }
 }
 
-void QueryResultTestTest::oneColumnTwoTimesInWhere()
-{
+void QueryResultTestTest::oneColumnTwoTimesInWhere() {
   try {
 
     GroupConditions gc;
@@ -169,8 +168,7 @@ void QueryResultTestTest::deleteObject() {
   }
 }
 
-void QueryResultTestTest::updateObject()
-{
+void QueryResultTestTest::updateObject() {
   try {
     session.clearReestr();
     session.setAutoUpdate(false);
