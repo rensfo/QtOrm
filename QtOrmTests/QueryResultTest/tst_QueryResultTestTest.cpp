@@ -201,8 +201,7 @@ void QueryResultTestTest::where() {
   QCOMPARE(a->count(), 1);
 }
 
-void QueryResultTestTest::queryFromCache()
-{
+void QueryResultTestTest::queryFromCache() {
 
 }
 
@@ -250,7 +249,6 @@ bool QueryResultTestTest::executeListCommand(const QStringList &commands) {
 }
 
 bool QueryResultTestTest::dropDatabase(const QString &dbName) {
-
   return QFile::remove(dbName);
 }
 
