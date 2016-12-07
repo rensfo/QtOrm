@@ -55,6 +55,8 @@ public:
   void clearReestr();
   void clearQueryCache();
 
+  void removeFromCache(QObject *object);
+
 protected:
   Query createQuery();
 

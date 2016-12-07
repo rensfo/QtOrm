@@ -39,10 +39,10 @@ public:
   Reestr *getReestr() const;
   void setReestr(Reestr *value);
 
-  Query &operator=(const Query &other);
-
   QueryCache *getQueryCache() const;
   void setQueryCache(QueryCache *value);
+
+  Query &operator=(const Query &other);
 
 signals:
   void executedSql(QString sqlText);

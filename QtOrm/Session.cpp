@@ -61,6 +61,13 @@ void Session::clearQueryCache()
   queryCache->clear();
 }
 
+void Session::removeFromCache(QObject *object)
+{
+  if(reestr) {
+    reestr->remove(object);
+  }
+}
+
 Query Session::createQuery() {
   Query query;
   query.setDatabase(database);
