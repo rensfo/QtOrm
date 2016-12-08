@@ -36,6 +36,9 @@ private Q_SLOTS:
   void updateObject();
   void where();
   void queryFromCache();
+  void refreshObject();
+  void refreshChildObject();
+  void deleteChildAndRefresh();
 
 private:
   bool openConnection();
@@ -47,6 +50,9 @@ private:
 
   bool dropDatabase(const QString &dbName);
   void closeConnection();
+
+  template<typename T>
+  T find(QList<T> container, std::function<bool(T)> func);
 
 private:
   QtOrm::Session session;
@@ -98,7 +104,6 @@ void QueryResultTestTest::objectFromReestr() {
 
 void QueryResultTestTest::oneTableTwoTimesInQuery() {
   try {
-    //    connect(&session, &Session::executedSql, [](QString sql){ qDebug() << sql; });
     E *e = session.getById<E>(1);
     Q_UNUSED(e)
 
@@ -202,7 +207,79 @@ void QueryResultTestTest::where() {
 }
 
 void QueryResultTestTest::queryFromCache() {
+  QCOMPARE(true, false);
+}
 
+void QueryResultTestTest::refreshObject() {
+  try {
+    QSqlQuery query(db);
+
+    A *a = session.get<A>("code_1", "code2");
+    if(query.exec("update A set code = null where code = 'code2'")) {
+      session.refresh(*a);
+      QCOMPARE(a->getCode(), QString(""));
+
+      a->setCode("code2");
+      session.saveObject(*a);
+      return;
+    }
+    QVERIFY(false);
+  } catch (QtOrm::Exception &e) {
+    qDebug() << e.getMessage();
+    QVERIFY(false);
+  }
+}
+
+void QueryResultTestTest::refreshChildObject() {
+  try {
+    QSqlQuery query(db);
+
+    A *a = session.get<A>("code_1", "code2");
+    if(query.exec("update B set code = 'code2.2.1' where code = 'code2.2'")) {
+      session.refresh(*a);
+
+      std::function<bool(B*)> func = [](B *item){
+        return item->getCode() == "code2.2.1";
+      };
+      B *updatedB = this->find<B *>(a->getChild(), func);
+      QVERIFY(updatedB != nullptr);
+      if(updatedB) {
+        updatedB->setCode("code2.2");
+        session.saveObject(*updatedB);
+      }
+      return;
+    }
+  } catch (QtOrm::Exception &e) {
+    qDebug() << e.getMessage();
+    QVERIFY(false);
+  }
+
+  QVERIFY(false);
+}
+
+void QueryResultTestTest::deleteChildAndRefresh() {
+  try {
+//    connect(&session, &Session::executedSql, [](QString sql){ qDebug() << sql; });
+    QSqlQuery query(db);
+
+    A *a = session.get<A>("code_1", "code2");
+    std::function<bool(B*)> func = [](B *item){
+      return item->getCode() == "code2.2";
+    };
+    B *updatedB = this->find<B *>(a->getChild(), func);
+
+    if(query.exec("delete from B where code = 'code2.2'")) {
+
+
+      session.refresh(*a);
+      QCOMPARE(a->getChild().count(), 2);
+    }
+  } catch (QtOrm::Exception &e) {
+    qDebug() << e.getMessage();
+    QVERIFY(false);
+  }
+
+  QVERIFY(false);
 }
 
 bool QueryResultTestTest::openConnection() {
@@ -254,6 +331,16 @@ bool QueryResultTestTest::dropDatabase(const QString &dbName) {
 
 void QueryResultTestTest::closeConnection() {
   db.close();
+}
+
+template<typename T>
+T QueryResultTestTest::find(QList<T> container, std::function<bool(T)> func) {
+  for(T element : container) {
+    if(func(element)){
+      return element;
+    }
+  }
+  return nullptr;
 }
 
 QTEST_MAIN(QueryResultTestTest)

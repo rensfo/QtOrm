@@ -83,6 +83,7 @@ protected:
   void rollback();
   bool isIdObjectDefault(QObject &object);
   bool isIdOneToOneDefault(QObject &object, OneToOne *oneToOne);
+  QString getQueryColumn(QueryTableModel *queryTableModel, PropertyMap *property);
 
 protected:
   Reestr *reestr = nullptr;
