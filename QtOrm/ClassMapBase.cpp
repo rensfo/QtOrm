@@ -27,7 +27,7 @@ QString ClassMapBase::getClassName() const {
 PropertyMap &ClassMapBase::id(QString propertyName) {
   if (!idProperty.isEmpty()) {
     QString errorText = QString::fromUtf8("Field id registred (%1.%2)").arg(getClassName()).arg(idProperty);
-    throw Exception(ErrorCode::IdPropertyAlreadyRegistred, errorText);
+    throw IdPropertyAlreadyRegistredException(errorText);
   }
 
   idProperty = propertyName;
@@ -92,7 +92,7 @@ void ClassMapBase::checkToExistProperty(const QString &property) {
   if (propertyIndex == -1) {
     QString message =
         QString::fromUtf8("Property %2 in class %1 not found").arg(classMetaObject.className()).arg(property);
-    throw Exception(ErrorCode::PropertyNotFound, message);
+    throw PropertyNotFoundException(message);
   }
 }
 

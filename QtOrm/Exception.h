@@ -7,18 +7,12 @@
 namespace QtOrm {
 
 enum class ErrorCode {
-  FindMoreThatOneRecord,
-  Sql,
-  NotRegistredClass,
-  IdPropertyAlreadyRegistred,
-  PropertyNotFound,
-  UnableToSetValue,
-  InstanceNotCreated
+  Sql
 };
 
 class Exception : public QException {
 public:
-  explicit Exception(ErrorCode code, const QString &message);
+  explicit Exception(const QString &message);
   Exception(const Exception &exception);
 
   virtual void raise() const override;
@@ -26,12 +20,45 @@ public:
 
   QString getMessage() const;
 
-  ErrorCode getCode() const;
-
 protected:
-  ErrorCode code;
   QString message;
 };
+
+class FindMoreThatOneRecordException : public Exception{
+public:
+  using Exception::Exception;
+};
+
+class NotRegistredClassException : public Exception{
+public:
+  using Exception::Exception;
+};
+
+class IdPropertyAlreadyRegistredException : public Exception{
+public:
+  using Exception::Exception;
+};
+
+class PropertyNotFoundException : public Exception{
+public:
+  using Exception::Exception;
+};
+
+class UnableToSetValueException : public Exception{
+public:
+  using Exception::Exception;
+};
+
+class InstanceNotCreatedException : public Exception{
+public:
+  using Exception::Exception;
+};
+
+class SqlException : public Exception{
+public:
+  using Exception::Exception;
+};
+
 }
 
 #endif // EXEPTION_H

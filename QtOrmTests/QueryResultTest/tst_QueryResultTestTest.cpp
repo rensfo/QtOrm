@@ -81,8 +81,9 @@ void QueryResultTestTest::unregisteredClass() {
   try {
     auto res = session.getList<A>();
     Q_UNUSED(res)
-  } catch (Exception ex) {
-    QVERIFY(ex.getCode() == ErrorCode::NotRegistredClass);
+  } catch (NotRegistredClassException &e) {
+    Q_UNUSED(e)
+    QVERIFY(true);
     return;
   }
   QVERIFY(false);
