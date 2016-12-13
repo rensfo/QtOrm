@@ -41,7 +41,7 @@ QObject *Query::getById(const QString &className, const QVariant &id) {
   return list->takeFirst();
 }
 
-QList<QObject *> *Query::getListObject(const QString &className, const QString &property, const QString &column, const QVariant value) {
+QList<QObject *> *Query::getListObject(const QString &className, const QString &property, const QString &column, const QVariant &value) {
   GroupConditions group;
   if (!property.isEmpty() || !column.isEmpty()) {
     Condition filter(this);
@@ -354,12 +354,25 @@ void Query::refreshObjectData(QObject &object, QueryTableModel *queryTableModel,
     refreshObjectData(*oneToOneObj, join->getQueryTableModel(), record);
   }
 
+  QVariant idValue = object.property(classBase->getIdProperty().getName().toStdString().data());
+
   for (OneToMany *oneToMany : classBase->getOneToManyRelations()) {
     Mapping::ClassMapBase *refClassBase = ConfigurationMap::getMappedClass(oneToMany->getRefClass());
+    QString refColumn = oneToMany->getColumn();
+    QList<QObject *> *newChildren = getListObject(refClassBase->getClassName(), QString(), refColumn, idValue);
+
     QVariant propertyValue = object.property(oneToMany->getProperty().toStdString().data());
-    QList<QObject *> *oneToManyObjects = refClassBase->getObjectListByVariant(propertyValue);
-    for (QObject *obj : *oneToManyObjects)
-      refresh(*obj);
+    QList<QObject *> *currentChildren = refClassBase->getObjectListByVariant(propertyValue);
+    for(QObject *child : *newChildren) {
+      if(currentChildren->contains(child)) {
+        refresh(*child);
+      }
+    }
+
+    QVariant newChildrenValue = refClassBase->getVariantByObjectList(newChildren);
+    object.setProperty(oneToMany->getProperty().toStdString().data(), newChildrenValue);
+//    for (QObject *obj : *oneToManyObjects)
+//      refresh(*obj);
   }
 }
 

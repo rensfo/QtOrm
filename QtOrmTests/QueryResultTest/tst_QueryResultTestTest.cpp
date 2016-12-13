@@ -274,6 +274,7 @@ void QueryResultTestTest::deleteChildAndRefresh() {
 
       session.refresh(*a);
       QCOMPARE(a->getChild().count(), 2);
+      return;
     }
   } catch (QtOrm::Exception &e) {
     qDebug() << e.getMessage();
