@@ -78,13 +78,13 @@ QList<QSharedPointer<QObject>> Query::getListObject(const QString &className, co
   return getList(query, *sqlBuilder.getQueryModel());
 }
 
-void Query::saveObject(QSharedPointer<QObject> object) {
+void Query::saveObject(QSharedPointer<QObject> &object) {
   startTransaction();
   saveObjectWoStartTransaction(object);
   commit();
 }
 
-void Query::insertObject(QSharedPointer<QObject> object) {
+void Query::insertObject(QSharedPointer<QObject> &object) {
   saveAllOneToOne(object);
 
   QSharedPointer<ClassMapBase> classBase = ConfigurationMap::getMappedClass(object->metaObject()->className());
@@ -110,7 +110,7 @@ void Query::insertObject(QSharedPointer<QObject> object) {
   saveAllOneToMany(object);
 }
 
-void Query::updateObject(QSharedPointer<QObject> object) {
+void Query::updateObject(QSharedPointer<QObject> &object) {
   saveAllOneToOne(object);
 
   QSharedPointer<ClassMapBase> classBase = ConfigurationMap::getMappedClass(object->metaObject()->className());
@@ -126,7 +126,7 @@ void Query::updateObject(QSharedPointer<QObject> object) {
   saveAllOneToMany(object);
 }
 
-void Query::deleteObject(QSharedPointer<QObject> object) {
+void Query::deleteObject(QSharedPointer<QObject> &object) {
   QSharedPointer<ClassMapBase> classBase = ConfigurationMap::getMappedClass(object->metaObject()->className());
 
   SimpleSqlBuilder sqlBuilder;
@@ -140,7 +140,7 @@ void Query::deleteObject(QSharedPointer<QObject> object) {
   removeObjectFromReestr(object);
 }
 
-void Query::refresh(QSharedPointer<QObject> object) {
+void Query::refresh(QSharedPointer<QObject> &object) {
   QSharedPointer<ClassMapBase> classBase = ConfigurationMap::getMappedClass(object->metaObject()->className());
 
   GroupConditions group;
@@ -167,7 +167,7 @@ void Query::refresh(QSharedPointer<QObject> object) {
   }
 }
 
-void Query::saveOneField(QSharedPointer<QObject> object, const QString &propertyName) {
+void Query::saveOneField(QSharedPointer<QObject> &object, const QString &propertyName) {
   QSharedPointer<ClassMapBase> classBase = ConfigurationMap::getMappedClass(object->metaObject()->className());
   QSharedPointer<OneToMany> oneToMany = classBase->findOneToManyByPropertyName(propertyName);
   if (oneToMany) {
@@ -218,7 +218,8 @@ QList<QSharedPointer<QObject>> Query::getList(QSqlQuery &query, const QueryModel
       obj = createNewInstance(classBase);
       insertObjectIntoReestr(classBase, query.record(), obj, mainTableAlias);
 
-      fillObject(obj, queryModel.getMainTableModel(), query.record());
+      QSharedPointer<QueryTableModel> mainTableModel = queryModel.getMainTableModel();
+      fillObject(obj, mainTableModel, query.record());
       fillOneToOne(obj, queryModel.getMainTableModel(), query.record());
       fillOneToMany(classBase->getOneToManyRelations(), classBase->getIdProperty()->getName(), obj);
     }
@@ -228,7 +229,7 @@ QList<QSharedPointer<QObject>> Query::getList(QSqlQuery &query, const QueryModel
   return objects;
 }
 
-void Query::fillObject(QSharedPointer<QObject> object, QSharedPointer<QueryTableModel> queryTableModel, const QSqlRecord &record) {
+void Query::fillObject(QSharedPointer<QObject> &object, QSharedPointer<QueryTableModel> &queryTableModel, const QSqlRecord &record) {
   QSharedPointer<ClassMapBase> classBase = ConfigurationMap::getMappedClass(object->metaObject()->className());
   auto properties = classBase->getProperties();
   for (auto prop : properties) {
@@ -273,7 +274,8 @@ void Query::fillOneToOne(QSharedPointer<QObject> object, QSharedPointer<QueryTab
         newObject = createNewInstance(refClassBase);
         insertObjectIntoReestr(refClassBase, record, newObject, tableAlias);
 
-        fillObject(newObject, join->getQueryTableModel(), record);
+        QSharedPointer<QueryTableModel> queryTableModel = join->getQueryTableModel();
+        fillObject(newObject, queryTableModel, record);
         fillOneToOne(newObject, join->getQueryTableModel(), record);
         fillOneToMany(refClassBase->getOneToManyRelations(), refClassBase->getIdProperty()->getName(), newObject);
       }
@@ -344,13 +346,17 @@ void Query::refreshObjectData(QSharedPointer<QObject> object, QSharedPointer<Que
   QSharedPointer<ClassMapBase> classBase = ConfigurationMap::getMappedClass(object->metaObject()->className());
   fillObject(object, queryTableModel, record);
 
+  refreshedObject.append(object);
+
   for (QSharedPointer<OneToOne> oneToOne : classBase->getOneToOneRelations()) {
     QString oneToOnePropertyTypeName = Mapping::ClassMapBase::getTypeNameOfProperty(object, oneToOne->getProperty());
     QSharedPointer<ClassMapBase> refClassBase = ConfigurationMap::getMappedClass(oneToOnePropertyTypeName);
     QVariant propertyValue = object->property(oneToOne->getProperty().toStdString().data());
     QSharedPointer<QObject> oneToOneObj = refClassBase->getObjectByVariant(propertyValue);
-    QSharedPointer<QueryJoin> join = queryTableModel->findJoinByColumnName(oneToOne->getTableColumn());
-    refreshObjectData(oneToOneObj, join->getQueryTableModel(), record);
+    if(!refreshedObject.contains(oneToOneObj)) {
+      QSharedPointer<QueryJoin> join = queryTableModel->findJoinByColumnName(oneToOne->getTableColumn());
+      refreshObjectData(oneToOneObj, join->getQueryTableModel(), record);
+    }
   }
 
   QVariant idValue = object->property(classBase->getIdProperty()->getName().toStdString().data());
@@ -363,7 +369,7 @@ void Query::refreshObjectData(QSharedPointer<QObject> object, QSharedPointer<Que
     QVariant propertyValue = object->property(oneToMany->getProperty().toStdString().data());
     QList<QSharedPointer<QObject>> currentChildren = refClassBase->getObjectListByVariant(propertyValue);
     for(QSharedPointer<QObject> child : newChildren) {
-      if(currentChildren.contains(child)) {
+      if(currentChildren.contains(child) && !refreshedObject.contains(child)) {
         refresh(child);
       }
     }
@@ -500,6 +506,10 @@ QSharedPointer<QueryCache> Query::getQueryCache() const{
 
 void Query::setQueryCache(QSharedPointer<QueryCache> value){
   queryCache = value;
+}
+
+void Query::clearRefreshedObject() {
+  refreshedObject.clear();
 }
 }
 }

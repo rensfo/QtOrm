@@ -2,30 +2,35 @@
 #define B_H
 
 #include <QObject>
+#include <QSharedPointer>
+
+class A;
 
 class B : public QObject {
   Q_OBJECT
   Q_PROPERTY(long id READ getId WRITE setId)
-  Q_PROPERTY(long idA READ getIdA WRITE setIdA NOTIFY idAChanged)
+  Q_PROPERTY(QSharedPointer<A> a READ getA WRITE setA NOTIFY aChanged)
   Q_PROPERTY(QString code READ getCode WRITE setCode NOTIFY codeChanged)
 public:
   Q_INVOKABLE explicit B(QObject *parent = nullptr);
+  ~B();
 
   long getId() const;
   void setId(long value);
 
-  long getIdA() const;
-  void setIdA(long value);
-
   QString getCode() const;
   void setCode(const QString &value);
+
+  QSharedPointer<A> getA() const;
+  void setA(const QSharedPointer<A> &value);
+
 signals:
-  void idAChanged();
+  void aChanged();
   void codeChanged();
 
 protected:
   long id = 0;
-  long idA = 0;
+  QSharedPointer<A> a;
   QString code;
 };
 

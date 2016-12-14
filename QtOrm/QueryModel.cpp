@@ -14,15 +14,15 @@ QSharedPointer<QueryTableModel> QueryModel::getMainTableModel() const {
   return mainTableModel;
 }
 
-void QueryModel::setMainTableModel(QSharedPointer<QueryTableModel> value) {
+void QueryModel::setMainTableModel(QSharedPointer<QueryTableModel> &value) {
   mainTableModel = value;
 }
 
-QSharedPointer<ClassMapBase> QueryModel::getClassBase() const {
+QSharedPointer<ClassMapBase> QueryModel::getClassBase() const{
   return classBase;
 }
 
-void QueryModel::setClassBase(QSharedPointer<ClassMapBase> value) {
+void QueryModel::setClassBase(QSharedPointer<ClassMapBase> &value) {
   if (classBase != value) {
     classBase = value;
   }

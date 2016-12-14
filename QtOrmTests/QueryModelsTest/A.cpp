@@ -3,6 +3,9 @@
 A::A(QObject *parent) : QObject(parent) {
 }
 
+A::~A(){
+}
+
 long A::getId() const {
   return id;
 }

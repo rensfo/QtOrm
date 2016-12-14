@@ -12,21 +12,6 @@ Session::Session(QObject *parent) : QObject(parent) {
   connect(&updater, &AutoUpdater::executedSql, this, &Session::executedSql);
 }
 
-void Session::saveObject(QSharedPointer<QObject> object) {
-  Query query = createQuery();
-  query.saveObject(object);
-}
-
-void Session::deleteObject(QSharedPointer<QObject> object) {
-  Query query = createQuery();
-  query.deleteObject(object);
-}
-
-void Session::refresh(QSharedPointer<QObject> value) {
-  Query query = createQuery();
-  query.refresh(value);
-}
-
 QSqlDatabase Session::getDatabase() const {
   return database;
 }

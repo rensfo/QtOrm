@@ -24,8 +24,10 @@ class Session : public QObject {
   Q_OBJECT
 public:
   explicit Session(QObject *parent = nullptr);
-  void saveObject(QSharedPointer<QObject> object);
-  void deleteObject(QSharedPointer<QObject> object);
+  template <class T>
+  void saveObject(QSharedPointer<T> &object);
+  template <class T>
+  void deleteObject(QSharedPointer<T> &object);
   template <class T>
   QSharedPointer<T> getById(const QVariant &id);
   template <class T>
@@ -44,7 +46,8 @@ public:
   QList<QSharedPointer<QObject> > getObjectList(const QString &property, const QVariant &value);
   template <class T>
   QList<QSharedPointer<QObject>> getObjectList(const GroupConditions &conditions);
-  void refresh(QSharedPointer<QObject> value);
+  template <class T>
+  void refresh(QSharedPointer<T> &value);
 
   QSqlDatabase getDatabase() const;
   void setDatabase(const QSqlDatabase &database);
@@ -147,8 +150,7 @@ QList<QSharedPointer<QObject>> Session::getObjectList(const GroupConditions &con
 }
 
 template <class T>
-QList<QSharedPointer<T>> Session::convertListTo(QList<QSharedPointer<QObject>> list)
-{
+QList<QSharedPointer<T>> Session::convertListTo(QList<QSharedPointer<QObject>> list) {
   QList<QSharedPointer<T>> convertedList;
   for(QSharedPointer<QObject> &item : list) {
     convertedList.append(item.objectCast<T>());
@@ -156,5 +158,27 @@ QList<QSharedPointer<T>> Session::convertListTo(QList<QSharedPointer<QObject>> l
 
   return convertedList;
 }
+
+template <class T>
+void Session::saveObject(QSharedPointer<T> &object) {
+  Query query = createQuery();
+  QSharedPointer<QObject> qobject = object.template objectCast<QObject>();
+  query.saveObject(qobject);
+}
+
+template <class T>
+void Session::deleteObject(QSharedPointer<T> &object) {
+  Query query = createQuery();
+  QSharedPointer<QObject> qobject = object.template objectCast<QObject>();
+  query.deleteObject(qobject);
+}
+
+template <class T>
+void Session::refresh(QSharedPointer<T> &object) {
+  Query query = createQuery();
+  QSharedPointer<QObject> qobject = object.template objectCast<QObject>();
+  query.refresh(qobject);
+}
+
 }
 #endif // SESSION_H

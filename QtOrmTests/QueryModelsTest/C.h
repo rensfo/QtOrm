@@ -11,6 +11,7 @@ class C : public QObject {
   Q_PROPERTY(QSharedPointer<KindA> kindA READ getKindA WRITE setKindA NOTIFY kindAChanged)
 public:
   Q_INVOKABLE explicit C(QObject *parent = nullptr);
+  ~C();
 
   long getId() const;
   void setId(long value);

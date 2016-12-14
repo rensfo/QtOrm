@@ -10,6 +10,7 @@ class TypeA : public QObject {
   Q_PROPERTY(QString name READ getName WRITE setName NOTIFY nameChanged)
 public:
   Q_INVOKABLE explicit TypeA(QObject *parent = nullptr);
+  ~TypeA();
 
   long getId() const;
   void setId(long value);

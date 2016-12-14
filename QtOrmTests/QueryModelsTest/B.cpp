@@ -1,6 +1,11 @@
 #include "B.h"
 
+#include "A.h"
+
 B::B(QObject *parent) : QObject(parent) {
+}
+
+B::~B() {
 }
 
 long B::getId() const {
@@ -11,18 +16,19 @@ void B::setId(long value) {
   id = value;
 }
 
-long B::getIdA() const {
-  return idA;
-}
-
-void B::setIdA(long value) {
-  idA = value;
-}
-
 QString B::getCode() const {
   return code;
 }
 
 void B::setCode(const QString &value) {
   code = value;
+}
+
+QSharedPointer<A> B::getA() const{
+  return a;
+}
+
+void B::setA(const QSharedPointer<A> &value){
+  a = value;
+  emit aChanged();
 }

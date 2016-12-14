@@ -13,6 +13,7 @@ class E : public QObject {
   Q_PROPERTY(QSharedPointer<D> d READ getD WRITE setD NOTIFY dChanged)
 public:
   Q_INVOKABLE explicit E(QObject *parent = nullptr);
+  ~E();
 
   long getId() const;
   void setId(long value);

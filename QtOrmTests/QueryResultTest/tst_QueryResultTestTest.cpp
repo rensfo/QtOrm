@@ -158,7 +158,7 @@ void QueryResultTestTest::insertObject() {
 void QueryResultTestTest::deleteObject() {
   try {
     QSharedPointer<A> a = session.getById<A>(1);
-    session.deleteObject(a);
+    session.deleteObject<A>(a);
 
     a->deleteLater();
 
@@ -214,7 +214,7 @@ void QueryResultTestTest::refreshObject() {
 
     QSharedPointer<A> a = session.get<A>("code_1", "code2");
     if(query.exec("update A set code = null where code = 'code2'")) {
-      session.refresh(a);
+      session.refresh<A>(a);
       QCOMPARE(a->getCode(), QString(""));
 
       a->setCode("code2");

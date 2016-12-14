@@ -3,6 +3,9 @@
 KindA::KindA(QObject *parent) : QObject(parent) {
 }
 
+KindA::~KindA() {
+}
+
 long KindA::getId() const {
   return id;
 }

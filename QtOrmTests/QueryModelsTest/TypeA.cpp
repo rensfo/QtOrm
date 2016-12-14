@@ -3,6 +3,9 @@
 TypeA::TypeA(QObject *parent) : QObject(parent) {
 }
 
+TypeA::~TypeA() {
+}
+
 long TypeA::getId() const {
   return id;
 }

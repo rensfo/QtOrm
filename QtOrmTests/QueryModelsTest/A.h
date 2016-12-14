@@ -15,6 +15,7 @@ class A : public QObject {
   Q_PROPERTY(QList<QSharedPointer<B>> child READ getChild WRITE setChild)
 public:
   Q_INVOKABLE explicit A(QObject *parent = nullptr);
+  ~A();
 
   long getId() const;
   void setId(long value);

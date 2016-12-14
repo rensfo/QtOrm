@@ -3,6 +3,9 @@
 E::E(QObject *parent) : QObject(parent) {
 }
 
+E::~E() {
+}
+
 QSharedPointer<C> E::getC() const {
   return c;
 }

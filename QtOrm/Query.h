@@ -29,10 +29,10 @@ public:
   virtual QList<QSharedPointer<QObject> > getListObject(const QString &className, const QString &property = QString(), const QString &column = QString(),
                                           const QVariant &value = QVariant());
   virtual QList<QSharedPointer<QObject> > getListObject(const QString &className, const GroupConditions &conditions);
-  virtual void saveObject(QSharedPointer<QObject> object);
-  virtual void deleteObject(QSharedPointer<QObject> object);
-  virtual void refresh(QSharedPointer<QObject> object);
-  virtual void saveOneField(QSharedPointer<QObject> object, const QString &propertyName);
+  virtual void saveObject(QSharedPointer<QObject> &object);
+  virtual void deleteObject(QSharedPointer<QObject> &object);
+  virtual void refresh(QSharedPointer<QObject> &object);
+  virtual void saveOneField(QSharedPointer<QObject> &object, const QString &propertyName);
 
   QSqlDatabase getDatabase() const;
   void setDatabase(const QSqlDatabase &value);
@@ -43,18 +43,20 @@ public:
   QSharedPointer<QueryCache> getQueryCache() const;
   void setQueryCache(QSharedPointer<QueryCache> value);
 
+  void clearRefreshedObject();
+
   Query &operator=(const Query &other);
 
 signals:
   void executedSql(QString sqlText);
 
 protected:
-  void insertObject(QSharedPointer<QObject> object);
-  void updateObject(QSharedPointer<QObject> object);
+  void insertObject(QSharedPointer<QObject> &object);
+  void updateObject(QSharedPointer<QObject> &object);
   virtual void executeQuery(QSqlQuery &query);
   QList<QSharedPointer<QObject> > getList(QSqlQuery &query, const QueryModel &queryModel);
 
-  void fillObject(QSharedPointer<QObject> object, QSharedPointer<QueryTableModel> queryTableModel, const QSqlRecord &record);
+  void fillObject(QSharedPointer<QObject> &object, QSharedPointer<QueryTableModel> &queryTableModel, const QSqlRecord &record);
   void fillOneToMany(const QList<QSharedPointer<OneToMany>> &relations, const QString &idProperty, QSharedPointer<QObject> object);
   void fillOneToOne(QSharedPointer<QObject> object, QSharedPointer<QueryTableModel> queryTableModel, const QSqlRecord &record);
   void objectSetProperty(QSharedPointer<QObject> object, const QString &propertyName, const QVariant &value);
@@ -90,6 +92,7 @@ protected:
   QSharedPointer<Reestr> reestr;
   QSqlDatabase database;
   QSharedPointer<QueryCache> queryCache;
+  QList<QSharedPointer<QObject>> refreshedObject;
 };
 }
 }

@@ -3,6 +3,9 @@
 C::C(QObject *parent) : QObject(parent) {
 }
 
+C::~C(){
+}
+
 long C::getId() const {
   return id;
 }

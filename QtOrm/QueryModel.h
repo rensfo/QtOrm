@@ -29,11 +29,11 @@ public:
   QSharedPointer<QueryTableModel> getMainTableModel() const;
 
   QSharedPointer<ClassMapBase> getClassBase() const;
-  void setClassBase(QSharedPointer<ClassMapBase> value);
+  void setClassBase(QSharedPointer<ClassMapBase> &value);
   virtual void buildModel() = 0;
 
 protected:
-  void setMainTableModel(QSharedPointer<QueryTableModel> value);
+  void setMainTableModel(QSharedPointer<QueryTableModel> &value);
 
 //  QSharedPointer<QueryTableModel> buildQueryTableModel(QSharedPointer<ClassMapBase> classBase);
 
