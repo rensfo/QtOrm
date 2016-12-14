@@ -16,7 +16,7 @@ void ClassMapBase::setTable(const QString &table) {
   this->table = table;
 }
 
-const QMap<QString, PropertyMap *> ClassMapBase::getProperties() const {
+const QMap<QString, QSharedPointer<PropertyMap> > ClassMapBase::getProperties() const {
   return properties;
 }
 
@@ -45,7 +45,7 @@ PropertyMap &ClassMapBase::map(QString propertyName, QString columnName) {
 PropertyMap &ClassMapBase::createProperty(QString propertyName) {
   checkToExistProperty(propertyName);
 
-  PropertyMap *propertyMap = new PropertyMap(propertyName);
+  QSharedPointer<PropertyMap> propertyMap = QSharedPointer<PropertyMap>::create(propertyName);
   properties.insert(propertyName, propertyMap);
 
   return *propertyMap;
@@ -59,18 +59,18 @@ void ClassMapBase::setMetaObject(const QMetaObject &metaObject) {
   this->classMetaObject = metaObject;
 }
 
-PropertyMap &ClassMapBase::getIdProperty() const {
-  return *(properties.value(idProperty));
+QSharedPointer<PropertyMap> ClassMapBase::getIdProperty() const {
+  return properties.value(idProperty);
 }
 
-PropertyMap &ClassMapBase::getProperty(const QString &property) {
-  return *(properties.value(property));
+QSharedPointer<PropertyMap> ClassMapBase::getProperty(const QString &property) {
+  return properties.value(property);
 }
 
 OneToMany &ClassMapBase::oneToMany(const QString &property) {
   checkToExistProperty(property);
 
-  OneToMany *relation = new OneToMany();
+  QSharedPointer<OneToMany> relation = QSharedPointer<OneToMany>::create();
   relation->setProperty(property);
   oneToManyRelations.append(relation);
 
@@ -80,7 +80,7 @@ OneToMany &ClassMapBase::oneToMany(const QString &property) {
 OneToOne &ClassMapBase::oneToOne(const QString &property) {
   checkToExistProperty(property);
 
-  OneToOne *relation = new OneToOne();
+  QSharedPointer<OneToOne> relation = QSharedPointer<OneToOne>::create();
   relation->setProperty(property);
   oneToOneRelations.append(relation);
 
@@ -96,22 +96,22 @@ void ClassMapBase::checkToExistProperty(const QString &property) {
   }
 }
 
-OneToOne *ClassMapBase::findOneToOneByPropertyName(const QString &propertyName) {
-  for (OneToOne *oneToOne : oneToOneRelations) {
+QSharedPointer<OneToOne> ClassMapBase::findOneToOneByPropertyName(const QString &propertyName) {
+  for (auto oneToOne : oneToOneRelations) {
     if (oneToOne->getProperty() == propertyName)
       return oneToOne;
   }
 
-  return nullptr;
+  return QSharedPointer<OneToOne>();
 }
 
-OneToMany *ClassMapBase::findOneToManyByPropertyName(const QString &propertyName) {
-  for (OneToMany *oneToMany : oneToManyRelations) {
+QSharedPointer<OneToMany> ClassMapBase::findOneToManyByPropertyName(const QString &propertyName) {
+  for (auto oneToMany : oneToManyRelations) {
     if (oneToMany->getProperty() == propertyName)
       return oneToMany;
   }
 
-  return nullptr;
+  return QSharedPointer<OneToMany>();
 }
 
 QString ClassMapBase::getTypeNameOfProperty(QSharedPointer<QObject> obj, const QString &prop) {
@@ -138,11 +138,11 @@ QString ClassMapBase::getTypeNameOfProperty(const QMetaObject &meta, const QStri
   return refClass;
 }
 
-QList<OneToMany *> ClassMapBase::getOneToManyRelations() const {
+QList<QSharedPointer<OneToMany>> ClassMapBase::getOneToManyRelations() const {
   return oneToManyRelations;
 }
 
-QList<OneToOne *> ClassMapBase::getOneToOneRelations() const {
+QList<QSharedPointer<OneToOne>> ClassMapBase::getOneToOneRelations() const {
   return oneToOneRelations;
 }
 }

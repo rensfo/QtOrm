@@ -29,7 +29,7 @@ QSharedPointer<QueryTableModel> InsertQueryModel::buildQueryTableModel() {
     queryTableModel->addColumn(property->getColumn());
   }
 
-  for (OneToOne *oneToOne : classBase->getOneToOneRelations())
+  for (QSharedPointer<OneToOne> oneToOne : classBase->getOneToOneRelations())
     queryTableModel->addColumn(oneToOne->getTableColumn());
 
   return queryTableModel;

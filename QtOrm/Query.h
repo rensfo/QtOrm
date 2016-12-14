@@ -55,7 +55,7 @@ protected:
   QList<QSharedPointer<QObject> > getList(QSqlQuery &query, const QueryModel &queryModel);
 
   void fillObject(QSharedPointer<QObject> object, QSharedPointer<QueryTableModel> queryTableModel, const QSqlRecord &record);
-  void fillOneToMany(const QList<OneToMany *> &relations, const QString &idProperty, QSharedPointer<QObject> object);
+  void fillOneToMany(const QList<QSharedPointer<OneToMany>> &relations, const QString &idProperty, QSharedPointer<QObject> object);
   void fillOneToOne(QSharedPointer<QObject> object, QSharedPointer<QueryTableModel> queryTableModel, const QSqlRecord &record);
   void objectSetProperty(QSharedPointer<QObject> object, const QString &propertyName, const QVariant &value);
   QSharedPointer<QObject> createNewInstance(QSharedPointer<ClassMapBase> classBase);
@@ -72,10 +72,10 @@ protected:
   QString getSqlTextWithBindParams(QSqlQuery &query);
 
   void saveAllOneToOne(QSharedPointer<QObject> object);
-  void saveOneToOne(QSharedPointer<QObject> object, OneToOne *oneToOne);
+  void saveOneToOne(QSharedPointer<QObject> object, QSharedPointer<OneToOne> oneToOne);
 
   void saveAllOneToMany(QSharedPointer<QObject> object);
-  void saveOneToMany(QSharedPointer<QObject> object, OneToMany *oneToMany);
+  void saveOneToMany(QSharedPointer<QObject> object, QSharedPointer<OneToMany> oneToMany);
 
   void saveObjectWoStartTransaction(QSharedPointer<QObject> object);
 
@@ -83,8 +83,8 @@ protected:
   void commit();
   void rollback();
   bool isIdObjectDefault(QSharedPointer<QObject> object);
-  bool isIdOneToOneDefault(QSharedPointer<QObject> object, OneToOne *oneToOne);
-  QString getQueryColumn(QSharedPointer<QueryTableModel> queryTableModel, PropertyMap *property);
+  bool isIdOneToOneDefault(QSharedPointer<QObject> object, QSharedPointer<OneToOne> oneToOne);
+  QString getQueryColumn(QSharedPointer<QueryTableModel> queryTableModel, QSharedPointer<PropertyMap> property);
 
 protected:
   QSharedPointer<Reestr> reestr;

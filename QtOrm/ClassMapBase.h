@@ -26,7 +26,7 @@ public:
 
   QString getClassName() const;
 
-  const QMap<QString, PropertyMap *> getProperties() const;
+  const QMap<QString, QSharedPointer<PropertyMap>> getProperties() const;
 
   PropertyMap &id(QString propertyName);
   PropertyMap &map(QString propertyName);
@@ -35,22 +35,22 @@ public:
   QMetaObject getMetaObject() const;
   void setMetaObject(const QMetaObject &classMetaObject);
 
-  PropertyMap &getIdProperty() const;
-  PropertyMap &getProperty(const QString &property);
+  QSharedPointer<PropertyMap> getIdProperty() const;
+  QSharedPointer<PropertyMap> getProperty(const QString &property);
 
   OneToMany &oneToMany(const QString &property);
   OneToOne &oneToOne(const QString &property);
 
-  QList<OneToMany *> getOneToManyRelations() const;
-  QList<OneToOne *> getOneToOneRelations() const;
+  QList<QSharedPointer<OneToMany>> getOneToManyRelations() const;
+  QList<QSharedPointer<OneToOne>> getOneToOneRelations() const;
 
   virtual QVariant getVariantByObjectList(QList<QSharedPointer<QObject>> value) = 0;
   virtual QList<QSharedPointer<QObject>> getObjectListByVariant(QVariant &value) = 0;
   virtual QVariant getVariantByObject(QSharedPointer<QObject> value) = 0;
   virtual QSharedPointer<QObject> getObjectByVariant(QVariant &value) = 0;
 
-  OneToOne *findOneToOneByPropertyName(const QString &propertyName);
-  OneToMany *findOneToManyByPropertyName(const QString &propertyName);
+  QSharedPointer<OneToOne> findOneToOneByPropertyName(const QString &propertyName);
+  QSharedPointer<OneToMany> findOneToManyByPropertyName(const QString &propertyName);
 
   static QString getTypeNameOfProperty(QSharedPointer<QObject> obj, const QString &prop);
   static QString getTypeNameOfProperty(const QMetaObject &meta, const QString &prop);
@@ -61,9 +61,9 @@ private:
 
 private:
   QString table;
-  QMap<QString, PropertyMap *> properties;
-  QList<OneToMany *> oneToManyRelations;
-  QList<OneToOne *> oneToOneRelations;
+  QMap<QString, QSharedPointer<PropertyMap>> properties;
+  QList<QSharedPointer<OneToMany>> oneToManyRelations;
+  QList<QSharedPointer<OneToOne>> oneToOneRelations;
 
   QString idProperty;
 

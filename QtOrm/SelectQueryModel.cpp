@@ -105,7 +105,7 @@ QString SelectQueryModel::conditionToString(Condition *condition)
   }
   else
   {
-    columnName = classBase->getProperty(condition->getPropertyName()).getColumn();
+    columnName = classBase->getProperty(condition->getPropertyName())->getColumn();
   }
 
   Operation operation = operationToSqlStandart(condition);
@@ -177,7 +177,7 @@ short SelectQueryModel::calculateCountUsedColumn(const QString &value)
 
   for(Condition *condition : conditionPlaceholder.keys())
   {
-    QString columnName = classBase->getProperty(condition->getPropertyName()).getColumn();
+    QString columnName = classBase->getProperty(condition->getPropertyName())->getColumn();
     if(columnName == value)
     {
       count++;
@@ -223,7 +223,7 @@ QSharedPointer<QueryTableModel> SelectQueryModel::buildQueryTableModel(QSharedPo
     QString refClass = ClassMapBase::getTypeNameOfProperty(classBase->getMetaObject(), property);
     QSharedPointer<ClassMapBase> refClassBase = ConfigurationMap::getMappedClass(refClass);
 
-    join->setRigthTableColumnName(refClassBase->getIdProperty().getColumn());
+    join->setRigthTableColumnName(refClassBase->getIdProperty()->getColumn());
     join->setQueryTableModel(buildQueryTableModel(refClassBase));
 
     queryTableModel->appendJoin(join);

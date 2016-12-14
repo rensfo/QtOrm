@@ -71,7 +71,7 @@ void QueryModelsTestTest::whereClause() {
 
   GroupConditions group;
   group.setOperation(GroupOperation::And);
-  group.addConditionEqual(classBase->getIdProperty().getName(), 1);
+  group.addConditionEqual(classBase->getIdProperty()->getName(), 1);
   group.addConditionEqual("code_1", "code1");
 
   query.setConditions(group);
@@ -88,7 +88,7 @@ void QueryModelsTestTest::whereClauseUseColumn() {
   GroupConditions group;
   group.setOperation(GroupOperation::And);
 
-  group.addConditionEqual(classBase->getIdProperty().getColumn(), 1);
+  group.addConditionEqual(classBase->getIdProperty()->getColumn(), 1);
 
   Condition condition;
   condition.setColumn("code");
