@@ -11,11 +11,11 @@ void C::setId(long value) {
   id = value;
 }
 
-KindA *C::getKindA() const {
+QSharedPointer<KindA> C::getKindA() const {
   return kindA;
 }
 
-void C::setKindA(KindA *value) {
+void C::setKindA(QSharedPointer<KindA> value) {
   kindA = value;
   emit kindAChanged();
 }

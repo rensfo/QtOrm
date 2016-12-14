@@ -3,20 +3,20 @@
 E::E(QObject *parent) : QObject(parent) {
 }
 
-C *E::getC() const {
+QSharedPointer<C> E::getC() const {
   return c;
 }
 
-void E::setC(C *value) {
+void E::setC(QSharedPointer<C> value) {
   c = value;
   emit cChanged();
 }
 
-D *E::getD() const {
+QSharedPointer<D> E::getD() const {
   return d;
 }
 
-void E::setD(D *value) {
+void E::setD(QSharedPointer<D> value) {
   d = value;
   emit dChanged();
 }

@@ -21,7 +21,7 @@ SimpleSqlBuilder::SimpleSqlBuilder(QObject *parent) : SqlBuilderBase(parent) {
 
 QSqlQuery SimpleSqlBuilder::insertQuery() {
   queryModel = getQueryModel(QueryModelType::Insert);
-  InsertQueryModel *insertQueryModel = dynamic_cast<InsertQueryModel *>(queryModel);
+  QSharedPointer<InsertQueryModel> insertQueryModel = queryModel.objectCast<InsertQueryModel>();
   insertQueryModel->setHasLastInsertedIdFeature(hasLastInsertedIdFeature());
   insertQueryModel->buildModel();
 
@@ -36,7 +36,7 @@ QSqlQuery SimpleSqlBuilder::insertQuery() {
 
 QSqlQuery SimpleSqlBuilder::updateQuery() {
   queryModel = getQueryModel(QueryModelType::Update);
-  UpdateQueryModel *updateQueryModel = dynamic_cast<UpdateQueryModel *>(queryModel);
+  QSharedPointer<UpdateQueryModel> updateQueryModel = queryModel.objectCast<UpdateQueryModel>();
   updateQueryModel->buildModel();
 
   QString fullSqlText = updateQueryModel->getSqlText();
@@ -58,7 +58,7 @@ QSqlQuery SimpleSqlBuilder::updateOneColumnQuery(const QString &property) {
 
 QSqlQuery SimpleSqlBuilder::deleteQuery() {
   queryModel = getQueryModel(QueryModelType::Delete);
-  DeleteQueryModel *deleteQueryModel = dynamic_cast<DeleteQueryModel *>(queryModel);
+  QSharedPointer<DeleteQueryModel> deleteQueryModel = queryModel.objectCast<DeleteQueryModel>();
   deleteQueryModel->buildModel();
 
   QString fullSqlText = deleteQueryModel->getSqlText();
@@ -98,9 +98,9 @@ void SimpleSqlBuilder::bindInsert(QSqlQuery &query) {
 
   for (auto oneToOne : classBase->getOneToOneRelations()) {
     QVariant valFromProp = object->property(oneToOne->getProperty().toStdString().c_str());
-    QString refClassName = Mapping::ClassMapBase::getTypeNameOfProperty(*object, oneToOne->getProperty());
-    Mapping::ClassMapBase *refClassBase = ConfigurationMap::getMappedClass(refClassName);
-    QObject *objFromProp = refClassBase->getObjectByVariant(valFromProp);
+    QString refClassName = Mapping::ClassMapBase::getTypeNameOfProperty(object, oneToOne->getProperty());
+    QSharedPointer<ClassMapBase> refClassBase = ConfigurationMap::getMappedClass(refClassName);
+    QSharedPointer<QObject> objFromProp = refClassBase->getObjectByVariant(valFromProp);
     QVariant val;
     if (objFromProp) {
       QString propRefClass = refClassBase->getIdProperty().getName();
@@ -145,9 +145,9 @@ void SimpleSqlBuilder::bind(QSqlQuery &query, const PropertyMap &property) {
 
 void SimpleSqlBuilder::bind(QSqlQuery &query, const OneToOne &oneToOne) {
   QVariant valFromProp = object->property(oneToOne.getProperty().toStdString().c_str());
-  QString refClassName = Mapping::ClassMapBase::getTypeNameOfProperty(*object, oneToOne.getProperty());
-  Mapping::ClassMapBase *refClassBase = ConfigurationMap::getMappedClass(refClassName);
-  QObject *objFromProp = refClassBase->getObjectByVariant(valFromProp);
+  QString refClassName = Mapping::ClassMapBase::getTypeNameOfProperty(object, oneToOne.getProperty());
+  QSharedPointer<ClassMapBase> refClassBase = ConfigurationMap::getMappedClass(refClassName);
+  QSharedPointer<QObject> objFromProp = refClassBase->getObjectByVariant(valFromProp);
   QVariant valToQuery;
   if (objFromProp) {
     QString propRefClass = refClassBase->getIdProperty().getName();

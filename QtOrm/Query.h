@@ -4,6 +4,7 @@
 #include <QMap>
 #include <QMetaProperty>
 #include <QObject>
+#include <QSharedPointer>
 #include <QSignalMapper>
 #include <QSqlDatabase>
 
@@ -24,23 +25,23 @@ class Query : public QObject {
 public:
   explicit Query(QObject *parent = nullptr);
   Query(const Query &other);
-  virtual QObject *getById(const QString &className, const QVariant &id);
-  virtual QList<QObject *> *getListObject(const QString &className, const QString &property = QString(), const QString &column = QString(),
+  virtual QSharedPointer<QObject> getById(const QString &className, const QVariant &id);
+  virtual QList<QSharedPointer<QObject> > getListObject(const QString &className, const QString &property = QString(), const QString &column = QString(),
                                           const QVariant &value = QVariant());
-  virtual QList<QObject *> *getListObject(const QString &className, const GroupConditions &conditions);
-  virtual void saveObject(QObject &object);
-  virtual void deleteObject(QObject &object);
-  virtual void refresh(QObject &object);
-  virtual void saveOneField(QObject &object, const QString &propertyName);
+  virtual QList<QSharedPointer<QObject> > getListObject(const QString &className, const GroupConditions &conditions);
+  virtual void saveObject(QSharedPointer<QObject> object);
+  virtual void deleteObject(QSharedPointer<QObject> object);
+  virtual void refresh(QSharedPointer<QObject> object);
+  virtual void saveOneField(QSharedPointer<QObject> object, const QString &propertyName);
 
   QSqlDatabase getDatabase() const;
   void setDatabase(const QSqlDatabase &value);
 
-  Reestr *getReestr() const;
-  void setReestr(Reestr *value);
+  QSharedPointer<Reestr> getReestr() const;
+  void setReestr(QSharedPointer<Reestr> value);
 
-  QueryCache *getQueryCache() const;
-  void setQueryCache(QueryCache *value);
+  QSharedPointer<QueryCache> getQueryCache() const;
+  void setQueryCache(QSharedPointer<QueryCache> value);
 
   Query &operator=(const Query &other);
 
@@ -48,47 +49,47 @@ signals:
   void executedSql(QString sqlText);
 
 protected:
-  void insertObject(QObject &object);
-  void updateObject(QObject &object);
+  void insertObject(QSharedPointer<QObject> object);
+  void updateObject(QSharedPointer<QObject> object);
   virtual void executeQuery(QSqlQuery &query);
-  QList<QObject *> *getList(QSqlQuery &query, const QueryModel &queryModel);
+  QList<QSharedPointer<QObject> > getList(QSqlQuery &query, const QueryModel &queryModel);
 
-  void fillObject(QObject &object, QueryTableModel *queryTableModel, const QSqlRecord &record);
-  void fillOneToMany(const QList<OneToMany *> &relations, const QString &idProperty, QObject &object);
-  void fillOneToOne(QObject &object, QueryTableModel *queryTableModel, const QSqlRecord &record);
-  void objectSetProperty(QObject &object, const QString &propertyName, const QVariant &value);
-  QObject *createNewInstance(Mapping::ClassMapBase &classBase);
+  void fillObject(QSharedPointer<QObject> object, QSharedPointer<QueryTableModel> queryTableModel, const QSqlRecord &record);
+  void fillOneToMany(const QList<OneToMany *> &relations, const QString &idProperty, QSharedPointer<QObject> object);
+  void fillOneToOne(QSharedPointer<QObject> object, QSharedPointer<QueryTableModel> queryTableModel, const QSqlRecord &record);
+  void objectSetProperty(QSharedPointer<QObject> object, const QString &propertyName, const QVariant &value);
+  QSharedPointer<QObject> createNewInstance(Mapping::ClassMapBase &classBase);
   bool reestrContainsObject(Mapping::ClassMapBase &classBase, const QSqlRecord &record, const QString &tableAlias);
-  QObject *getObjectFromReestr(Mapping::ClassMapBase &classBase, const QSqlRecord &record, const QString &tableAlias);
-  void insertObjectIntoReestr(Mapping::ClassMapBase &classBase, const QSqlRecord &record, QObject *object,
+  QSharedPointer<QObject> getObjectFromReestr(Mapping::ClassMapBase &classBase, const QSqlRecord &record, const QString &tableAlias);
+  void insertObjectIntoReestr(Mapping::ClassMapBase &classBase, const QSqlRecord &record, QSharedPointer<QObject> object,
                               const QString &tableAlias);
-  void insertObjectIntoReestr(Mapping::ClassMapBase &classBase, QObject *object, QVariant idValue);
-  void removeObjectFromReestr(QObject *object);
+  void insertObjectIntoReestr(Mapping::ClassMapBase &classBase, QSharedPointer<QObject> object, QVariant idValue);
+  void removeObjectFromReestr(QSharedPointer<QObject> object);
   QVariant getIdFromRecord(Mapping::ClassMapBase &classBase, const QSqlRecord &record, const QString &tableAlias);
 
-  void refreshObjectData(QObject &object, QueryTableModel *queryTableModel, const QSqlRecord &record);
+  void refreshObjectData(QSharedPointer<QObject> object, QSharedPointer<QueryTableModel> queryTableModel, const QSqlRecord &record);
 
   QString getSqlTextWithBindParams(QSqlQuery &query);
 
-  void saveAllOneToOne(QObject &object);
-  void saveOneToOne(QObject &object, OneToOne *oneToOne);
+  void saveAllOneToOne(QSharedPointer<QObject> object);
+  void saveOneToOne(QSharedPointer<QObject> object, OneToOne *oneToOne);
 
-  void saveAllOneToMany(QObject &object);
-  void saveOneToMany(QObject &object, OneToMany *oneToMany);
+  void saveAllOneToMany(QSharedPointer<QObject> object);
+  void saveOneToMany(QSharedPointer<QObject> object, OneToMany *oneToMany);
 
-  void saveObjectWoStartTransaction(QObject &object);
+  void saveObjectWoStartTransaction(QSharedPointer<QObject> object);
 
   void startTransaction();
   void commit();
   void rollback();
-  bool isIdObjectDefault(QObject &object);
-  bool isIdOneToOneDefault(QObject &object, OneToOne *oneToOne);
-  QString getQueryColumn(QueryTableModel *queryTableModel, PropertyMap *property);
+  bool isIdObjectDefault(QSharedPointer<QObject> object);
+  bool isIdOneToOneDefault(QSharedPointer<QObject> object, OneToOne *oneToOne);
+  QString getQueryColumn(QSharedPointer<QueryTableModel> queryTableModel, PropertyMap *property);
 
 protected:
-  Reestr *reestr = nullptr;
+  QSharedPointer<Reestr> reestr;
   QSqlDatabase database;
-  QueryCache *queryCache = nullptr;
+  QSharedPointer<QueryCache> queryCache;
 };
 }
 }

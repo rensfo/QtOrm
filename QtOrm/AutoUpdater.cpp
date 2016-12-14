@@ -14,7 +14,7 @@ AutoUpdater::AutoUpdater(QObject *parent) : QObject(parent) {
   onObjectPropertyChangedMethod = findOnObjectPropertyChangedMethod();
 }
 
-QString AutoUpdater::getPropertyName(QObject *sender, int senderSignalIndex) {
+QString AutoUpdater::getPropertyName(QSharedPointer<QObject> sender, int senderSignalIndex) {
   QMetaMethod senderSignal = sender->metaObject()->method(senderSignalIndex);
   QMetaProperty senderProperty;
   const QMetaObject *senderMeta = sender->metaObject();
@@ -30,8 +30,8 @@ QString AutoUpdater::getPropertyName(QObject *sender, int senderSignalIndex) {
   return QString(senderProperty.name());
 }
 
-void AutoUpdater::connectToAllProperties(QObject *object) {
-  ClassMapBase *classBase = ConfigurationMap::getMappedClass(object->metaObject()->className());
+void AutoUpdater::connectToAllProperties(QSharedPointer<QObject> object) {
+  QSharedPointer<ClassMapBase> classBase = ConfigurationMap::getMappedClass(object->metaObject()->className());
   QStringList properties;
   for (OneToOne *oneToOne : classBase->getOneToOneRelations())
     properties.append(oneToOne->getProperty());
@@ -42,7 +42,7 @@ void AutoUpdater::connectToAllProperties(QObject *object) {
     int propertyIndex = object->metaObject()->indexOfProperty(propertyName.toStdString().data());
     QMetaProperty property = object->metaObject()->property(propertyIndex);
     if (property.hasNotifySignal()) {
-      connect(object, property.notifySignal(), this, onObjectPropertyChangedMethod);
+      connect(object.data(), property.notifySignal(), this, onObjectPropertyChangedMethod);
     } else {
       if (classBase->getIdProperty().getName() != propertyName)
         qDebug() << QString("Property %1 from class %2 has not Notify signal!")
@@ -54,8 +54,9 @@ void AutoUpdater::connectToAllProperties(QObject *object) {
 
 void AutoUpdater::onObjectPropertyChanged() {
   QObject *sender = this->sender();
-  if (sender) {
-    QString senderPropertyName = getPropertyName(sender, senderSignalIndex());
+  QSharedPointer<QObject> sharedSender = reestr->value(sender);
+  if (sharedSender) {
+    QString senderPropertyName = getPropertyName(sharedSender, senderSignalIndex());
 
     using namespace Sql;
     Query query;
@@ -63,7 +64,7 @@ void AutoUpdater::onObjectPropertyChanged() {
     query.setReestr(reestr);
 
     connect(&query, &Query::executedSql, this, &AutoUpdater::executedSql);
-    query.saveOneField(*sender, senderPropertyName);
+    query.saveOneField(sharedSender, senderPropertyName);
   }
 }
 
@@ -87,11 +88,11 @@ void AutoUpdater::setDatabase(const QSqlDatabase &value) {
   database = value;
 }
 
-Reestr *AutoUpdater::getReestr() const {
+QSharedPointer<Reestr> AutoUpdater::getReestr() const {
   return reestr;
 }
 
-void AutoUpdater::setReestr(Reestr *value) {
+void AutoUpdater::setReestr(QSharedPointer<Reestr> value) {
   reestr = value;
 }
 }

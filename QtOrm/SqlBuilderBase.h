@@ -3,6 +3,7 @@
 
 #include <QHash>
 #include <QObject>
+#include <QSharedPointer>
 #include <QSqlDatabase>
 #include <QSqlQuery>
 #include <QTextStream>
@@ -33,34 +34,34 @@ public:
   GroupConditions getConditions() const;
   virtual void setConditions(const GroupConditions &value);
 
-  ClassMapBase *getClassBase() const;
-  virtual void setClassBase(ClassMapBase *value);
+  QSharedPointer<ClassMapBase> getClassBase() const;
+  virtual void setClassBase(QSharedPointer<ClassMapBase> value);
 
-  QObject *getObject() const;
-  void setObject(QObject *value);
+  QSharedPointer<QObject> getObject() const;
+  void setObject(QSharedPointer<QObject> value);
 
   QSqlDatabase getDatabase() const;
   void setDatabase(const QSqlDatabase &value);
 
-  QueryModel *getQueryModel() const;
+  QSharedPointer<QueryModel> getQueryModel() const;
 
-  QueryCache *getQueryCache() const;
-  void setQueryCache(QueryCache *value);
+  QSharedPointer<QueryCache> getQueryCache() const;
+  void setQueryCache(QSharedPointer<QueryCache> value);
 
 protected:
   QString getPlaceHolder(const QString param);
   void bindValues(QSqlQuery &query, const GroupConditions &conditions, const QMap<Condition *, QString> &placeHolders);
-  QueryModel *getQueryModel(QueryModelType queryType, const QString &columnName = QString());
-  QueryModel *createModelAndAddToCache(QueryModelType queryType, const QString &className, const QString &columnName = QString());
-  QueryModel *createModel(QueryModelType queryType);
+  QSharedPointer<QueryModel> getQueryModel(QueryModelType queryType, const QString &columnName = QString());
+  QSharedPointer<QueryModel> createModelAndAddToCache(QueryModelType queryType, const QString &className, const QString &columnName = QString());
+  QSharedPointer<QueryModel> createModel(QueryModelType queryType);
 
 protected:
   QSqlDatabase database;
-  ClassMapBase *classBase = nullptr;
+  QSharedPointer<ClassMapBase> classBase;
   GroupConditions conditions;
-  QObject *object = nullptr;
-  QueryModel *queryModel = nullptr;
-  QueryCache *queryCache = nullptr;
+  QSharedPointer<QObject> object;
+  QSharedPointer<QueryModel> queryModel;
+  QSharedPointer<QueryCache> queryCache;
 };
 }
 }

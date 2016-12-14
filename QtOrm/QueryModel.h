@@ -26,21 +26,21 @@ public:
   explicit QueryModel(QObject *parent = nullptr);
   virtual QString getSqlText();
 
-  QueryTableModel *getMainTableModel() const;
+  QSharedPointer<QueryTableModel> getMainTableModel() const;
 
-  ClassMapBase *getClassBase() const;
-  void setClassBase(ClassMapBase *value);
+  QSharedPointer<ClassMapBase> getClassBase() const;
+  void setClassBase(QSharedPointer<ClassMapBase> value);
   virtual void buildModel() = 0;
 
 protected:
-  void setMainTableModel(QueryTableModel *value);
+  void setMainTableModel(QSharedPointer<QueryTableModel> value);
 
-  QueryTableModel *buildQueryTableModel(ClassMapBase *classBase);
+//  QSharedPointer<QueryTableModel> buildQueryTableModel(QSharedPointer<ClassMapBase> classBase);
 
 protected:
-  QueryTableModel *mainTableModel;
+  QSharedPointer<QueryTableModel> mainTableModel;
   QString sqlText;
-  ClassMapBase *classBase;
+  QSharedPointer<ClassMapBase> classBase;
 };
 }
 }

@@ -114,16 +114,26 @@ OneToMany *ClassMapBase::findOneToManyByPropertyName(const QString &propertyName
   return nullptr;
 }
 
-QString ClassMapBase::getTypeNameOfProperty(const QObject &obj, const QString &prop) {
-  return getTypeNameOfProperty(*obj.metaObject(), prop);
+QString ClassMapBase::getTypeNameOfProperty(QSharedPointer<QObject> obj, const QString &prop) {
+  return getTypeNameOfProperty(*obj->metaObject(), prop);
 }
 
 QString ClassMapBase::getTypeNameOfProperty(const QMetaObject &meta, const QString &prop) {
   int propertyIndex = meta.indexOfProperty(prop.toStdString().data());
   QMetaProperty metaProperty = meta.property(propertyIndex);
   QString refClass = metaProperty.typeName();
-  if (refClass.right(1) == "*")
+
+  QString sharedPointerClassName = "QSharedPointer<";
+
+  if(refClass.contains(sharedPointerClassName)){
+    int begin = sharedPointerClassName.size();
+    int length = refClass.size() - begin - 1;
+    refClass = refClass.mid(begin, length);
+  }
+
+  if (refClass.right(1) == "*"){
     refClass = refClass.left(refClass.size() - 1);
+  }
 
   return refClass;
 }

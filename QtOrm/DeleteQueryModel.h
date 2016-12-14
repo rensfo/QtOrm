@@ -12,10 +12,11 @@ class DeleteQueryModel : public QueryModel {
   Q_OBJECT
 public:
   explicit DeleteQueryModel(QObject *parent = nullptr);
+  ~DeleteQueryModel();
   virtual void buildModel() override;
 
 protected:
-  QueryTableModel *buildQueryTableModel();
+  QSharedPointer<QueryTableModel> buildQueryTableModel();
   QString buildSql();
 
 protected:

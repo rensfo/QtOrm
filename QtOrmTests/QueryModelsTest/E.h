@@ -9,19 +9,19 @@
 class E : public QObject {
   Q_OBJECT
   Q_PROPERTY(long id READ getId WRITE setId)
-  Q_PROPERTY(C *c READ getC WRITE setC NOTIFY cChanged)
-  Q_PROPERTY(D *d READ getD WRITE setD NOTIFY dChanged)
+  Q_PROPERTY(QSharedPointer<C> c READ getC WRITE setC NOTIFY cChanged)
+  Q_PROPERTY(QSharedPointer<D> d READ getD WRITE setD NOTIFY dChanged)
 public:
   Q_INVOKABLE explicit E(QObject *parent = nullptr);
 
   long getId() const;
   void setId(long value);
 
-  C *getC() const;
-  void setC(C *value);
+  QSharedPointer<C> getC() const;
+  void setC(QSharedPointer<C> value);
 
-  D *getD() const;
-  void setD(D *value);
+  QSharedPointer<D> getD() const;
+  void setD(QSharedPointer<D> value);
 
 signals:
   void cChanged();
@@ -29,8 +29,8 @@ signals:
 
 private:
   long id = 0;
-  C *c = nullptr;
-  D *d = nullptr;
+  QSharedPointer<C> c;
+  QSharedPointer<D> d;
 };
 
 #endif // E_H

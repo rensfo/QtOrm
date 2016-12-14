@@ -6,14 +6,14 @@
 namespace QtOrm {
 namespace Config {
 
-QMap<QString, QtOrm::Mapping::ClassMapBase *> ConfigurationMap::mappedClass;
+QMap<QString, QSharedPointer<ClassMapBase>> ConfigurationMap::mappedClass;
 
 ConfigurationMap::ConfigurationMap() {
 }
 
-ClassMapBase *ConfigurationMap::getMappedClass(const QString &className) {
+QSharedPointer<ClassMapBase> ConfigurationMap::getMappedClass(const QString &className) {
   if (!isRegisterClass(className))
-    throw NotRegistredClassException(QString("Class '%1' do not registed.").arg(className));
+    throw NotRegistredClassException(QString("Class '%1' was not registed.").arg(className));
 
   return mappedClass.value(className);
 }

@@ -92,8 +92,8 @@ void QueryResultTestTest::unregisteredClass() {
 void QueryResultTestTest::objectFromReestr() {
   try {
     registerClasses();
-    A *a = session.getById<A>(1);
-    A *aFromReestr = session.getById<A>(1);
+    QSharedPointer<A> a = session.getById<A>(1);
+    QSharedPointer<A> aFromReestr = session.getById<A>(1);
 
     QVERIFY(a == aFromReestr);
   } catch (QtOrm::Exception &e) {
@@ -105,7 +105,7 @@ void QueryResultTestTest::objectFromReestr() {
 
 void QueryResultTestTest::oneTableTwoTimesInQuery() {
   try {
-    E *e = session.getById<E>(1);
+    QSharedPointer<E> e = session.getById<E>(1);
     Q_UNUSED(e)
 
     QVERIFY(true);
@@ -124,9 +124,9 @@ void QueryResultTestTest::oneColumnTwoTimesInWhere() {
     gc.addConditionEqual("code_1", "code1");
     gc.addConditionEqual("code_1", "code2");
 
-    QList<A *> *listA = session.getList<A>(gc);
+    QList<QSharedPointer<A>> listA = session.getList<A>(gc);
 
-    QCOMPARE(listA->count(), 2);
+    QCOMPARE(listA.count(), 2);
   } catch (QtOrm::Exception &e) {
     Q_UNUSED(e)
 
@@ -136,15 +136,14 @@ void QueryResultTestTest::oneColumnTwoTimesInWhere() {
 
 void QueryResultTestTest::insertObject() {
   try {
-    A *a = new A();
+    QSharedPointer<A> a = QSharedPointer<A>::create();
     a->setCode("code10");
-    session.saveObject(*a);
+    session.saveObject(a);
 
     session.clearReestr();
 
     a->deleteLater();
 
-    a = nullptr;
     a = session.get<A>("code_1", "code10");
 
     a->deleteLater();
@@ -158,11 +157,10 @@ void QueryResultTestTest::insertObject() {
 
 void QueryResultTestTest::deleteObject() {
   try {
-    A *a = session.getById<A>(1);
-    session.deleteObject(*a);
+    QSharedPointer<A> a = session.getById<A>(1);
+    session.deleteObject(a);
 
     a->deleteLater();
-    a = nullptr;
 
     a = session.getById<A>(1);
 
@@ -179,15 +177,14 @@ void QueryResultTestTest::updateObject() {
     session.clearReestr();
     session.setAutoUpdate(false);
 
-    A *a = session.getById<A>(3);
+    QSharedPointer<A> a = session.getById<A>(3);
 
     a->setCode("x");
-    session.saveObject(*a);
+    session.saveObject(a);
 
     session.clearReestr();
 
     a->deleteLater();
-    a = nullptr;
 
     a = session.getById<A>(3);
 
@@ -204,7 +201,7 @@ void QueryResultTestTest::where() {
   where.addConditionEqual("code_1", "code2");
   auto a = session.getList<A>(where);
 
-  QCOMPARE(a->count(), 1);
+  QCOMPARE(a.count(), 1);
 }
 
 void QueryResultTestTest::queryFromCache() {
@@ -215,13 +212,13 @@ void QueryResultTestTest::refreshObject() {
   try {
     QSqlQuery query(db);
 
-    A *a = session.get<A>("code_1", "code2");
+    QSharedPointer<A> a = session.get<A>("code_1", "code2");
     if(query.exec("update A set code = null where code = 'code2'")) {
-      session.refresh(*a);
+      session.refresh(a);
       QCOMPARE(a->getCode(), QString(""));
 
       a->setCode("code2");
-      session.saveObject(*a);
+      session.saveObject(a);
       return;
     }
     QVERIFY(false);
@@ -235,18 +232,18 @@ void QueryResultTestTest::refreshChildObject() {
   try {
     QSqlQuery query(db);
 
-    A *a = session.get<A>("code_1", "code2");
+    QSharedPointer<A> a = session.get<A>("code_1", "code2");
     if(query.exec("update B set code = 'code2.2.1' where code = 'code2.2'")) {
-      session.refresh(*a);
+      session.refresh(a);
 
-      std::function<bool(B*)> func = [](B *item){
+      std::function<bool(QSharedPointer<B>)> func = [](QSharedPointer<B> item){
         return item->getCode() == "code2.2.1";
       };
-      B *updatedB = this->find<B *>(a->getChild(), func);
+      QSharedPointer<B> updatedB = this->find<QSharedPointer<B>>(a->getChild(), func);
       QVERIFY(updatedB != nullptr);
       if(updatedB) {
         updatedB->setCode("code2.2");
-        session.saveObject(*updatedB);
+        session.saveObject(updatedB);
       }
       return;
     }
@@ -263,16 +260,16 @@ void QueryResultTestTest::deleteChildAndRefresh() {
 //    connect(&session, &Session::executedSql, [](QString sql){ qDebug() << sql; });
     QSqlQuery query(db);
 
-    A *a = session.get<A>("code_1", "code2");
-    std::function<bool(B*)> func = [](B *item){
+    QSharedPointer<A> a = session.get<A>("code_1", "code2");
+    std::function<bool(QSharedPointer<B>)> func = [](QSharedPointer<B> item){
       return item->getCode() == "code2.2";
     };
-    B *updatedB = this->find<B *>(a->getChild(), func);
+    QSharedPointer<B> updatedB = this->find<QSharedPointer<B>>(a->getChild(), func);
 
     if(query.exec("delete from B where code = 'code2.2'")) {
 
 
-      session.refresh(*a);
+      session.refresh(a);
       QCOMPARE(a->getChild().count(), 2);
       return;
     }
@@ -342,7 +339,7 @@ T QueryResultTestTest::find(QList<T> container, std::function<bool(T)> func) {
       return element;
     }
   }
-  return nullptr;
+  return T();
 }
 
 QTEST_MAIN(QueryResultTestTest)

@@ -10,13 +10,16 @@ using QtOrm::Mapping::OneToOne;
 UpdateQueryModel::UpdateQueryModel(QObject *parent) : QueryModel(parent) {
 }
 
+UpdateQueryModel::~UpdateQueryModel() {
+}
+
 void UpdateQueryModel::buildModel() {
   mainTableModel = buildQueryTableModel();
   sqlText = buildSql();
 }
 
-QueryTableModel *UpdateQueryModel::buildQueryTableModel() {
-  QueryTableModel *queryTableModel = new QueryTableModel();
+QSharedPointer<QueryTableModel> UpdateQueryModel::buildQueryTableModel() {
+  QSharedPointer<QueryTableModel> queryTableModel = QSharedPointer<QueryTableModel>::create();
   queryTableModel->setName(classBase->getTable());
   for (auto property : classBase->getProperties()) {
     if (property->getIsId()) {

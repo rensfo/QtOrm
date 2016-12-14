@@ -20,19 +20,19 @@ void A::setCode(const QString &value) {
   emit codeChanged();
 }
 
-QList<B *> A::getChild() const {
+QList<QSharedPointer<B>> A::getChild() const {
   return child;
 }
 
-void A::setChild(const QList<B *> &value) {
+void A::setChild(const QList<QSharedPointer<B> > &value) {
   child = value;
 }
 
-KindA *A::getKindA() const {
+QSharedPointer<KindA> A::getKindA() const {
     return kindA;
 }
 
-void A::setKindA(KindA *value) {
+void A::setKindA(QSharedPointer<KindA> value) {
   kindA = value;
   emit kindAChanged();
 }

@@ -10,13 +10,14 @@ class InsertQueryModel : public QueryModel {
   Q_OBJECT
 public:
   explicit InsertQueryModel(QObject *parent = nullptr);
+  ~InsertQueryModel();
 
   bool getHasLastInsertedIdFeature() const;
   void setHasLastInsertedIdFeature(bool value);
   virtual void buildModel() override;
 
 protected:
-  QueryTableModel *buildQueryTableModel();
+  QSharedPointer<QueryTableModel> buildQueryTableModel();
   QString buildSql();
 
 protected:

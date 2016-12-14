@@ -1,6 +1,8 @@
 #ifndef SIMPLESQLMANAGER_H
 #define SIMPLESQLMANAGER_H
 
+#include <QSharedPointer>
+
 #include "SqlBuilderBase.h"
 
 namespace QtOrm {

@@ -6,13 +6,16 @@ namespace Sql {
 DeleteQueryModel::DeleteQueryModel(QObject *parent) : QueryModel(parent) {
 }
 
+DeleteQueryModel::~DeleteQueryModel() {
+}
+
 void DeleteQueryModel::buildModel() {
   mainTableModel = buildQueryTableModel();
   sqlText = buildSql();
 }
 
-QueryTableModel *DeleteQueryModel::buildQueryTableModel() {
-  QueryTableModel *queryTableModel = new QueryTableModel();
+QSharedPointer<QueryTableModel> DeleteQueryModel::buildQueryTableModel() {
+  QSharedPointer<QueryTableModel> queryTableModel = QSharedPointer<QueryTableModel>::create();
   queryTableModel->setName(classBase->getTable());
   for (auto property : classBase->getProperties()) {
     if (property->getIsId()) {

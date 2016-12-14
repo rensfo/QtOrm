@@ -5,12 +5,12 @@ D::D(QObject *parent) : QObject(parent)
 
 }
 
-KindA *D::getKindA() const
+QSharedPointer<KindA> D::getKindA() const
 {
   return kindA;
 }
 
-void D::setKindA(KindA *value)
+void D::setKindA(QSharedPointer<KindA> value)
 {
   kindA = value;
 }

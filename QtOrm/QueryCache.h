@@ -2,6 +2,7 @@
 #define QUERYCACHE_H
 
 #include <QObject>
+#include <QSharedPointer>
 
 #include "QueryModel.h"
 
@@ -17,29 +18,29 @@ class QueryCache : public QObject
 
   struct CacheData
   {
-    QueryModel *selectModel;
-    QueryModel *insertModel;
-    QueryModel *updateModel;
-    QueryModel *deleteModel;
-    QMap<QString, QueryModel *> columnsUpdateModels;
+    QSharedPointer<QueryModel> selectModel;
+    QSharedPointer<QueryModel> insertModel;
+    QSharedPointer<QueryModel> updateModel;
+    QSharedPointer<QueryModel> deleteModel;
+    QMap<QString, QSharedPointer<QueryModel>> columnsUpdateModels;
   };
 
 public:
   explicit QueryCache(QObject *parent = nullptr);
 
-  void addModel(QueryModelType type, QueryModel *model, const QString &className, const QString &columnName);
-  void addSelectModel(const QString &className, QueryModel *model);
-  void addInsertModel(const QString &className, QueryModel *model);
-  void addUpdateModel(const QString &className, QueryModel *model);
-  void addDeleteModel(const QString &className, QueryModel *model);
-  void addColumnUpdateModel(const QString &className, const QString &column, QueryModel *model);
+  void addModel(QueryModelType type, QSharedPointer<QueryModel> model, const QString &className, const QString &columnName);
+  void addSelectModel(const QString &className, QSharedPointer<QueryModel> model);
+  void addInsertModel(const QString &className, QSharedPointer<QueryModel> model);
+  void addUpdateModel(const QString &className, QSharedPointer<QueryModel> model);
+  void addDeleteModel(const QString &className, QSharedPointer<QueryModel> model);
+  void addColumnUpdateModel(const QString &className, const QString &column, QSharedPointer<QueryModel> model);
 
-  QueryModel *getModel(QueryModelType type, const QString &className, const QString &columnName = QString());
-  QueryModel *getSelectModel(const QString &className);
-  QueryModel *getInsertModel(const QString &className);
-  QueryModel *getUpdateModel(const QString &className);
-  QueryModel *getDeleteModel(const QString &className);
-  QueryModel *getColumnUpdateModel(const QString &className, const QString &column);
+  QSharedPointer<QueryModel> getModel(QueryModelType type, const QString &className, const QString &columnName = QString());
+  QSharedPointer<QueryModel> getSelectModel(const QString &className);
+  QSharedPointer<QueryModel> getInsertModel(const QString &className);
+  QSharedPointer<QueryModel> getUpdateModel(const QString &className);
+  QSharedPointer<QueryModel> getDeleteModel(const QString &className);
+  QSharedPointer<QueryModel> getColumnUpdateModel(const QString &className, const QString &column);
 
   void clear();
 

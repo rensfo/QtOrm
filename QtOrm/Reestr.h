@@ -3,29 +3,34 @@
 
 #include <QHash>
 #include <QObject>
+#include <QSharedPointer>
 
 namespace QtOrm {
 
 class Reestr : public QObject {
   Q_OBJECT
+
+  using ReestrData = QHash<QString, QSharedPointer<QObject>>;
+
 public:
   explicit Reestr(QObject *parent = nullptr);
   bool contains(const QString &table, const QString &id);
-  void insert(const QString &table, const QString &id, QObject *object);
+  void insert(const QString &table, const QString &id, QSharedPointer<QObject> object);
   void remove(const QString &table, const QString &id);
-  void remove(QObject *object);
-  QObject *value(const QString &table, const QString &id);
+  void remove(QSharedPointer<QObject> object);
+  QSharedPointer<QObject> value(const QString &table, const QString &id);
+  QSharedPointer<QObject> value(QObject *object);
 
   void clear();
 
 signals:
-  void inserted(QObject *addedObject);
+  void inserted(QSharedPointer<QObject> addedObject);
 
 protected:
   bool exists(const QString &table, const QString &id);
 
 private:
-  QHash<QString, QHash<QString, QObject *>> data;
+  QHash<QString, ReestrData> data;
 };
 }
 #endif // REESTR_H

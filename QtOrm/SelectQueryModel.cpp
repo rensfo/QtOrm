@@ -10,7 +10,10 @@ using QtOrm::Config::ConfigurationMap;
 SelectQueryModel::SelectQueryModel(QObject *parent) : QueryModel(parent) {
 }
 
-void SelectQueryModel::setAliases(QueryTableModel *tableModel) {
+SelectQueryModel::~SelectQueryModel() {
+}
+
+void SelectQueryModel::setAliases(QSharedPointer<QueryTableModel> tableModel) {
   tableModel->setAlias(generateTableAlias());
 
   for (QueryJoin *join : tableModel->getJoins()) {
@@ -203,8 +206,8 @@ void SelectQueryModel::buildModel() {
   buildSelectAndFromClause();
 }
 
-QueryTableModel *SelectQueryModel::buildQueryTableModel(ClassMapBase *classBase) {
-  QueryTableModel *queryTableModel = new QueryTableModel();
+QSharedPointer<QueryTableModel> SelectQueryModel::buildQueryTableModel(QSharedPointer<ClassMapBase> classBase) {
+  QSharedPointer<QueryTableModel> queryTableModel = QSharedPointer<QueryTableModel>::create();
   queryTableModel->setName(classBase->getTable());
 
   for (auto property : classBase->getProperties()) {
@@ -218,7 +221,7 @@ QueryTableModel *SelectQueryModel::buildQueryTableModel(ClassMapBase *classBase)
 
     QString property = oneToOne->getProperty();
     QString refClass = ClassMapBase::getTypeNameOfProperty(classBase->getMetaObject(), property);
-    ClassMapBase *refClassBase = ConfigurationMap::getMappedClass(refClass);
+    QSharedPointer<ClassMapBase> refClassBase = ConfigurationMap::getMappedClass(refClass);
 
     join->setRigthTableColumnName(refClassBase->getIdProperty().getColumn());
     join->setQueryTableModel(buildQueryTableModel(refClassBase));

@@ -2,6 +2,7 @@
 #define QUERYJOIN_H
 
 #include <QObject>
+#include <QSharedPointer>
 
 namespace QtOrm {
 namespace Sql {
@@ -24,14 +25,14 @@ public:
   QString getRigthTableColumnName() const;
   void setRigthTableColumnName(const QString &value);
 
-  QueryTableModel *getQueryTableModel() const;
-  void setQueryTableModel(QueryTableModel *value);
+  QSharedPointer<QueryTableModel> getQueryTableModel() const;
+  void setQueryTableModel(QSharedPointer<QueryTableModel> value);
 
 protected:
   JoinType type;
   QString leftTableColumnName;
   QString rigthTableColumnName;
-  QueryTableModel *queryTableModel = nullptr;
+  QSharedPointer<QueryTableModel> queryTableModel;
 };
 }
 }

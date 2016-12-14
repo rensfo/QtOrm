@@ -10,19 +10,19 @@ QString QueryModel::getSqlText() {
   return sqlText;
 }
 
-QueryTableModel *QueryModel::getMainTableModel() const {
+QSharedPointer<QueryTableModel> QueryModel::getMainTableModel() const {
   return mainTableModel;
 }
 
-void QueryModel::setMainTableModel(QueryTableModel *value) {
+void QueryModel::setMainTableModel(QSharedPointer<QueryTableModel> value) {
   mainTableModel = value;
 }
 
-ClassMapBase *QueryModel::getClassBase() const {
+QSharedPointer<ClassMapBase> QueryModel::getClassBase() const {
   return classBase;
 }
 
-void QueryModel::setClassBase(ClassMapBase *value) {
+void QueryModel::setClassBase(QSharedPointer<ClassMapBase> value) {
   if (classBase != value) {
     classBase = value;
   }

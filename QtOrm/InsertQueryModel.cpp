@@ -9,13 +9,16 @@ using QtOrm::Mapping::OneToOne;
 InsertQueryModel::InsertQueryModel(QObject *parent) : QueryModel(parent) {
 }
 
+InsertQueryModel::~InsertQueryModel() {
+}
+
 void InsertQueryModel::buildModel() {
   mainTableModel = buildQueryTableModel();
   sqlText = buildSql();
 }
 
-QueryTableModel *InsertQueryModel::buildQueryTableModel() {
-  QueryTableModel *queryTableModel = new QueryTableModel();
+QSharedPointer<QueryTableModel> InsertQueryModel::buildQueryTableModel() {
+  QSharedPointer<QueryTableModel> queryTableModel = QSharedPointer<QueryTableModel>::create();
   queryTableModel->setName(classBase->getTable());
   for (auto property : classBase->getProperties()) {
     if (property->getIsId()) {

@@ -20,7 +20,7 @@ SqlBuilderBase::SqlBuilderBase(QObject *parent) : QObject(parent) {
 
 QSqlQuery SqlBuilderBase::selectQuery() {
   queryModel = getQueryModel(QueryModelType::Select);
-  SelectQueryModel *selectQueryModel = dynamic_cast<SelectQueryModel *>(queryModel);
+  QSharedPointer<SelectQueryModel> selectQueryModel = queryModel.objectCast<SelectQueryModel>();
   selectQueryModel->buildModel();
   selectQueryModel->setConditions(conditions);
   selectQueryModel->buildModel();
@@ -51,12 +51,12 @@ void SqlBuilderBase::bindValues(QSqlQuery &query, const GroupConditions &conditi
   }
 }
 
-QueryModel *SqlBuilderBase::getQueryModel(QueryModelType queryType, const QString &columnName)
+QSharedPointer<QueryModel> SqlBuilderBase::getQueryModel(QueryModelType queryType, const QString &columnName)
 {
   QString className = classBase->getClassName();
   if(queryCache)
   {
-    if(QueryModel *model = queryCache->getModel(queryType, className, columnName))
+    if(QSharedPointer<QueryModel> model = queryCache->getModel(queryType, className, columnName))
     {
       return model;
     }
@@ -69,9 +69,9 @@ QueryModel *SqlBuilderBase::getQueryModel(QueryModelType queryType, const QStrin
   return createModelAndAddToCache(queryType, className, columnName);
 }
 
-QueryModel *SqlBuilderBase::createModelAndAddToCache(QueryModelType queryType, const QString &className, const QString &columnName)
+QSharedPointer<QueryModel> SqlBuilderBase::createModelAndAddToCache(QueryModelType queryType, const QString &className, const QString &columnName)
 {
-  QueryModel *newModel = createModel(queryType);
+  QSharedPointer<QueryModel> newModel = createModel(queryType);
   if(queryCache)
   {
     queryCache->addModel(queryType, newModel, className, columnName);
@@ -80,26 +80,26 @@ QueryModel *SqlBuilderBase::createModelAndAddToCache(QueryModelType queryType, c
   return newModel;
 }
 
-QueryModel *SqlBuilderBase::createModel(QueryModelType queryType)
+QSharedPointer<QueryModel> SqlBuilderBase::createModel(QueryModelType queryType)
 {
-  QueryModel *result = nullptr;
+  QSharedPointer<QueryModel> result;
 
   switch (queryType)
   {
     case QueryModelType::Select:
-      result = new SelectQueryModel();
+      result = QSharedPointer<SelectQueryModel>::create();
     break;
     case QueryModelType::Insert:
-      result = new InsertQueryModel();
+      result = QSharedPointer<InsertQueryModel>::create();
     break;
     case QueryModelType::Update:
-      result = new UpdateQueryModel();
+      result = QSharedPointer<UpdateQueryModel>::create();
     break;
     case QueryModelType::UpdateColumn:
       throw std::string("update column not defined");
     break;
     case QueryModelType::Delete:
-      result = new DeleteQueryModel();
+      result = QSharedPointer<DeleteQueryModel>::create();
     break;
     //throw exception
   }
@@ -108,17 +108,17 @@ QueryModel *SqlBuilderBase::createModel(QueryModelType queryType)
   return result;
 }
 
-QueryCache *SqlBuilderBase::getQueryCache() const
+QSharedPointer<QueryCache> SqlBuilderBase::getQueryCache() const
 {
   return queryCache;
 }
 
-void SqlBuilderBase::setQueryCache(QueryCache *value)
+void SqlBuilderBase::setQueryCache(QSharedPointer<QueryCache> value)
 {
   queryCache = value;
 }
 
-QueryModel *SqlBuilderBase::getQueryModel() const
+QSharedPointer<QueryModel> SqlBuilderBase::getQueryModel() const
 {
   return queryModel;
 }
@@ -131,19 +131,19 @@ void SqlBuilderBase::setDatabase(const QSqlDatabase &value) {
   database = value;
 }
 
-QObject *SqlBuilderBase::getObject() const {
+QSharedPointer<QObject> SqlBuilderBase::getObject() const {
   return object;
 }
 
-void SqlBuilderBase::setObject(QObject *value) {
+void SqlBuilderBase::setObject(QSharedPointer<QObject> value) {
   object = value;
 }
 
-ClassMapBase *SqlBuilderBase::getClassBase() const {
+QSharedPointer<ClassMapBase> SqlBuilderBase::getClassBase() const {
   return classBase;
 }
 
-void SqlBuilderBase::setClassBase(ClassMapBase *value) {
+void SqlBuilderBase::setClassBase(QSharedPointer<ClassMapBase> value) {
   classBase = value;
 }
 

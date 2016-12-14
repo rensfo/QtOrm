@@ -24,27 +24,27 @@ class Session : public QObject {
   Q_OBJECT
 public:
   explicit Session(QObject *parent = nullptr);
-  void saveObject(QObject &object);
-  void deleteObject(QObject &object);
+  void saveObject(QSharedPointer<QObject> object);
+  void deleteObject(QSharedPointer<QObject> object);
   template <class T>
-  T *getById(const QVariant &id);
+  QSharedPointer<T> getById(const QVariant &id);
   template <class T>
-  T *get(const Condition &filter);
+  QSharedPointer<T> get(const Condition &filter);
   template <class T>
-  T *get(const QString &property, const QVariant &value);
+  QSharedPointer<T> get(const QString &property, const QVariant &value);
   template <class T>
-  QList<T *> *getList();
+  QList<QSharedPointer<T>> getList();
   template <class T>
-  QList<T *> *getList(const QString &property, const QVariant &value);
+  QList<QSharedPointer<T>> getList(const QString &property, const QVariant &value);
   template <class T>
-  QList<T *> *getList(const GroupConditions &conditions);
+  QList<QSharedPointer<T>> getList(const GroupConditions &conditions);
   template <class T>
-  QList<QObject *> *getObjectList();
+  QList<QSharedPointer<QObject> > getObjectList();
   template <class T>
-  QList<QObject *> *getObjectList(const QString &property, const QVariant &value);
+  QList<QSharedPointer<QObject> > getObjectList(const QString &property, const QVariant &value);
   template <class T>
-  QList<QObject *> *getObjectList(const GroupConditions &conditions);
-  void refresh(QObject &value);
+  QList<QSharedPointer<QObject>> getObjectList(const GroupConditions &conditions);
+  void refresh(QSharedPointer<QObject> value);
 
   QSqlDatabase getDatabase() const;
   void setDatabase(const QSqlDatabase &database);
@@ -55,96 +55,106 @@ public:
   void clearReestr();
   void clearQueryCache();
 
-  void removeFromCache(QObject *object);
+  void removeFromCache(QSharedPointer<QObject> object);
 
 protected:
   Query createQuery();
+  template <class T>
+  QList<QSharedPointer<T>> convertListTo(QList<QSharedPointer<QObject>> list);
 
 signals:
   void executedSql(QString sqlText);
 
 protected:
   QSqlDatabase database;
-  Reestr *reestr = nullptr;
+  QSharedPointer<Reestr> reestr;
   AutoUpdater updater;
   bool autoUpdate = false;
-  QueryCache *queryCache = nullptr;
+  QSharedPointer<QueryCache> queryCache;
 };
 
 template <class T>
-T *Session::getById(const QVariant &id) {
+QSharedPointer<T> Session::getById(const QVariant &id) {
   QString className = T::staticMetaObject.className();
   Query query = createQuery();
-  QObject *selectedObj = query.getById(className, id);
+  QSharedPointer<QObject> selectedObj = query.getById(className, id);
 
   if (!selectedObj)
-    return nullptr;
+    return QSharedPointer<T>();
 
-  return qobject_cast<T *>(selectedObj);
+  return selectedObj.objectCast<T>();
 }
 
 template <class T>
-T *Session::get(const Condition &filter) {
+QSharedPointer<T> Session::get(const Condition &filter) {
   GroupConditions group;
   group.addCondition(filter);
   auto list = getList<T>(group);
 
-  if (list->count() == 0) {
-    return nullptr;
+  if (list.count() == 0) {
+    return QSharedPointer<T>();
   }
 
-  return list->first();
+  return list.first();
 }
 
 template <class T>
-T *Session::get(const QString &property, const QVariant &value) {
+QSharedPointer<T> Session::get(const QString &property, const QVariant &value) {
   Condition c(property, Operation::Equal, value);
   return this->get<T>(c);
 }
 
 template <class T>
-QList<T *> *Session::getList() {
-  return reinterpret_cast<QList<T *> *>(getObjectList<T>());
+QList<QSharedPointer<T>> Session::getList() {
+  return this->convertListTo<T>(getObjectList<T>());
 }
 
 template <class T>
-QList<T *> *Session::getList(const QString &property, const QVariant &value) {
-  return reinterpret_cast<QList<T *> *>(getObjectList<T>(property, value));
+QList<QSharedPointer<T>> Session::getList(const QString &property, const QVariant &value) {
+  return convertListTo<T>(getObjectList<T>(property, value));
 }
 
 template <class T>
-QList<T *> *Session::getList(const GroupConditions &conditions) {
-  return reinterpret_cast<QList<T *> *>(getObjectList<T>(conditions));
+QList<QSharedPointer<T>> Session::getList(const GroupConditions &conditions) {
+  return convertListTo<T>(getObjectList<T>(conditions));
 }
 
 template <class T>
-QList<QObject *> *Session::getObjectList() {
+QList<QSharedPointer<QObject>> Session::getObjectList() {
   QString className = T::staticMetaObject.className();
-  QList<QObject *> *result;
   Query query = createQuery();
-  result = query.getListObject(className, QString(), QString(), QVariant());
+  QList<QSharedPointer<QObject>> result = query.getListObject(className, QString(), QString(), QVariant());
 
   return result;
 }
 
 template <class T>
-QList<QObject *> *Session::getObjectList(const QString &property, const QVariant &value) {
+QList<QSharedPointer<QObject>> Session::getObjectList(const QString &property, const QVariant &value) {
   QString className = T::staticMetaObject.className();
-  QList<QObject *> *result;
   Query query = createQuery();
-  result = query.getListObject(className, property, QString(), value);
+  QList<QSharedPointer<QObject>> result = query.getListObject(className, property, QString(), value);
 
   return result;
 }
 
 template <class T>
-QList<QObject *> *Session::getObjectList(const GroupConditions &conditions) {
+QList<QSharedPointer<QObject>> Session::getObjectList(const GroupConditions &conditions) {
   QString className = T::staticMetaObject.className();
-  QList<QObject *> *result;
   Query query = createQuery();
-  result = query.getListObject(className, conditions);
+  QList<QSharedPointer<QObject>> result = query.getListObject(className, conditions);
 
   return result;
+}
+
+template <class T>
+QList<QSharedPointer<T>> Session::convertListTo(QList<QSharedPointer<QObject>> list)
+{
+  QList<QSharedPointer<T>> convertedList;
+  for(QSharedPointer<QObject> &item : list) {
+    convertedList.append(item.objectCast<T>());
+  }
+
+  return convertedList;
 }
 }
 #endif // SESSION_H

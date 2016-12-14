@@ -15,20 +15,20 @@ class AutoUpdater : public QObject {
 public:
   explicit AutoUpdater(QObject *parent = nullptr);
 
-  Reestr *getReestr() const;
-  void setReestr(Reestr *value);
+  QSharedPointer<Reestr> getReestr() const;
+  void setReestr(QSharedPointer<Reestr> value);
 
   QSqlDatabase getDatabase() const;
   void setDatabase(const QSqlDatabase &value);
 
 protected:
-  QString getPropertyName(QObject *sender, int senderSignalIndex);
+  QString getPropertyName(QSharedPointer<QObject> sender, int senderSignalIndex);
 
 signals:
   void executedSql(QString);
 
 public slots:
-  void connectToAllProperties(QObject *object);
+  void connectToAllProperties(QSharedPointer<QObject> object);
 
 protected slots:
   void onObjectPropertyChanged();
@@ -38,7 +38,7 @@ protected:
 
 protected:
   QMetaMethod onObjectPropertyChangedMethod;
-  Reestr *reestr = nullptr;
+  QSharedPointer<Reestr> reestr;
   QSqlDatabase database;
 };
 }

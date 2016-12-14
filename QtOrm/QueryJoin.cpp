@@ -32,11 +32,11 @@ void QueryJoin::setRigthTableColumnName(const QString &value) {
   rigthTableColumnName = value;
 }
 
-QueryTableModel *QueryJoin::getQueryTableModel() const {
+QSharedPointer<QueryTableModel> QueryJoin::getQueryTableModel() const {
   return queryTableModel;
 }
 
-void QueryJoin::setQueryTableModel(QueryTableModel *value) {
+void QueryJoin::setQueryTableModel(QSharedPointer<QueryTableModel> value) {
   queryTableModel = value;
 }
 }

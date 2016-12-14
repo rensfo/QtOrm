@@ -46,7 +46,7 @@ QueryModelsTestTest::QueryModelsTestTest() {
 }
 
 void QueryModelsTestTest::selectClause() {
-  ClassMapBase *classBase = ConfigurationMap::getMappedClass("A");
+  QSharedPointer<ClassMapBase> classBase = ConfigurationMap::getMappedClass("A");
   SelectQueryModel query;
   query.setClassBase(classBase);
   query.buildModel();
@@ -55,7 +55,7 @@ void QueryModelsTestTest::selectClause() {
 }
 
 void QueryModelsTestTest::fromClause() {
-  ClassMapBase *classBase = ConfigurationMap::getMappedClass("A");
+  QSharedPointer<ClassMapBase> classBase = ConfigurationMap::getMappedClass("A");
   SelectQueryModel query;
   query.setClassBase(classBase);
   query.buildModel();
@@ -64,7 +64,7 @@ void QueryModelsTestTest::fromClause() {
 }
 
 void QueryModelsTestTest::whereClause() {
-  ClassMapBase *classBase = ConfigurationMap::getMappedClass("A");
+  QSharedPointer<ClassMapBase> classBase = ConfigurationMap::getMappedClass("A");
   SelectQueryModel query;
   query.setClassBase(classBase);
   query.buildModel();
@@ -80,7 +80,7 @@ void QueryModelsTestTest::whereClause() {
 }
 
 void QueryModelsTestTest::whereClauseUseColumn() {
-  ClassMapBase *classBase = ConfigurationMap::getMappedClass("A");
+  QSharedPointer<ClassMapBase> classBase = ConfigurationMap::getMappedClass("A");
   SelectQueryModel query;
   query.setClassBase(classBase);
   query.buildModel();
@@ -102,7 +102,7 @@ void QueryModelsTestTest::whereClauseUseColumn() {
 }
 
 void QueryModelsTestTest::emptyWhereClause() {
-  ClassMapBase *classBase = ConfigurationMap::getMappedClass("A");
+  QSharedPointer<ClassMapBase> classBase = ConfigurationMap::getMappedClass("A");
   SelectQueryModel query;
   query.setClassBase(classBase);
   query.buildModel();
@@ -115,7 +115,7 @@ void QueryModelsTestTest::emptyWhereClause() {
 }
 
 void QueryModelsTestTest::oneColumnTwoTimes() {
-  ClassMapBase *classBase = ConfigurationMap::getMappedClass("A");
+  QSharedPointer<ClassMapBase> classBase = ConfigurationMap::getMappedClass("A");
   SelectQueryModel query;
   query.setClassBase(classBase);
   query.buildModel();
@@ -131,7 +131,7 @@ void QueryModelsTestTest::oneColumnTwoTimes() {
 }
 
 void QueryModelsTestTest::updateSql() {
-  ClassMapBase *classBase = ConfigurationMap::getMappedClass("A");
+  QSharedPointer<ClassMapBase> classBase = ConfigurationMap::getMappedClass("A");
   UpdateQueryModel query;
   query.setClassBase(classBase);
   query.buildModel();
@@ -140,7 +140,7 @@ void QueryModelsTestTest::updateSql() {
 }
 
 void QueryModelsTestTest::insertSql() {
-  ClassMapBase *classBase = ConfigurationMap::getMappedClass("A");
+  QSharedPointer<ClassMapBase> classBase = ConfigurationMap::getMappedClass("A");
   InsertQueryModel query;
   query.setClassBase(classBase);
   query.buildModel();
@@ -149,7 +149,7 @@ void QueryModelsTestTest::insertSql() {
 }
 
 void QueryModelsTestTest::deleteSql() {
-  ClassMapBase *classBase = ConfigurationMap::getMappedClass("A");
+  QSharedPointer<ClassMapBase> classBase = ConfigurationMap::getMappedClass("A");
   DeleteQueryModel query;
   query.setClassBase(classBase);
   query.buildModel();

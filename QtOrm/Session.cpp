@@ -5,25 +5,24 @@
 
 namespace QtOrm {
 Session::Session(QObject *parent) : QObject(parent) {
-  reestr = new Reestr(this);
-
-  queryCache = new QueryCache(this);
+  reestr = QSharedPointer<Reestr>::create();
+  queryCache = QSharedPointer<QueryCache>::create();
 
   updater.setReestr(reestr);
   connect(&updater, &AutoUpdater::executedSql, this, &Session::executedSql);
 }
 
-void Session::saveObject(QObject &object) {
+void Session::saveObject(QSharedPointer<QObject> object) {
   Query query = createQuery();
   query.saveObject(object);
 }
 
-void Session::deleteObject(QObject &object) {
+void Session::deleteObject(QSharedPointer<QObject> object) {
   Query query = createQuery();
   query.deleteObject(object);
 }
 
-void Session::refresh(QObject &value) {
+void Session::refresh(QSharedPointer<QObject> value) {
   Query query = createQuery();
   query.refresh(value);
 }
@@ -45,9 +44,9 @@ void Session::setAutoUpdate(bool value) {
   if (autoUpdate != value) {
     autoUpdate = value;
     if (autoUpdate) {
-      connect(reestr, &Reestr::inserted, &updater, &AutoUpdater::connectToAllProperties);
+      connect(reestr.data(), &Reestr::inserted, &updater, &AutoUpdater::connectToAllProperties);
     } else {
-      disconnect(reestr, &Reestr::inserted, &updater, &AutoUpdater::connectToAllProperties);
+      disconnect(reestr.data(), &Reestr::inserted, &updater, &AutoUpdater::connectToAllProperties);
     }
   }
 }
@@ -61,7 +60,7 @@ void Session::clearQueryCache()
   queryCache->clear();
 }
 
-void Session::removeFromCache(QObject *object)
+void Session::removeFromCache(QSharedPointer<QObject> object)
 {
   if(reestr) {
     reestr->remove(object);

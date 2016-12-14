@@ -29,11 +29,11 @@ void KindA::setName(const QString &value) {
   emit nameChanged();
 }
 
-TypeA *KindA::getTypeA() const {
+QSharedPointer<TypeA> KindA::getTypeA() const {
   return typeA;
 }
 
-void KindA::setTypeA(TypeA *value) {
+void KindA::setTypeA(QSharedPointer<TypeA> value) {
   typeA = value;
   emit typeAChanged();
 }

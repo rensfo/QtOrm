@@ -15,4 +15,6 @@ public:
   }
 };
 
+Q_DECLARE_METATYPE(QSharedPointer<KindA>);
+
 #endif // KINDAMAP_H

@@ -12,6 +12,7 @@ class SelectQueryModel : public QueryModel {
   Q_OBJECT
 public:
   explicit SelectQueryModel(QObject *parent = nullptr);
+  ~SelectQueryModel();
 
   QString getSelect() const;
   QString getFrom() const;
@@ -21,7 +22,7 @@ public:
 
   QString getWhere() const;
 
-  QueryTableModel *buildQueryTableModel(ClassMapBase *classBase);
+  QSharedPointer<QueryTableModel> buildQueryTableModel(QSharedPointer<ClassMapBase> classBase);
 
   virtual QString getSqlText() override;
 
@@ -32,7 +33,7 @@ public:
 
 protected:
   void buildSelectAndFromClause();
-  void setAliases(QueryTableModel *tableModel);
+  void setAliases(QSharedPointer<QueryTableModel> tableModel);
   QString generateTableAlias();
   void resetTableNumber();
   QString buildSelectClause();

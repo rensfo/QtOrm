@@ -7,13 +7,13 @@
 class AMap : public QtOrm::Mapping::ClassMap<A> {
 public:
   AMap() {
-    setTable("A");
-    id("id");
-    map("code_1").setColumn("code");
+  setTable("A");
+  id("id");
+  map("code_1").setColumn("code");
 
-    oneToOne("kindA").setTableColumn("idKindA");
+  oneToOne("kindA").setTableColumn("idKindA");
 
-    oneToMany("child").setRefClass("B").setColumn("idA");
+  oneToMany("child").setRefClass("B").setColumn("idA");
   }
 };
 

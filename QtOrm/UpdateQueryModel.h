@@ -9,12 +9,14 @@ namespace QtOrm {
 namespace Sql {
 
 class UpdateQueryModel : public QueryModel {
+  Q_OBJECT
 public:
   explicit UpdateQueryModel(QObject *parent = nullptr);
+  ~UpdateQueryModel();
   virtual void buildModel() override;
 
 protected:
-  QueryTableModel *buildQueryTableModel();
+  QSharedPointer<QueryTableModel> buildQueryTableModel();
   QString buildSql();
 
 protected:

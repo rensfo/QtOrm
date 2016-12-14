@@ -2,6 +2,7 @@
 #define CONFIGURATIONMAP_H
 
 #include <QMap>
+#include <QSharedPointer>
 
 #include "ClassMapBase.h"
 
@@ -16,11 +17,11 @@ public:
   static void addMapping();
   template <class T>
   static void removeMapping();
-  static ClassMapBase *getMappedClass(const QString &className);
+  static QSharedPointer<ClassMapBase> getMappedClass(const QString &className);
   static bool isRegisterClass(const QString &className);
 
 private:
-  static QMap<QString, QtOrm::Mapping::ClassMapBase *> mappedClass;
+  static QMap<QString, QSharedPointer<ClassMapBase>> mappedClass;
 };
 
 template <class T>
@@ -28,7 +29,7 @@ void ConfigurationMap::addMapping() {
 
   (void)static_cast<ClassMapBase *>((T *)0);
 
-  T *classMap = new T();
+  QSharedPointer<T> classMap = QSharedPointer<T>::create();
   mappedClass.insert(classMap->getClassName(), classMap);
 }
 

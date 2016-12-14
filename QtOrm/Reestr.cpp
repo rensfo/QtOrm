@@ -1,5 +1,7 @@
 #include "Reestr.h"
 
+#include <QMetaObject>
+
 namespace QtOrm {
 
 Reestr::Reestr(QObject *parent) : QObject(parent) {
@@ -13,7 +15,7 @@ bool Reestr::contains(const QString &table, const QString &id) {
   return false;
 }
 
-void Reestr::insert(const QString &table, const QString &id, QObject *object) {
+void Reestr::insert(const QString &table, const QString &id, QSharedPointer<QObject> object) {
   if (data.contains(table)) {
     if (!data.value(table).contains(id)) {
       data[table].insert(id, object);
@@ -21,7 +23,7 @@ void Reestr::insert(const QString &table, const QString &id, QObject *object) {
       emit inserted(object);
     }
   } else {
-    QHash<QString, QObject *> ids;
+    ReestrData ids;
     ids.insert(id, object);
     data.insert(table, ids);
 
@@ -35,9 +37,9 @@ void Reestr::remove(const QString &table, const QString &id) {
   }
 }
 
-void Reestr::remove(QObject *object) {
-  for (QHash<QString, QObject *> &ids : data) {
-    for (QObject *reestrObject : ids) {
+void Reestr::remove(QSharedPointer<QObject> object) {
+  for (ReestrData &ids : data) {
+    for (QSharedPointer<QObject> &reestrObject : ids) {
       if (reestrObject == object) {
         QString key = ids.key(object);
         ids.remove(key);
@@ -47,12 +49,25 @@ void Reestr::remove(QObject *object) {
   }
 }
 
-QObject *Reestr::value(const QString &table, const QString &id) {
+QSharedPointer<QObject> Reestr::value(const QString &table, const QString &id) {
   if (exists(table, id)) {
     return data[table][id];
   }
 
-  return nullptr;
+  return QSharedPointer<QObject>();
+}
+
+QSharedPointer<QObject> Reestr::value(QObject *object) {
+  QString className = object->metaObject()->className();
+  if(data.contains(className)){
+    for(QSharedPointer<QObject> &reestrObject : data[className]){
+      if(reestrObject.data() == object){
+        return reestrObject;
+      }
+    }
+  }
+
+  return QSharedPointer<QObject>();
 }
 
 void Reestr::clear() {
