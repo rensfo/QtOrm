@@ -39,6 +39,7 @@ private Q_SLOTS:
   void refreshObject();
   void refreshChildObject();
   void deleteChildAndRefresh();
+  void childrenOneToOneParent();
 
 private:
   bool openConnection();
@@ -249,7 +250,6 @@ void QueryResultTestTest::refreshChildObject() {
     }
   } catch (QtOrm::Exception &e) {
     qDebug() << e.getMessage();
-    QVERIFY(false);
   }
 
   QVERIFY(false);
@@ -257,7 +257,7 @@ void QueryResultTestTest::refreshChildObject() {
 
 void QueryResultTestTest::deleteChildAndRefresh() {
   try {
-//    connect(&session, &Session::executedSql, [](QString sql){ qDebug() << sql; });
+
     QSqlQuery query(db);
 
     QSharedPointer<A> a = session.get<A>("code_1", "code2");
@@ -268,9 +268,21 @@ void QueryResultTestTest::deleteChildAndRefresh() {
     }
   } catch (QtOrm::Exception &e) {
     qDebug() << e.getMessage();
-    QVERIFY(false);
   }
 
+  QVERIFY(false);
+}
+
+void QueryResultTestTest::childrenOneToOneParent() {
+  try {
+//    connect(&session, &Session::executedSql, [](QString sql){ qDebug() << sql; });
+    QSharedPointer<A> a = session.get<A>("code_1", "code2");
+
+    QCOMPARE(a, a->getChild().first()->getA());
+    return;
+  } catch (QtOrm::Exception &e) {
+    qDebug() << e.getMessage();
+  }
   QVERIFY(false);
 }
 
