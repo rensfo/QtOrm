@@ -6,11 +6,11 @@ namespace Sql {
 QueryTableModel::QueryTableModel(QObject *parent) : QObject(parent) {
 }
 
-void QueryTableModel::appendJoin(QueryJoin *value) {
+void QueryTableModel::appendJoin(QSharedPointer<QueryJoin> value) {
   joins.append(value);
 }
 
-void QueryTableModel::removeJoin(QueryJoin *value) {
+void QueryTableModel::removeJoin(QSharedPointer<QueryJoin> value) {
   joins.removeOne(value);
 }
 
@@ -22,7 +22,7 @@ void QueryTableModel::addColumn(const QString &name) {
   columns.append(name);
 }
 
-QList<QueryJoin *> QueryTableModel::getJoins() const {
+QList<QSharedPointer<QueryJoin> > QueryTableModel::getJoins() const {
   return joins;
 }
 
@@ -61,7 +61,7 @@ QString QueryTableModel::getTablesForFromClause() {
 QString QueryTableModel::getJoinsText() {
   QString joinsText;
 
-  for (QueryJoin *join : joins) {
+  for (QSharedPointer<QueryJoin> join : joins) {
     QString joinText = QString("%1 %2 %3 on %3.%4 = %5.%6")
                            .arg(ToString(join->getType()))
                            .arg(join->getQueryTableModel()->getName())
@@ -80,13 +80,13 @@ QString QueryTableModel::getJoinsText() {
   return joinsText;
 }
 
-QueryJoin *QueryTableModel::findJoinByColumnName(const QString &columnName) {
-  for (QueryJoin *join : joins) {
+QSharedPointer<QueryJoin> QueryTableModel::findJoinByColumnName(const QString &columnName) {
+  for (QSharedPointer<QueryJoin> join : joins) {
     if (join->getLeftTableColumnName() == columnName)
       return join;
   }
 
-  return nullptr;
+  return QSharedPointer<QueryJoin>();
 }
 
 QString QueryTableModel::getSelfColumnsForSelectClause() {
@@ -101,7 +101,7 @@ QString QueryTableModel::getSelfColumnsForSelectClause() {
 
 QString QueryTableModel::getJoinColumnsForSelectClause() {
   QString joinsColumns;
-  for (QueryJoin *join : joins) {
+  for (QSharedPointer<QueryJoin> join : joins) {
     QString queryJoinColumns = join->getQueryTableModel()->getColumnsForSelectClause();
     joinsColumns = joinColumns(joinsColumns, queryJoinColumns);
   }

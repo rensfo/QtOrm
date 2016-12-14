@@ -16,7 +16,7 @@ SelectQueryModel::~SelectQueryModel() {
 void SelectQueryModel::setAliases(QSharedPointer<QueryTableModel> tableModel) {
   tableModel->setAlias(generateTableAlias());
 
-  for (QueryJoin *join : tableModel->getJoins()) {
+  for (QSharedPointer<QueryJoin> join : tableModel->getJoins()) {
     setAliases(join->getQueryTableModel());
   }
 }
@@ -215,7 +215,7 @@ QSharedPointer<QueryTableModel> SelectQueryModel::buildQueryTableModel(QSharedPo
   }
 
   for (auto oneToOne : classBase->getOneToOneRelations()) {
-    QueryJoin *join = new QueryJoin();
+    QSharedPointer<QueryJoin> join = QSharedPointer<QueryJoin>::create();
     join->setType(JoinType::Left);
     join->setLeftTableColumnName(oneToOne->getTableColumn());
 

@@ -14,13 +14,13 @@ class QueryTableModel : public QObject {
 public:
   explicit QueryTableModel(QObject *parent = nullptr);
 
-  void appendJoin(QueryJoin *value);
-  void removeJoin(QueryJoin *value);
+  void appendJoin(QSharedPointer<QueryJoin> value);
+  void removeJoin(QSharedPointer<QueryJoin> value);
   void clearJoins();
 
   void addColumn(const QString &name);
 
-  QList<QueryJoin *> getJoins() const;
+  QList<QSharedPointer<QueryJoin>> getJoins() const;
 
   QStringList getColumns() const;
 
@@ -34,7 +34,7 @@ public:
   QString getTablesForFromClause();
   QString getJoinsText();
 
-  QueryJoin *findJoinByColumnName(const QString &columnName);
+  QSharedPointer<QueryJoin> findJoinByColumnName(const QString &columnName);
 
 protected:
   QString getSelfColumnsForSelectClause();
@@ -44,15 +44,13 @@ protected:
   QString joinStrings(const QString &str1, const QString &str2, const QString &joinString);
   QString ToString(JoinType joinType);
 
-
   QString getSelfTableForFromClause();
 
 protected:
   QString name;
   QString alias;
   QStringList columns;
-
-  QList<QueryJoin *> joins;
+  QList<QSharedPointer<QueryJoin>> joins;
 };
 }
 }

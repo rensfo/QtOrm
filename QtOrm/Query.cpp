@@ -263,7 +263,7 @@ void Query::fillOneToOne(QSharedPointer<QObject> object, QSharedPointer<QueryTab
     QSharedPointer<ClassMapBase> refClassBase = ConfigurationMap::getMappedClass(refClass);
     QSharedPointer<QObject> newObject;
 
-    QueryJoin *join = queryTableModel->findJoinByColumnName(oneToOne->getTableColumn());
+    QSharedPointer<QueryJoin> join = queryTableModel->findJoinByColumnName(oneToOne->getTableColumn());
     QString tableAlias = join->getQueryTableModel()->getAlias();
     QString idColumn = getQueryColumn(join->getQueryTableModel(), &refClassBase->getIdProperty());
     if(!record.value(idColumn).isNull()) {
@@ -349,7 +349,7 @@ void Query::refreshObjectData(QSharedPointer<QObject> object, QSharedPointer<Que
     QSharedPointer<ClassMapBase> refClassBase = ConfigurationMap::getMappedClass(oneToOnePropertyTypeName);
     QVariant propertyValue = object->property(oneToOne->getProperty().toStdString().data());
     QSharedPointer<QObject> oneToOneObj = refClassBase->getObjectByVariant(propertyValue);
-    QueryJoin *join = queryTableModel->findJoinByColumnName(oneToOne->getTableColumn());
+    QSharedPointer<QueryJoin> join = queryTableModel->findJoinByColumnName(oneToOne->getTableColumn());
     refreshObjectData(oneToOneObj, join->getQueryTableModel(), record);
   }
 
