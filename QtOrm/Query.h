@@ -58,14 +58,14 @@ protected:
   void fillOneToMany(const QList<OneToMany *> &relations, const QString &idProperty, QSharedPointer<QObject> object);
   void fillOneToOne(QSharedPointer<QObject> object, QSharedPointer<QueryTableModel> queryTableModel, const QSqlRecord &record);
   void objectSetProperty(QSharedPointer<QObject> object, const QString &propertyName, const QVariant &value);
-  QSharedPointer<QObject> createNewInstance(Mapping::ClassMapBase &classBase);
-  bool reestrContainsObject(Mapping::ClassMapBase &classBase, const QSqlRecord &record, const QString &tableAlias);
-  QSharedPointer<QObject> getObjectFromReestr(Mapping::ClassMapBase &classBase, const QSqlRecord &record, const QString &tableAlias);
-  void insertObjectIntoReestr(Mapping::ClassMapBase &classBase, const QSqlRecord &record, QSharedPointer<QObject> object,
+  QSharedPointer<QObject> createNewInstance(QSharedPointer<ClassMapBase> classBase);
+  bool reestrContainsObject(QSharedPointer<ClassMapBase> classBase, const QSqlRecord &record, const QString &tableAlias);
+  QSharedPointer<QObject> getObjectFromReestr(QSharedPointer<ClassMapBase> classBase, const QSqlRecord &record, const QString &tableAlias);
+  void insertObjectIntoReestr(QSharedPointer<ClassMapBase> classBase, const QSqlRecord &record, QSharedPointer<QObject> object,
                               const QString &tableAlias);
-  void insertObjectIntoReestr(Mapping::ClassMapBase &classBase, QSharedPointer<QObject> object, QVariant idValue);
+  void insertObjectIntoReestr(QSharedPointer<ClassMapBase> classBase, QSharedPointer<QObject> object, QVariant idValue);
   void removeObjectFromReestr(QSharedPointer<QObject> object);
-  QVariant getIdFromRecord(Mapping::ClassMapBase &classBase, const QSqlRecord &record, const QString &tableAlias);
+  QVariant getIdFromRecord(QSharedPointer<ClassMapBase> classBase, const QSqlRecord &record, const QString &tableAlias);
 
   void refreshObjectData(QSharedPointer<QObject> object, QSharedPointer<QueryTableModel> queryTableModel, const QSqlRecord &record);
 

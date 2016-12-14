@@ -105,7 +105,7 @@ void Query::insertObject(QSharedPointer<QObject> object) {
     newId = query.record().value(0);
   }
   objectSetProperty(object, classBase->getIdProperty().getName(), newId);
-  insertObjectIntoReestr(*classBase, object, newId);
+  insertObjectIntoReestr(classBase, object, newId);
 
   saveAllOneToMany(object);
 }
@@ -212,16 +212,14 @@ QList<QSharedPointer<QObject>> Query::getList(QSqlQuery &query, const QueryModel
   QString mainTableAlias = queryModel.getMainTableModel()->getAlias();
   while (query.next()) {
     QSharedPointer<QObject> obj;
-    if (reestrContainsObject(*classBase, query.record(), mainTableAlias)) {
-      obj = getObjectFromReestr(*classBase, query.record(), mainTableAlias);
+    if (reestrContainsObject(classBase, query.record(), mainTableAlias)) {
+      obj = getObjectFromReestr(classBase, query.record(), mainTableAlias);
     } else {
-      obj = createNewInstance(*classBase);
-      insertObjectIntoReestr(*classBase, query.record(), obj, mainTableAlias);
+      obj = createNewInstance(classBase);
+      insertObjectIntoReestr(classBase, query.record(), obj, mainTableAlias);
 
       fillObject(obj, queryModel.getMainTableModel(), query.record());
-
       fillOneToOne(obj, queryModel.getMainTableModel(), query.record());
-
       fillOneToMany(classBase->getOneToManyRelations(), classBase->getIdProperty().getName(), obj);
     }
     objects.append(obj);
@@ -269,11 +267,11 @@ void Query::fillOneToOne(QSharedPointer<QObject> object, QSharedPointer<QueryTab
     QString tableAlias = join->getQueryTableModel()->getAlias();
     QString idColumn = getQueryColumn(join->getQueryTableModel(), &refClassBase->getIdProperty());
     if(!record.value(idColumn).isNull()) {
-      if (reestrContainsObject(*refClassBase, record, tableAlias)) {
-        newObject = getObjectFromReestr(*refClassBase, record, tableAlias);
+      if (reestrContainsObject(refClassBase, record, tableAlias)) {
+        newObject = getObjectFromReestr(refClassBase, record, tableAlias);
       } else {
-        newObject = createNewInstance(*refClassBase);
-        insertObjectIntoReestr(*refClassBase, record, newObject, tableAlias);
+        newObject = createNewInstance(refClassBase);
+        insertObjectIntoReestr(refClassBase, record, newObject, tableAlias);
 
         fillObject(newObject, join->getQueryTableModel(), record);
         fillOneToOne(newObject, join->getQueryTableModel(), record);
@@ -293,33 +291,33 @@ void Query::objectSetProperty(QSharedPointer<QObject> object, const QString &pro
   }
 }
 
-QSharedPointer<QObject> Query::createNewInstance(ClassMapBase &classBase) {
-  QSharedPointer<QObject> newObject = QSharedPointer<QObject>(classBase.getMetaObject().newInstance());
+QSharedPointer<QObject> Query::createNewInstance(QSharedPointer<ClassMapBase> classBase) {
+  QSharedPointer<QObject> newObject = QSharedPointer<QObject>(classBase->getMetaObject().newInstance());
   if (!newObject) {
     throw InstanceNotCreatedException("Object instance was not created(Missing Q_INVOKABLE in constructor?)");
   }
   return newObject;
 }
 
-bool Query::reestrContainsObject(ClassMapBase &classBase, const QSqlRecord &record, const QString &tableAlias) {
-  QString tableName = classBase.getTable();
+bool Query::reestrContainsObject(QSharedPointer<ClassMapBase> classBase, const QSqlRecord &record, const QString &tableAlias) {
+  QString tableName = classBase->getTable();
   QVariant idValue = getIdFromRecord(classBase, record, tableAlias);
   return reestr->contains(tableName, idValue.toString());
 }
 
-QSharedPointer<QObject> Query::getObjectFromReestr(ClassMapBase &classBase, const QSqlRecord &record, const QString &tableAlias) {
-  QString tableName = classBase.getTable();
+QSharedPointer<QObject> Query::getObjectFromReestr(QSharedPointer<ClassMapBase> classBase, const QSqlRecord &record, const QString &tableAlias) {
+  QString tableName = classBase->getTable();
   QVariant idValue = getIdFromRecord(classBase, record, tableAlias);
   return reestr->value(tableName, idValue.toString());
 }
 
-void Query::insertObjectIntoReestr(ClassMapBase &classBase, const QSqlRecord &record, QSharedPointer<QObject> object,
+void Query::insertObjectIntoReestr(QSharedPointer<ClassMapBase> classBase, const QSqlRecord &record, QSharedPointer<QObject> object,
                                    const QString &tableAlias) {
   QString idColumn;
   if (tableAlias.isEmpty()) {
-    idColumn = classBase.getIdProperty().getColumn();
+    idColumn = classBase->getIdProperty().getColumn();
   } else {
-    idColumn = tableAlias + "_" + classBase.getIdProperty().getColumn();
+    idColumn = tableAlias + "_" + classBase->getIdProperty().getColumn();
   }
 
   QVariant idValue = record.value(idColumn);
@@ -327,8 +325,8 @@ void Query::insertObjectIntoReestr(ClassMapBase &classBase, const QSqlRecord &re
   insertObjectIntoReestr(classBase, object, idValue);
 }
 
-void Query::insertObjectIntoReestr(ClassMapBase &classBase, QSharedPointer<QObject> object, QVariant idValue) {
-  QString tableName = classBase.getTable();
+void Query::insertObjectIntoReestr(QSharedPointer<ClassMapBase> classBase, QSharedPointer<QObject> object, QVariant idValue) {
+  QString tableName = classBase->getTable();
 
   reestr->insert(tableName, idValue.toString(), object);
 }
@@ -337,8 +335,8 @@ void Query::removeObjectFromReestr(QSharedPointer<QObject> object) {
   reestr->remove(object);
 }
 
-QVariant Query::getIdFromRecord(ClassMapBase &classBase, const QSqlRecord &record, const QString &tableAlias) {
-  QString idColumn = tableAlias + "_" + classBase.getIdProperty().getColumn();
+QVariant Query::getIdFromRecord(QSharedPointer<ClassMapBase> classBase, const QSqlRecord &record, const QString &tableAlias) {
+  QString idColumn = tableAlias + "_" + classBase->getIdProperty().getColumn();
   return record.value(idColumn);
 }
 

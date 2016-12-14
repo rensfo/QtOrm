@@ -261,14 +261,7 @@ void QueryResultTestTest::deleteChildAndRefresh() {
     QSqlQuery query(db);
 
     QSharedPointer<A> a = session.get<A>("code_1", "code2");
-    std::function<bool(QSharedPointer<B>)> func = [](QSharedPointer<B> item){
-      return item->getCode() == "code2.2";
-    };
-    QSharedPointer<B> updatedB = this->find<QSharedPointer<B>>(a->getChild(), func);
-
     if(query.exec("delete from B where code = 'code2.2'")) {
-
-
       session.refresh(a);
       QCOMPARE(a->getChild().count(), 2);
       return;
@@ -282,6 +275,8 @@ void QueryResultTestTest::deleteChildAndRefresh() {
 }
 
 bool QueryResultTestTest::openConnection() {
+  dropDatabase(dbName);
+
   db = QSqlDatabase::addDatabase("QSQLITE");
   db.setDatabaseName(dbName);
 
