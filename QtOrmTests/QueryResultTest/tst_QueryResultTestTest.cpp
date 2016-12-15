@@ -35,7 +35,6 @@ private Q_SLOTS:
   void deleteObject();
   void updateObject();
   void where();
-  void queryFromCache();
   void refreshObject();
   void refreshChildObject();
   void deleteChildAndRefresh();
@@ -203,10 +202,6 @@ void QueryResultTestTest::where() {
   auto a = session.getList<A>(where);
 
   QCOMPARE(a.count(), 1);
-}
-
-void QueryResultTestTest::queryFromCache() {
-  QCOMPARE(true, false);
 }
 
 void QueryResultTestTest::refreshObject() {
