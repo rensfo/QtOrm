@@ -211,19 +211,23 @@ QList<QSharedPointer<QObject>> Query::getList(QSqlQuery &query, const QueryModel
   QSharedPointer<ClassMapBase> classBase = queryModel.getClassBase();
   QString mainTableAlias = queryModel.getMainTableModel()->getAlias();
   while (query.next()) {
-    QSharedPointer<QObject> obj;
+    QSharedPointer<QObject> newObject;
     if (reestrContainsObject(classBase, query.record(), mainTableAlias)) {
-      obj = getObjectFromReestr(classBase, query.record(), mainTableAlias);
+      newObject = getObjectFromReestr(classBase, query.record(), mainTableAlias);
     } else {
-      obj = createNewInstance(classBase);
-      insertObjectIntoReestr(classBase, query.record(), obj, mainTableAlias);
+      newObject = createNewInstance(classBase);
+      insertObjectIntoReestr(classBase, query.record(), newObject, mainTableAlias);
 
       QSharedPointer<QueryTableModel> mainTableModel = queryModel.getMainTableModel();
-      fillObject(obj, mainTableModel, query.record());
-      fillOneToOne(obj, queryModel.getMainTableModel(), query.record());
-      fillOneToMany(classBase->getOneToManyRelations(), classBase->getIdProperty()->getName(), obj);
+      fillObject(newObject, mainTableModel, query.record());
+      fillOneToOne(newObject, queryModel.getMainTableModel(), query.record());
+      fillOneToMany(classBase->getOneToManyRelations(), classBase->getIdProperty()->getName(), newObject);
+
+      if(updater){
+        updater->connectToAllProperties(newObject);
+      }
     }
-    objects.append(obj);
+    objects.append(newObject);
   }
 
   return objects;
@@ -278,6 +282,10 @@ void Query::fillOneToOne(QSharedPointer<QObject> object, QSharedPointer<QueryTab
         fillObject(newObject, queryTableModel, record);
         fillOneToOne(newObject, join->getQueryTableModel(), record);
         fillOneToMany(refClassBase->getOneToManyRelations(), refClassBase->getIdProperty()->getName(), newObject);
+
+        if(updater){
+          updater->connectToAllProperties(newObject);
+        }
       }
       QVariant var = refClassBase->getVariantByObject(newObject);
       objectSetProperty(object, property, var);
@@ -498,6 +506,16 @@ bool Query::isIdOneToOneDefault(QSharedPointer<QObject> object, QSharedPointer<O
 
 QString Query::getQueryColumn(QSharedPointer<QueryTableModel> queryTableModel, QSharedPointer<PropertyMap> property){
   return QString("%1_%2").arg(queryTableModel->getAlias()).arg(property->getColumn());
+}
+
+QSharedPointer<AutoUpdater> Query::getUpdater() const
+{
+  return updater;
+}
+
+void Query::setUpdater(const QSharedPointer<AutoUpdater> &value)
+{
+  updater = value;
 }
 
 QSharedPointer<QueryCache> Query::getQueryCache() const{

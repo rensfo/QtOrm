@@ -71,7 +71,7 @@ signals:
 protected:
   QSqlDatabase database;
   QSharedPointer<Reestr> reestr;
-  AutoUpdater updater;
+  QSharedPointer<AutoUpdater> updater;
   bool autoUpdate = false;
   QSharedPointer<QueryCache> queryCache;
 };

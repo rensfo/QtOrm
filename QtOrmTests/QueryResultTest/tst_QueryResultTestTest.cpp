@@ -40,6 +40,7 @@ private Q_SLOTS:
   void refreshChildObject();
   void deleteChildAndRefresh();
   void childrenOneToOneParent();
+  void autoUpdate();
 
 private:
   bool openConnection();
@@ -161,16 +162,15 @@ void QueryResultTestTest::deleteObject() {
     QSharedPointer<A> a = session.getById<A>(1);
     session.deleteObject<A>(a);
 
-    a->deleteLater();
-
+    a.clear();
     a = session.getById<A>(1);
 
     QVERIFY(!a);
-
+    return;
   } catch (QtOrm::Exception &e) {
     qDebug() << e.getMessage();
-    QVERIFY(false);
   }
+  QVERIFY(false);
 }
 
 void QueryResultTestTest::updateObject() {
@@ -275,10 +275,36 @@ void QueryResultTestTest::deleteChildAndRefresh() {
 
 void QueryResultTestTest::childrenOneToOneParent() {
   try {
-//    connect(&session, &Session::executedSql, [](QString sql){ qDebug() << sql; });
     QSharedPointer<A> a = session.get<A>("code_1", "code2");
 
     QCOMPARE(a, a->getChild().first()->getA());
+    return;
+  } catch (QtOrm::Exception &e) {
+    qDebug() << e.getMessage();
+  }
+  QVERIFY(false);
+}
+
+void QueryResultTestTest::autoUpdate() {
+
+  try {
+    session.clearReestr();
+    session.clearQueryCache();
+    session.setAutoUpdate(true);
+
+    QString newCode = "code2.2";
+    QString oldCode = "code2";
+//    connect(&session, &Session::executedSql, [](QString sql){ qDebug() << sql; });
+    auto a = session.get<A>("code_1", oldCode);
+    a->setCode(newCode);
+
+    session.clearReestr();
+    a = session.get<A>("code_1", newCode);
+    QCOMPARE(a->getCode(), newCode);
+
+    a->setCode(oldCode);
+    session.setAutoUpdate(false);
+    session.clearReestr();
     return;
   } catch (QtOrm::Exception &e) {
     qDebug() << e.getMessage();

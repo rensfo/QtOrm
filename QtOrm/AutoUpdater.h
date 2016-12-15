@@ -5,7 +5,6 @@
 #include <QObject>
 #include <QSqlDatabase>
 
-#include "Query.h"
 #include "Reestr.h"
 
 namespace QtOrm {

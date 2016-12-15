@@ -8,6 +8,7 @@
 #include <QSignalMapper>
 #include <QSqlDatabase>
 
+#include "AutoUpdater.h"
 #include "ClassMapBase.h"
 #include "GroupConditions.h"
 #include "OneToOne.h"
@@ -46,6 +47,9 @@ public:
   void clearRefreshedObject();
 
   Query &operator=(const Query &other);
+
+  QSharedPointer<QtOrm::AutoUpdater> getUpdater() const;
+  void setUpdater(const QSharedPointer<AutoUpdater> &value);
 
 signals:
   void executedSql(QString sqlText);
@@ -93,6 +97,7 @@ protected:
   QSqlDatabase database;
   QSharedPointer<QueryCache> queryCache;
   QList<QSharedPointer<QObject>> refreshedObject;
+  QSharedPointer<AutoUpdater> updater;
 };
 }
 }

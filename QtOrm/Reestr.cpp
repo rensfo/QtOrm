@@ -19,20 +19,16 @@ void Reestr::insert(const QString &table, const QString &id, QSharedPointer<QObj
   if (data.contains(table)) {
     if (!data.value(table).contains(id)) {
       data[table].insert(id, object);
-
-      emit inserted(object);
     }
   } else {
     ReestrData ids;
     ids.insert(id, object);
     data.insert(table, ids);
-
-    emit inserted(object);
   }
 }
 
 void Reestr::remove(const QString &table, const QString &id) {
-  if (exists(table, id)) {
+  if (contains(table, id)) {
     data[table].remove(id);
   }
 }
@@ -50,7 +46,7 @@ void Reestr::remove(QSharedPointer<QObject> object) {
 }
 
 QSharedPointer<QObject> Reestr::value(const QString &table, const QString &id) {
-  if (exists(table, id)) {
+  if (contains(table, id)) {
     return data[table][id];
   }
 
@@ -72,12 +68,5 @@ QSharedPointer<QObject> Reestr::value(QObject *object) {
 
 void Reestr::clear() {
   data.clear();
-}
-
-bool Reestr::exists(const QString &table, const QString &id) {
-  if (data.contains(table))
-    return data.value(table).contains(id);
-
-  return false;
 }
 }

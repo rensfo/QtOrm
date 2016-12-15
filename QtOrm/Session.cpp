@@ -8,8 +8,9 @@ Session::Session(QObject *parent) : QObject(parent) {
   reestr = QSharedPointer<Reestr>::create();
   queryCache = QSharedPointer<QueryCache>::create();
 
-  updater.setReestr(reestr);
-  connect(&updater, &AutoUpdater::executedSql, this, &Session::executedSql);
+  updater = QSharedPointer<AutoUpdater>::create();
+  updater->setReestr(reestr);
+  connect(updater.data(), &AutoUpdater::executedSql, this, &Session::executedSql);
 }
 
 QSqlDatabase Session::getDatabase() const {
@@ -18,7 +19,7 @@ QSqlDatabase Session::getDatabase() const {
 
 void Session::setDatabase(const QSqlDatabase &database) {
   this->database = database;
-  updater.setDatabase(this->database);
+  updater->setDatabase(this->database);
 }
 
 bool Session::getAutoUpdate() const {
@@ -28,11 +29,6 @@ bool Session::getAutoUpdate() const {
 void Session::setAutoUpdate(bool value) {
   if (autoUpdate != value) {
     autoUpdate = value;
-    if (autoUpdate) {
-      connect(reestr.data(), &Reestr::inserted, &updater, &AutoUpdater::connectToAllProperties);
-    } else {
-      disconnect(reestr.data(), &Reestr::inserted, &updater, &AutoUpdater::connectToAllProperties);
-    }
   }
 }
 
@@ -57,6 +53,9 @@ Query Session::createQuery() {
   query.setDatabase(database);
   query.setReestr(reestr);
   query.setQueryCache(queryCache);
+  if(autoUpdate){
+    query.setUpdater(updater);
+  }
 
   connect(&query, &Query::executedSql, this, &Session::executedSql);
 

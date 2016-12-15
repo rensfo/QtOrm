@@ -33,8 +33,9 @@ QString AutoUpdater::getPropertyName(QSharedPointer<QObject> sender, int senderS
 void AutoUpdater::connectToAllProperties(QSharedPointer<QObject> object) {
   QSharedPointer<ClassMapBase> classBase = ConfigurationMap::getMappedClass(object->metaObject()->className());
   QStringList properties;
-  for (QSharedPointer<OneToOne> oneToOne : classBase->getOneToOneRelations())
+  for (QSharedPointer<OneToOne> oneToOne : classBase->getOneToOneRelations()) {
     properties.append(oneToOne->getProperty());
+  }
 
   properties.append(classBase->getProperties().keys());
 
@@ -45,7 +46,7 @@ void AutoUpdater::connectToAllProperties(QSharedPointer<QObject> object) {
       connect(object.data(), property.notifySignal(), this, onObjectPropertyChangedMethod);
     } else {
       if (classBase->getIdProperty()->getName() != propertyName)
-        qDebug() << QString("Property %1 from class %2 has not Notify signal!")
+        qWarning() << QString("Property %1 from class %2 has not Notify signal!")
                         .arg(propertyName)
                         .arg(object->metaObject()->className());
     }

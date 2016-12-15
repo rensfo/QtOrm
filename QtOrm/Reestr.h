@@ -23,12 +23,6 @@ public:
 
   void clear();
 
-signals:
-  void inserted(QSharedPointer<QObject> addedObject);
-
-protected:
-  bool exists(const QString &table, const QString &id);
-
 private:
   QHash<QString, ReestrData> data;
 };
