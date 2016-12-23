@@ -2,6 +2,7 @@
 
 #include <QMap>
 #include <QString>
+#include <QDebug>
 
 namespace QtOrm {
 namespace Config {
@@ -20,6 +21,10 @@ QSharedPointer<ClassMapBase> ConfigurationMap::getMappedClass(const QString &cla
 
 bool ConfigurationMap::isRegisterClass(const QString &className) {
   return mappedClass.contains(className);
+}
+
+QStringList ConfigurationMap::getRegistredClasses() {
+  return mappedClass.keys();
 }
 }
 }

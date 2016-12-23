@@ -5,28 +5,37 @@
 #include <QSharedPointer>
 
 #include "ClassMapBase.h"
+#include "ConfigurationMap.h"
 
 namespace QtOrm {
 namespace Mapping {
 
-template <class T>
+using QtOrm::Config::ConfigurationMap;
+
+template <typename T>
 class ClassMap : public ClassMapBase {
 public:
   ClassMap();
+  ~ClassMap();
   QVariant getVariantByObjectList(QList<QSharedPointer<QObject>> value) override;
   QVariant getVariantByObject(QSharedPointer<QObject> value) override;
   QSharedPointer<QObject> getObjectByVariant(QVariant &value) override;
   QList<QSharedPointer<QObject>> getObjectListByVariant(QVariant &value) override;
 };
 
-template <class T>
+template <typename T>
 ClassMap<T>::ClassMap() : ClassMapBase() {
   (void)static_cast<QObject *>((T *)0);
   qRegisterMetaType<QSharedPointer<T>>();
   setMetaObject(T::staticMetaObject);
 }
 
-template <class T>
+template<typename T>
+ClassMap<T>::~ClassMap() {
+
+}
+
+template <typename T>
 QVariant ClassMap<T>::getVariantByObjectList(QList<QSharedPointer<QObject>> value) {
   QList<QSharedPointer<T>> lst;
   for (QSharedPointer<QObject> &item : value){
@@ -36,18 +45,18 @@ QVariant ClassMap<T>::getVariantByObjectList(QList<QSharedPointer<QObject>> valu
   return QVariant::fromValue<QList<QSharedPointer<T>>>(lst);
 }
 
-template <class T>
+template <typename T>
 QVariant ClassMap<T>::getVariantByObject(QSharedPointer<QObject> value) {
   return QVariant::fromValue(qobject_cast<T *>(value));
 }
 
-template <class T>
+template <typename T>
 QSharedPointer<QObject> ClassMap<T>::getObjectByVariant(QVariant &value) {
   QSharedPointer<T> sharedData = value.value<QSharedPointer<T>>();
   return sharedData.template objectCast<QObject>();
 }
 
-template <class T>
+template <typename T>
 QList<QSharedPointer<QObject>> ClassMap<T>::getObjectListByVariant(QVariant &value) {
   QList<QSharedPointer<QObject>> ret;
 

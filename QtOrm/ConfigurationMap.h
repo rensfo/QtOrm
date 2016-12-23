@@ -13,29 +13,36 @@ using namespace QtOrm::Mapping;
 class ConfigurationMap {
 public:
   ConfigurationMap();
-  template <class T>
+  template <typename T>
   static void addMapping();
-  template <class T>
+  template <typename T>
   static void removeMapping();
   static QSharedPointer<ClassMapBase> getMappedClass(const QString &className);
   static bool isRegisterClass(const QString &className);
+  static QStringList getRegistredClasses();
+  template <typename T>
+  static void checkParent();
 
-private:
+protected:
   static QMap<QString, QSharedPointer<ClassMapBase>> mappedClass;
 };
 
-template <class T>
-void ConfigurationMap::addMapping() {
+template<typename T>
+void ConfigurationMap::checkParent() {
+  static_assert(std::is_base_of<ClassMapBase, T>(), "Type was not inherited from ClassMapBase");
+}
 
-  (void)static_cast<ClassMapBase *>((T *)0);
+template <typename T>
+void ConfigurationMap::addMapping() {
+  checkParent<T>();
 
   QSharedPointer<T> classMap = QSharedPointer<T>::create();
   mappedClass.insert(classMap->getClassName(), classMap);
 }
 
-template <class T>
+template <typename T>
 void ConfigurationMap::removeMapping() {
-  (void)static_cast<ClassMapBase *>((T *)0);
+  checkParent<T>();
 
   T classMap;
   QString className = classMap.getClassName();
