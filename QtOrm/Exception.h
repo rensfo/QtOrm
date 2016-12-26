@@ -59,6 +59,11 @@ public:
   using Exception::Exception;
 };
 
+class DatabaseConnectionClosedException : public Exception{
+public:
+  using Exception::Exception;
+};
+
 }
 
 #endif // EXEPTION_H

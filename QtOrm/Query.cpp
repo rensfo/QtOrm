@@ -87,10 +87,11 @@ void Query::saveObject(QSharedPointer<QObject> &object) {
 void Query::insertObject(QSharedPointer<QObject> &object) {
   saveAllOneToOne(object);
 
-  QSharedPointer<ClassMapBase> classBase = ConfigurationMap::getMappedClass(object->metaObject()->className());
+  QSharedPointer<ClassMapBase> classBase = ConfigurationMap::getMappedClass(object);
 
   SimpleSqlBuilder sqlBuilder;
   sqlBuilder.setDatabase(database);
+  sqlBuilder.setQueryCache(queryCache);
   sqlBuilder.setClassBase(classBase);
   sqlBuilder.setObject(object);
   QSqlQuery query = sqlBuilder.insertQuery();
@@ -113,10 +114,11 @@ void Query::insertObject(QSharedPointer<QObject> &object) {
 void Query::updateObject(QSharedPointer<QObject> &object) {
   saveAllOneToOne(object);
 
-  QSharedPointer<ClassMapBase> classBase = ConfigurationMap::getMappedClass(object->metaObject()->className());
+  QSharedPointer<ClassMapBase> classBase = ConfigurationMap::getMappedClass(object);
 
   SimpleSqlBuilder sqlBuilder;
   sqlBuilder.setDatabase(database);
+  sqlBuilder.setQueryCache(queryCache);
   sqlBuilder.setClassBase(classBase);
   sqlBuilder.setObject(object);
   QSqlQuery query = sqlBuilder.updateQuery();
@@ -127,10 +129,11 @@ void Query::updateObject(QSharedPointer<QObject> &object) {
 }
 
 void Query::deleteObject(QSharedPointer<QObject> &object) {
-  QSharedPointer<ClassMapBase> classBase = ConfigurationMap::getMappedClass(object->metaObject()->className());
+  QSharedPointer<ClassMapBase> classBase = ConfigurationMap::getMappedClass(object);
 
   SimpleSqlBuilder sqlBuilder;
   sqlBuilder.setDatabase(database);
+  sqlBuilder.setQueryCache(queryCache);
   sqlBuilder.setClassBase(classBase);
   sqlBuilder.setObject(object);
   QSqlQuery query = sqlBuilder.deleteQuery();
@@ -141,7 +144,7 @@ void Query::deleteObject(QSharedPointer<QObject> &object) {
 }
 
 void Query::refresh(QSharedPointer<QObject> &object) {
-  QSharedPointer<ClassMapBase> classBase = ConfigurationMap::getMappedClass(object->metaObject()->className());
+  QSharedPointer<ClassMapBase> classBase = ConfigurationMap::getMappedClass(object);
 
   GroupConditions group;
 
@@ -152,6 +155,7 @@ void Query::refresh(QSharedPointer<QObject> &object) {
 
   SimpleSqlBuilder sqlBuilder;
   sqlBuilder.setDatabase(database);
+  sqlBuilder.setQueryCache(queryCache);
   sqlBuilder.setClassBase(classBase);
   sqlBuilder.setConditions(group);
 
@@ -168,7 +172,7 @@ void Query::refresh(QSharedPointer<QObject> &object) {
 }
 
 void Query::saveOneField(QSharedPointer<QObject> &object, const QString &propertyName) {
-  QSharedPointer<ClassMapBase> classBase = ConfigurationMap::getMappedClass(object->metaObject()->className());
+  QSharedPointer<ClassMapBase> classBase = ConfigurationMap::getMappedClass(object);
   QSharedPointer<OneToMany> oneToMany = classBase->findOneToManyByPropertyName(propertyName);
   if (oneToMany) {
     saveOneToMany(object, oneToMany);
@@ -180,6 +184,7 @@ void Query::saveOneField(QSharedPointer<QObject> &object, const QString &propert
 
     SimpleSqlBuilder sqlBuilder;
     sqlBuilder.setDatabase(database);
+    sqlBuilder.setQueryCache(queryCache);
     sqlBuilder.setClassBase(classBase);
     sqlBuilder.setObject(object);
     QSqlQuery query = sqlBuilder.updateOneColumnQuery(propertyName);
@@ -197,6 +202,10 @@ void Query::setDatabase(const QSqlDatabase &value) {
 }
 
 void Query::executeQuery(QSqlQuery &query) {
+  if(tryReopenDatabaseConnectionIfNeed()) {
+    throw DatabaseConnectionClosedException("Database connection was closed");
+  }
+
   QString executedQuery = getSqlTextWithBindParams(query);
   if (!query.exec()) {
     emit executedSql(executedQuery);
@@ -234,7 +243,7 @@ QList<QSharedPointer<QObject>> Query::getList(QSqlQuery &query, const QueryModel
 }
 
 void Query::fillObject(QSharedPointer<QObject> &object, QSharedPointer<QueryTableModel> &queryTableModel, const QSqlRecord &record) {
-  QSharedPointer<ClassMapBase> classBase = ConfigurationMap::getMappedClass(object->metaObject()->className());
+  QSharedPointer<ClassMapBase> classBase = ConfigurationMap::getMappedClass(object);
   auto properties = classBase->getProperties();
   for (auto prop : properties) {
     QString queryColumn = getQueryColumn(queryTableModel, prop);
@@ -260,7 +269,7 @@ void Query::fillOneToMany(const QList<QSharedPointer<OneToMany>> &relations, con
 }
 
 void Query::fillOneToOne(QSharedPointer<QObject> object, QSharedPointer<QueryTableModel> queryTableModel, const QSqlRecord &record) {
-  QSharedPointer<ClassMapBase> classBase = ConfigurationMap::getMappedClass(object->metaObject()->className());
+  QSharedPointer<ClassMapBase> classBase = ConfigurationMap::getMappedClass(object);
   for (QSharedPointer<OneToOne> oneToOne : classBase->getOneToOneRelations()) {
     QString property = oneToOne->getProperty();
     QString refClass = Mapping::ClassMapBase::getTypeNameOfProperty(object, property);
@@ -351,7 +360,7 @@ QVariant Query::getIdFromRecord(QSharedPointer<ClassMapBase> classBase, const QS
 }
 
 void Query::refreshObjectData(QSharedPointer<QObject> object, QSharedPointer<QueryTableModel> queryTableModel, const QSqlRecord &record) {
-  QSharedPointer<ClassMapBase> classBase = ConfigurationMap::getMappedClass(object->metaObject()->className());
+  QSharedPointer<ClassMapBase> classBase = ConfigurationMap::getMappedClass(object);
   fillObject(object, queryTableModel, record);
 
   refreshedObject.append(object);
@@ -410,7 +419,7 @@ QString Query::getSqlTextWithBindParams(QSqlQuery &query) {
 }
 
 void Query::saveAllOneToOne(QSharedPointer<QObject> object) {
-  QSharedPointer<ClassMapBase> classBase = ConfigurationMap::getMappedClass(object->metaObject()->className());
+  QSharedPointer<ClassMapBase> classBase = ConfigurationMap::getMappedClass(object);;
   for (QSharedPointer<OneToOne> oneToOne : classBase->getOneToOneRelations()) {
     if (oneToOne->getSaveCascade()) {
       saveOneToOne(object, oneToOne);
@@ -433,7 +442,7 @@ void Query::saveOneToOne(QSharedPointer<QObject> object, QSharedPointer<OneToOne
 }
 
 void Query::saveAllOneToMany(QSharedPointer<QObject> object) {
-  QSharedPointer<ClassMapBase> classBase = ConfigurationMap::getMappedClass(object->metaObject()->className());
+  QSharedPointer<ClassMapBase> classBase = ConfigurationMap::getMappedClass(object);
   for (QSharedPointer<OneToMany> oneToMany : classBase->getOneToManyRelations()) {
     if (oneToMany->getSaveCascade())
       saveOneToMany(object, oneToMany);
@@ -489,7 +498,7 @@ void Query::rollback() {
 }
 
 bool Query::isIdObjectDefault(QSharedPointer<QObject> object) {
-  QSharedPointer<ClassMapBase> classBase = ConfigurationMap::getMappedClass(object->metaObject()->className());
+  QSharedPointer<ClassMapBase> classBase = ConfigurationMap::getMappedClass(object);
   QVariant idVal = object->property(classBase->getIdProperty()->getName().toStdString().data());
   return idVal.value<ulong>() == 0;
 }
@@ -506,6 +515,10 @@ bool Query::isIdOneToOneDefault(QSharedPointer<QObject> object, QSharedPointer<O
 
 QString Query::getQueryColumn(QSharedPointer<QueryTableModel> queryTableModel, QSharedPointer<PropertyMap> property){
   return QString("%1_%2").arg(queryTableModel->getAlias()).arg(property->getColumn());
+}
+
+bool Query::tryReopenDatabaseConnectionIfNeed() {
+  return !database.isOpen() && !database.open();
 }
 
 QSharedPointer<AutoUpdater> Query::getUpdater() const

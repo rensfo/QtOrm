@@ -19,6 +19,10 @@ QSharedPointer<ClassMapBase> ConfigurationMap::getMappedClass(const QString &cla
   return mappedClass.value(className);
 }
 
+QSharedPointer<ClassMapBase> ConfigurationMap::getMappedClass(const QSharedPointer<QObject> &object) {
+  return getMappedClass(object->metaObject()->className());
+}
+
 bool ConfigurationMap::isRegisterClass(const QString &className) {
   return mappedClass.contains(className);
 }

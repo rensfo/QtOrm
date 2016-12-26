@@ -91,6 +91,7 @@ protected:
   bool isIdObjectDefault(QSharedPointer<QObject> object);
   bool isIdOneToOneDefault(QSharedPointer<QObject> object, QSharedPointer<OneToOne> oneToOne);
   QString getQueryColumn(QSharedPointer<QueryTableModel> queryTableModel, QSharedPointer<PropertyMap> property);
+  bool tryReopenDatabaseConnectionIfNeed();
 
 protected:
   QSharedPointer<Reestr> reestr;

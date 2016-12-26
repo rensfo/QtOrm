@@ -18,6 +18,7 @@ public:
   template <typename T>
   static void removeMapping();
   static QSharedPointer<ClassMapBase> getMappedClass(const QString &className);
+  static QSharedPointer<ClassMapBase> getMappedClass(const QSharedPointer<QObject> &object);
   static bool isRegisterClass(const QString &className);
   static QStringList getRegistredClasses();
   template <typename T>
