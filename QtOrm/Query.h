@@ -15,6 +15,7 @@
 #include "QueryCache.h"
 #include "QueryModel.h"
 #include "Reestr.h"
+#include "SimpleSqlBuilder.h"
 
 namespace QtOrm {
 namespace Sql {
@@ -63,6 +64,7 @@ protected:
   void fillObject(QSharedPointer<QObject> &object, QSharedPointer<QueryTableModel> &queryTableModel, const QSqlRecord &record);
   void fillOneToMany(const QList<QSharedPointer<OneToMany>> &relations, const QString &idProperty, QSharedPointer<QObject> object);
   void fillOneToOne(QSharedPointer<QObject> object, QSharedPointer<QueryTableModel> queryTableModel, const QSqlRecord &record);
+  QSharedPointer<QObject> getObject(const QSqlRecord &record, const QSharedPointer<ClassMapBase> &classBase, const QString &tableAlias, QSharedPointer<QueryTableModel> queryTableModel);
   void objectSetProperty(QSharedPointer<QObject> object, const QString &propertyName, const QVariant &value);
   QSharedPointer<QObject> createNewInstance(QSharedPointer<ClassMapBase> classBase);
   bool reestrContainsObject(QSharedPointer<ClassMapBase> classBase, const QSqlRecord &record, const QString &tableAlias);
@@ -92,6 +94,7 @@ protected:
   bool isIdOneToOneDefault(QSharedPointer<QObject> object, QSharedPointer<OneToOne> oneToOne);
   QString getQueryColumn(QSharedPointer<QueryTableModel> queryTableModel, QSharedPointer<PropertyMap> property);
   bool tryReopenDatabaseConnectionIfNeed();
+  SimpleSqlBuilder buildSimpleSqlBuilder(QSharedPointer<ClassMapBase> &classBase);
 
 protected:
   QSharedPointer<Reestr> reestr;
