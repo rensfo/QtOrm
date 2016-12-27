@@ -16,7 +16,7 @@ public:
   virtual void buildModel() override;
 
 protected:
-  QSharedPointer<QueryTableModel> buildQueryTableModel();
+  virtual QSharedPointer<QueryTableModel> buildQueryTableModel();
   QString buildSql();
 
 protected:

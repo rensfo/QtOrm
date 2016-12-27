@@ -9,7 +9,10 @@
 #include "DeleteQueryModel.h"
 #include "InsertQueryModel.h"
 #include "SelectQueryModel.h"
+#include "UpdateFieldQueryModel.h"
 #include "UpdateQueryModel.h"
+
+#include <QDebug>
 
 namespace QtOrm {
 namespace Sql {
@@ -51,17 +54,12 @@ void SqlBuilderBase::bindValues(QSqlQuery &query, const GroupConditions &conditi
   }
 }
 
-QSharedPointer<QueryModel> SqlBuilderBase::getQueryModel(QueryModelType queryType, const QString &columnName)
-{
+QSharedPointer<QueryModel> SqlBuilderBase::getQueryModel(QueryModelType queryType, const QString &columnName) {
   QString className = classBase->getClassName();
-  if(queryCache)
-  {
-    if(QSharedPointer<QueryModel> model = queryCache->getModel(queryType, className, columnName))
-    {
+  if(queryCache) {
+    if(QSharedPointer<QueryModel> model = queryCache->getModel(queryType, className, columnName)) {
       return model;
-    }
-    else
-    {
+    } else {
       return createModelAndAddToCache(queryType, className, columnName);
     }
   }
@@ -72,8 +70,7 @@ QSharedPointer<QueryModel> SqlBuilderBase::getQueryModel(QueryModelType queryTyp
 QSharedPointer<QueryModel> SqlBuilderBase::createModelAndAddToCache(QueryModelType queryType, const QString &className, const QString &columnName)
 {
   QSharedPointer<QueryModel> newModel = createModel(queryType);
-  if(queryCache)
-  {
+  if(queryCache) {
     queryCache->addModel(queryType, newModel, className, columnName);
   }
 
@@ -96,7 +93,7 @@ QSharedPointer<QueryModel> SqlBuilderBase::createModel(QueryModelType queryType)
       result = QSharedPointer<UpdateQueryModel>::create();
     break;
     case QueryModelType::UpdateColumn:
-      throw std::string("update column not defined");
+      result = QSharedPointer<UpdateFieldQueryModel>::create();
     break;
     case QueryModelType::Delete:
       result = QSharedPointer<DeleteQueryModel>::create();

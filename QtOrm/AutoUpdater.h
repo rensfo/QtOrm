@@ -5,6 +5,7 @@
 #include <QObject>
 #include <QSqlDatabase>
 
+#include "QueryCache.h"
 #include "Reestr.h"
 
 namespace QtOrm {
@@ -19,6 +20,9 @@ public:
 
   QSqlDatabase getDatabase() const;
   void setDatabase(const QSqlDatabase &value);
+
+  QSharedPointer<QueryCache> getQueryCache() const;
+  void setQueryCache(const QSharedPointer<QueryCache> &value);
 
 protected:
   QString getPropertyName(QSharedPointer<QObject> sender, int senderSignalIndex);
@@ -39,6 +43,7 @@ protected:
   QMetaMethod onObjectPropertyChangedMethod;
   QSharedPointer<Reestr> reestr;
   QSqlDatabase database;
+  QSharedPointer<QueryCache> queryCache;
 };
 }
 

@@ -10,6 +10,7 @@ Session::Session(QObject *parent) : QObject(parent) {
 
   updater = QSharedPointer<AutoUpdater>::create();
   updater->setReestr(reestr);
+  updater->setQueryCache(queryCache);
   connect(updater.data(), &AutoUpdater::executedSql, this, &Session::executedSql);
 }
 

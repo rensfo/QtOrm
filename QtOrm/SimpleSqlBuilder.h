@@ -24,8 +24,6 @@ protected:
   virtual void bindDelete(QSqlQuery &query);
   void bind(QSqlQuery &query, QSharedPointer<PropertyMap> property);
   void bind(QSqlQuery &query, QSharedPointer<OneToOne> oneToOne);
-  bool propertiesContains(const QString &propertyName);
-  QSharedPointer<OneToOne> findOneToOneByPropertyName(const QString &propertyName);
   bool hasLastInsertedIdFeature();
 };
 }

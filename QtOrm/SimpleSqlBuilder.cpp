@@ -10,6 +10,7 @@
 #include "DeleteQueryModel.h"
 #include "InsertQueryModel.h"
 #include "OneToMany.h"
+#include "UpdateFieldQueryModel.h"
 #include "UpdateQueryModel.h"
 
 namespace QtOrm {
@@ -48,7 +49,12 @@ QSqlQuery SimpleSqlBuilder::updateQuery() {
 }
 
 QSqlQuery SimpleSqlBuilder::updateOneColumnQuery(const QString &property) {
-  QString fullSqlText = getUpdateOneColumnText(property);
+  queryModel = getQueryModel(QueryModelType::UpdateColumn, property);
+  QSharedPointer<UpdateFieldQueryModel> updateFieldQueryModel = queryModel.objectCast<UpdateFieldQueryModel>();
+  updateFieldQueryModel->setPropertyName(property);
+  updateFieldQueryModel->buildModel();
+
+  QString fullSqlText = updateFieldQueryModel->getSqlText();
   QSqlQuery query(database);
   query.prepare(fullSqlText);
   bindOneColumnUpdate(query, property);
@@ -71,11 +77,11 @@ QSqlQuery SimpleSqlBuilder::deleteQuery() {
 
 QString SimpleSqlBuilder::getUpdateOneColumnText(const QString &propertyName) {
   QString tableColumnName = "";
-  if (propertiesContains(propertyName)) {
+  if (classBase->propertiesContains(propertyName)) {
     QSharedPointer<PropertyMap> property = classBase->getProperty(propertyName);
     tableColumnName = property->getColumn();
   } else {
-    QSharedPointer<OneToOne> oneToOne = findOneToOneByPropertyName(propertyName);
+    QSharedPointer<OneToOne> oneToOne = classBase->findOneToOneByPropertyName(propertyName);
     tableColumnName = oneToOne->getTableColumn();
   }
 
@@ -123,10 +129,10 @@ void SimpleSqlBuilder::bindUpdate(QSqlQuery &query) {
 void SimpleSqlBuilder::bindOneColumnUpdate(QSqlQuery &query, const QString &propertyName) {
   QSharedPointer<PropertyMap> idProperty = classBase->getIdProperty();
   bind(query, idProperty);
-  if (propertiesContains(propertyName)) {
+  if (classBase->propertiesContains(propertyName)) {
     bind(query, classBase->getProperty(propertyName));
   } else {
-    QSharedPointer<OneToOne> oneToOne = findOneToOneByPropertyName(propertyName);
+    QSharedPointer<OneToOne> oneToOne = classBase->findOneToOneByPropertyName(propertyName);
     bind(query, oneToOne);
   }
 }
@@ -156,20 +162,6 @@ void SimpleSqlBuilder::bind(QSqlQuery &query, QSharedPointer<OneToOne> oneToOne)
   }
 
   query.bindValue(getPlaceHolder(oneToOne->getTableColumn()), valToQuery);
-}
-
-bool SimpleSqlBuilder::propertiesContains(const QString &propertyName) {
-  return classBase->getProperties().contains(propertyName);
-}
-
-QSharedPointer<OneToOne> SimpleSqlBuilder::findOneToOneByPropertyName(const QString &propertyName) {
-  for (auto oneToOne : classBase->getOneToOneRelations()) {
-    if (oneToOne->getProperty() == propertyName) {
-      return oneToOne;
-    }
-  }
-
-  return QSharedPointer<OneToOne>();
 }
 
 bool SimpleSqlBuilder::hasLastInsertedIdFeature() {

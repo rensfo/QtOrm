@@ -138,6 +138,10 @@ QString ClassMapBase::getTypeNameOfProperty(const QMetaObject &meta, const QStri
   return refClass;
 }
 
+bool ClassMapBase::propertiesContains(const QString &propertyName) {
+  return properties.contains(propertyName);
+}
+
 QList<QSharedPointer<OneToMany>> ClassMapBase::getOneToManyRelations() const {
   return oneToManyRelations;
 }

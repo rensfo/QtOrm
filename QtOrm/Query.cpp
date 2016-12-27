@@ -8,8 +8,6 @@
 #include <QSqlField>
 #include <QSqlRecord>
 
-#include "QDebug"
-
 #include "ConfigurationMap.h"
 #include "SimpleSqlBuilder.h"
 
@@ -477,10 +475,11 @@ Query &Query::operator=(const Query &other) {
 }
 
 void Query::saveObjectWoStartTransaction(QSharedPointer<QObject> object) {
-  if (isIdObjectDefault(object))
+  if (isIdObjectDefault(object)) {
     insertObject(object);
-  else
+   } else {
     updateObject(object);
+  }
 }
 
 void Query::startTransaction() {

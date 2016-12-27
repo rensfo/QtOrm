@@ -59,10 +59,11 @@ void AutoUpdater::onObjectPropertyChanged() {
   if (sharedSender) {
     QString senderPropertyName = getPropertyName(sharedSender, senderSignalIndex());
 
-    using namespace Sql;
+    using Sql::Query;
     Query query;
     query.setDatabase(database);
     query.setReestr(reestr);
+    query.setQueryCache(queryCache);
 
     connect(&query, &Query::executedSql, this, &AutoUpdater::executedSql);
     query.saveOneField(sharedSender, senderPropertyName);
@@ -79,6 +80,14 @@ QMetaMethod AutoUpdater::findOnObjectPropertyChangedMethod() {
   }
 
   return result;
+}
+
+QSharedPointer<QueryCache> AutoUpdater::getQueryCache() const {
+  return queryCache;
+}
+
+void AutoUpdater::setQueryCache(const QSharedPointer<QueryCache> &value) {
+  queryCache = value;
 }
 
 QSqlDatabase AutoUpdater::getDatabase() const {
