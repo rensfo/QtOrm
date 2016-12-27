@@ -51,9 +51,10 @@ public:
 protected:
   QString getPlaceHolder(const QString param);
   void bindValues(QSqlQuery &query, const GroupConditions &conditions, const QMap<Condition *, QString> &placeHolders);
-  QSharedPointer<QueryModel> getQueryModel(QueryModelType queryType, const QString &columnName = QString());
-  QSharedPointer<QueryModel> createModelAndAddToCache(QueryModelType queryType, const QString &className, const QString &columnName = QString());
+  QSharedPointer<QueryModel> getQueryModel(QueryModelType queryType);
+  QSharedPointer<QueryModel> createModelAndAddToCache(QueryModelType queryType);
   QSharedPointer<QueryModel> createModel(QueryModelType queryType);
+  bool hasLastInsertedIdFeature();
 
 protected:
   QSqlDatabase database;
@@ -62,6 +63,7 @@ protected:
   QSharedPointer<QObject> object;
   QSharedPointer<QueryModel> queryModel;
   QSharedPointer<QueryCache> queryCache;
+  QString propertyName;
 };
 }
 }

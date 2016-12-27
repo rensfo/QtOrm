@@ -3,6 +3,7 @@
 #include <QSqlError>
 #include <QSqlRecord>
 #include <QString>
+#include <QSqlDriver>
 
 #include "ClassMapBase.h"
 #include "ConfigurationMap.h"
@@ -23,15 +24,12 @@ SqlBuilderBase::SqlBuilderBase(QObject *parent) : QObject(parent) {
 
 QSqlQuery SqlBuilderBase::selectQuery() {
   queryModel = getQueryModel(QueryModelType::Select);
-  QSharedPointer<SelectQueryModel> selectQueryModel = queryModel.objectCast<SelectQueryModel>();
-  selectQueryModel->buildModel();
-  selectQueryModel->setConditions(conditions);
-  selectQueryModel->buildModel();
 
   QSqlQuery query(database);
-  query.prepare(selectQueryModel->getSqlText());
-  bindValues(query, conditions, selectQueryModel->getConditionPlaceholder());
+  query.prepare(queryModel->getSqlText());
 
+  QSharedPointer<SelectQueryModel> selectQueryModel = queryModel.objectCast<SelectQueryModel>();
+  bindValues(query, conditions, selectQueryModel->getConditionPlaceholder());
   selectQueryModel->clearPlaceHolders();
 
   return query;
@@ -44,7 +42,6 @@ QString SqlBuilderBase::getPlaceHolder(const QString param) {
 void SqlBuilderBase::bindValues(QSqlQuery &query, const GroupConditions &conditions, const QMap<Condition *, QString> &placeHolders) {
   for (Condition *f : conditions.getConditions()) {
     if (!f->getValues().isEmpty()) {
-//      QString columnName = classBase->getProperty(f->getPropertyName()).getColumn();
       QString placeHolder = placeHolders[f];
       query.bindValue(getPlaceHolder(placeHolder), f->getValues().first());
     }
@@ -54,24 +51,27 @@ void SqlBuilderBase::bindValues(QSqlQuery &query, const GroupConditions &conditi
   }
 }
 
-QSharedPointer<QueryModel> SqlBuilderBase::getQueryModel(QueryModelType queryType, const QString &columnName) {
+QSharedPointer<QueryModel> SqlBuilderBase::getQueryModel(QueryModelType queryType) {
   QString className = classBase->getClassName();
   if(queryCache) {
-    if(QSharedPointer<QueryModel> model = queryCache->getModel(queryType, className, columnName)) {
+    if(QSharedPointer<QueryModel> model = queryCache->getModel(queryType, className, propertyName)) {
+      if(queryType == QueryModelType::Select){
+        QSharedPointer<SelectQueryModel> selectModel = model.objectCast<SelectQueryModel>();
+        selectModel->setConditions(conditions);
+      }
       return model;
-    } else {
-      return createModelAndAddToCache(queryType, className, columnName);
     }
   }
 
-  return createModelAndAddToCache(queryType, className, columnName);
+  return createModelAndAddToCache(queryType);
 }
 
-QSharedPointer<QueryModel> SqlBuilderBase::createModelAndAddToCache(QueryModelType queryType, const QString &className, const QString &columnName)
+QSharedPointer<QueryModel> SqlBuilderBase::createModelAndAddToCache(QueryModelType queryType)
 {
+  QString className = classBase->getClassName();
   QSharedPointer<QueryModel> newModel = createModel(queryType);
   if(queryCache) {
-    queryCache->addModel(queryType, newModel, className, columnName);
+    queryCache->addModel(queryType, newModel, className, propertyName);
   }
 
   return newModel;
@@ -83,26 +83,53 @@ QSharedPointer<QueryModel> SqlBuilderBase::createModel(QueryModelType queryType)
 
   switch (queryType)
   {
-    case QueryModelType::Select:
-      result = QSharedPointer<SelectQueryModel>::create();
+    case QueryModelType::Select: {
+      QSharedPointer<SelectQueryModel> selectModel = QSharedPointer<SelectQueryModel>::create();
+      selectModel->setClassBase(classBase);
+      selectModel->buildModel();
+      selectModel->setConditions(conditions);
+      result = selectModel;
     break;
-    case QueryModelType::Insert:
-      result = QSharedPointer<InsertQueryModel>::create();
+    }
+    case QueryModelType::Insert:{
+      QSharedPointer<InsertQueryModel> insertModel = QSharedPointer<InsertQueryModel>::create();
+      insertModel->setClassBase(classBase);
+      insertModel->setHasLastInsertedIdFeature(hasLastInsertedIdFeature());
+      insertModel->buildModel();
+      result = insertModel;
+      break;
+    }
+    case QueryModelType::Update: {
+      QSharedPointer<UpdateQueryModel> updateModel = QSharedPointer<UpdateQueryModel>::create();
+      updateModel->setClassBase(classBase);
+      updateModel->buildModel();
+      result = updateModel;
+      break;
+    }
+    case QueryModelType::UpdateColumn: {
+      QSharedPointer<UpdateFieldQueryModel> updateColumnModel = QSharedPointer<UpdateFieldQueryModel>::create();
+      updateColumnModel->setClassBase(classBase);
+      updateColumnModel->setPropertyName(propertyName);
+      updateColumnModel->buildModel();
+      result = updateColumnModel;
     break;
-    case QueryModelType::Update:
-      result = QSharedPointer<UpdateQueryModel>::create();
+    }
+    case QueryModelType::Delete: {
+      QSharedPointer<DeleteQueryModel> deleteModel = QSharedPointer<DeleteQueryModel>::create();
+      deleteModel->setClassBase(classBase);
+      deleteModel->buildModel();
+      result = deleteModel;
     break;
-    case QueryModelType::UpdateColumn:
-      result = QSharedPointer<UpdateFieldQueryModel>::create();
-    break;
-    case QueryModelType::Delete:
-      result = QSharedPointer<DeleteQueryModel>::create();
-    break;
+    }
     //throw exception
   }
-  result->setClassBase(classBase);
 
   return result;
+}
+
+bool SqlBuilderBase::hasLastInsertedIdFeature()
+{
+  return database.driver()->hasFeature(QSqlDriver::LastInsertId) && database.driverName() != "QPSQL";
 }
 
 QSharedPointer<QueryCache> SqlBuilderBase::getQueryCache() const

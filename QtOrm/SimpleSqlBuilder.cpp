@@ -1,7 +1,6 @@
 #include "SimpleSqlBuilder.h"
 
 #include <QDebug>
-#include <QSqlDriver>
 #include <QSqlError>
 #include <QSqlRecord>
 #include <QStringList>
@@ -21,78 +20,36 @@ SimpleSqlBuilder::SimpleSqlBuilder(QObject *parent) : SqlBuilderBase(parent) {
 }
 
 QSqlQuery SimpleSqlBuilder::insertQuery() {
-  queryModel = getQueryModel(QueryModelType::Insert);
-  QSharedPointer<InsertQueryModel> insertQueryModel = queryModel.objectCast<InsertQueryModel>();
-  insertQueryModel->setHasLastInsertedIdFeature(hasLastInsertedIdFeature());
-  insertQueryModel->buildModel();
-
-  QString fullSqlText = insertQueryModel->getSqlText();
-
-  QSqlQuery query(database);
-  query.prepare(fullSqlText);
-  bindInsert(query);
-
-  return query;
+  using namespace std::placeholders;
+  std::function<void(QSqlQuery &)> insertBindFunction = std::bind(&QtOrm::Sql::SimpleSqlBuilder::bindInsert, this, _1);
+  return prepareSqlQuery(QueryModelType::Insert, insertBindFunction);
 }
 
 QSqlQuery SimpleSqlBuilder::updateQuery() {
-  queryModel = getQueryModel(QueryModelType::Update);
-  QSharedPointer<UpdateQueryModel> updateQueryModel = queryModel.objectCast<UpdateQueryModel>();
-  updateQueryModel->buildModel();
-
-  QString fullSqlText = updateQueryModel->getSqlText();
-  QSqlQuery query(database);
-  query.prepare(fullSqlText);
-  bindUpdate(query);
-
-  return query;
+  using namespace std::placeholders;
+  std::function<void(QSqlQuery &)> updateBindFunction = std::bind(&QtOrm::Sql::SimpleSqlBuilder::bindUpdate, this, _1);
+  return prepareSqlQuery(QueryModelType::Update, updateBindFunction);
 }
 
-QSqlQuery SimpleSqlBuilder::updateOneColumnQuery(const QString &property) {
-  queryModel = getQueryModel(QueryModelType::UpdateColumn, property);
-  QSharedPointer<UpdateFieldQueryModel> updateFieldQueryModel = queryModel.objectCast<UpdateFieldQueryModel>();
-  updateFieldQueryModel->setPropertyName(property);
-  updateFieldQueryModel->buildModel();
+QSqlQuery SimpleSqlBuilder::updateOneColumnQuery(const QString &propertyName) {
+  this->propertyName = propertyName;
 
-  QString fullSqlText = updateFieldQueryModel->getSqlText();
-  QSqlQuery query(database);
-  query.prepare(fullSqlText);
-  bindOneColumnUpdate(query, property);
-
-  return query;
+  using namespace std::placeholders;
+  std::function<void(QSqlQuery &)> updateColumnBindFunction = std::bind(&QtOrm::Sql::SimpleSqlBuilder::bindOneColumnUpdate, this, _1);
+  return prepareSqlQuery(QueryModelType::UpdateColumn, updateColumnBindFunction);
 }
 
 QSqlQuery SimpleSqlBuilder::deleteQuery() {
   queryModel = getQueryModel(QueryModelType::Delete);
   QSharedPointer<DeleteQueryModel> deleteQueryModel = queryModel.objectCast<DeleteQueryModel>();
   deleteQueryModel->buildModel();
-
   QString fullSqlText = deleteQueryModel->getSqlText();
   QSqlQuery query(database);
   query.prepare(fullSqlText);
+
   bindDelete(query);
 
   return query;
-}
-
-QString SimpleSqlBuilder::getUpdateOneColumnText(const QString &propertyName) {
-  QString tableColumnName = "";
-  if (classBase->propertiesContains(propertyName)) {
-    QSharedPointer<PropertyMap> property = classBase->getProperty(propertyName);
-    tableColumnName = property->getColumn();
-  } else {
-    QSharedPointer<OneToOne> oneToOne = classBase->findOneToOneByPropertyName(propertyName);
-    tableColumnName = oneToOne->getTableColumn();
-  }
-
-  QString setClause = QString("%1 = :%1").arg(tableColumnName);
-
-  QSharedPointer<PropertyMap> idProperty = classBase->getIdProperty();
-  QString whereClause = QString("%1 = :%1").arg(idProperty->getColumn());
-
-  QString fullSqlText = QString("update %1 set %2 where %3").arg(classBase->getTable()).arg(setClause).arg(whereClause);
-
-  return fullSqlText;
 }
 
 void SimpleSqlBuilder::bindInsert(QSqlQuery &query) {
@@ -126,7 +83,7 @@ void SimpleSqlBuilder::bindUpdate(QSqlQuery &query) {
   }
 }
 
-void SimpleSqlBuilder::bindOneColumnUpdate(QSqlQuery &query, const QString &propertyName) {
+void SimpleSqlBuilder::bindOneColumnUpdate(QSqlQuery &query) {
   QSharedPointer<PropertyMap> idProperty = classBase->getIdProperty();
   bind(query, idProperty);
   if (classBase->propertiesContains(propertyName)) {
@@ -164,8 +121,14 @@ void SimpleSqlBuilder::bind(QSqlQuery &query, QSharedPointer<OneToOne> oneToOne)
   query.bindValue(getPlaceHolder(oneToOne->getTableColumn()), valToQuery);
 }
 
-bool SimpleSqlBuilder::hasLastInsertedIdFeature() {
-  return database.driver()->hasFeature(QSqlDriver::LastInsertId) && database.driverName() != "QPSQL";
+QSqlQuery SimpleSqlBuilder::prepareSqlQuery(QueryModelType modelType, std::function<void(QSqlQuery &)> bindFunction) {
+  queryModel = getQueryModel(modelType);
+  QString fullSqlText = queryModel->getSqlText();
+  QSqlQuery query(database);
+  query.prepare(fullSqlText);
+  bindFunction(query);
+
+  return query;
 }
 }
 }
