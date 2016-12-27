@@ -47,10 +47,10 @@ public:
 
   void clearRefreshedObject();
 
-  Query &operator=(const Query &other);
-
   QSharedPointer<QtOrm::AutoUpdater> getUpdater() const;
   void setUpdater(const QSharedPointer<AutoUpdater> &value);
+
+  Query &operator=(const Query &other);
 
 signals:
   void executedSql(QString sqlText);
@@ -94,7 +94,7 @@ protected:
   bool isIdOneToOneDefault(QSharedPointer<QObject> object, QSharedPointer<OneToOne> oneToOne);
   QString getQueryColumn(QSharedPointer<QueryTableModel> queryTableModel, QSharedPointer<PropertyMap> property);
   bool tryReopenDatabaseConnectionIfNeed();
-  SimpleSqlBuilder buildSimpleSqlBuilder(QSharedPointer<ClassMapBase> &classBase);
+  SimpleSqlBuilder createSimpleSqlBuilder(QSharedPointer<ClassMapBase> &classBase);
 
 protected:
   QSharedPointer<Reestr> reestr;
