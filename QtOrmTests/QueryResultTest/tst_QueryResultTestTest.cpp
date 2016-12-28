@@ -324,9 +324,9 @@ void QueryResultTestTest::operationBetween() {
 
 void QueryResultTestTest::operationIn() {
   try {
-    connect(&session, &Session::executedSql, [](QString sql){ qDebug() << sql; });
+//    connect(&session, &Session::executedSql, [](QString sql){ qDebug() << sql; });
     GroupConditions where;
-    where.addIn("id", { 2, 3 });
+    where.addIn("id", { 3, 4 });
     auto listA = session.getList<A>(where);
 
     QCOMPARE(listA.count(), 2);

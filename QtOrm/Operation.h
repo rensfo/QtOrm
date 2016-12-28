@@ -7,14 +7,18 @@ namespace QtOrm {
 namespace Sql {
 
 enum class Operation : int {
-  None = 0,
-  Like = 1,
-  Equal = 2,
-  NotEqual = 4,
-  IsNull = 16,
-  IsNotNull = 32,
-  In = 64,
-  Between = 128
+  None,
+  Like,
+  Equal,
+  NotEqual,
+  IsNull,
+  IsNotNull,
+  In,
+  Between,
+  Greater,
+  GreaterOrEqual,
+  Less,
+  LessOrEqual
 };
 
 Q_DECLARE_FLAGS(Operations, Operation)
@@ -26,7 +30,11 @@ static QMap<Operation, QString> OperationStrings = {{Operation::Like, "like"},
                                                     {Operation::IsNull, "is null"},
                                                     {Operation::IsNotNull, "is not null"},
                                                     {Operation::In, "in"},
-                                                    {Operation::Between, "between"}};
+                                                    {Operation::Between, "between"},
+                                                    {Operation::Greater, ">"},
+                                                    {Operation::GreaterOrEqual, ">="},
+                                                    {Operation::Less, "<"},
+                                                    {Operation::LessOrEqual, "<="}};
 }
 }
 #endif // OPERATION_H

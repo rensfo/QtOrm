@@ -34,6 +34,10 @@ public:
   void addLike(const QString &fieldName, const QVariant &value);
   void addBetween(const QString &fieldName, const QVariant &value1, const QVariant &value2);
   void addIn(const QString &fieldName, const QVariantList &values);
+  void addGreater(const QString &fieldName, const QVariant &value);
+  void addGreaterOrEqual(const QString &fieldName, const QVariant &value);
+  void addLess(const QString &fieldName, const QVariant &value);
+  void addLessOrEqual(const QString &fieldName, const QVariant &value);
 
   void clearConditions();
   void clearGroups();
