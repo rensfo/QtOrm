@@ -6,9 +6,7 @@
 
 namespace QtOrm {
 
-enum class ErrorCode {
-  Sql
-};
+enum class ErrorCode { Sql };
 
 class Exception : public QException {
 public:
@@ -24,46 +22,45 @@ protected:
   QString message;
 };
 
-class FindMoreThatOneRecordException : public Exception{
+class FindMoreThatOneRecordException : public Exception {
 public:
   using Exception::Exception;
 };
 
-class NotRegistredClassException : public Exception{
+class NotRegistredClassException : public Exception {
 public:
   using Exception::Exception;
 };
 
-class IdPropertyAlreadyRegistredException : public Exception{
+class IdPropertyAlreadyRegistredException : public Exception {
 public:
   using Exception::Exception;
 };
 
-class PropertyNotFoundException : public Exception{
+class PropertyNotFoundException : public Exception {
 public:
   using Exception::Exception;
 };
 
-class UnableToSetValueException : public Exception{
+class UnableToSetValueException : public Exception {
 public:
   using Exception::Exception;
 };
 
-class InstanceNotCreatedException : public Exception{
+class InstanceNotCreatedException : public Exception {
 public:
   using Exception::Exception;
 };
 
-class SqlException : public Exception{
+class SqlException : public Exception {
 public:
   using Exception::Exception;
 };
 
-class DatabaseConnectionClosedException : public Exception{
+class DatabaseConnectionClosedException : public Exception {
 public:
   using Exception::Exception;
 };
-
 }
 
 #endif // EXEPTION_H

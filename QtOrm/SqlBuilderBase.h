@@ -50,7 +50,8 @@ public:
 
 protected:
   QString getPlaceHolder(const QString &param);
-  void bindValues(QSqlQuery &query, const QSharedPointer<GroupConditions> &conditions, const QMap<QSharedPointer<Condition>, QString> &placeHolders);
+  void bindValues(QSqlQuery &query, const QSharedPointer<GroupConditions> &conditions,
+                  const QMap<QSharedPointer<Condition>, QString> &placeHolders);
   QSharedPointer<QueryModel> getQueryModel(QueryModelType queryType);
   QSharedPointer<QueryModel> createModelAndAddToCache(QueryModelType queryType);
   QSharedPointer<QueryModel> createModel(QueryModelType queryType);

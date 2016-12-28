@@ -27,7 +27,6 @@ protected:
   void bindQueryParams(QSqlQuery &query, QSharedPointer<PropertyMap> property);
   void bindQueryParams(QSqlQuery &query, QSharedPointer<OneToOne> oneToOne);
   QSqlQuery prepareSqlQuery(QueryModelType modelType, std::function<void(QSqlQuery &)> bindFunction);
-
 };
 }
 }

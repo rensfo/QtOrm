@@ -6,18 +6,15 @@
 
 #include "QueryModel.h"
 
-namespace QtOrm
-{
+namespace QtOrm {
 
 using Sql::QueryModel;
 using Sql::QueryModelType;
 
-class QueryCache : public QObject
-{
+class QueryCache : public QObject {
   Q_OBJECT
 
-  struct CacheData
-  {
+  struct CacheData {
     QSharedPointer<QueryModel> selectModel;
     QSharedPointer<QueryModel> insertModel;
     QSharedPointer<QueryModel> updateModel;
@@ -28,14 +25,16 @@ class QueryCache : public QObject
 public:
   explicit QueryCache(QObject *parent = nullptr);
 
-  void addModel(QueryModelType type, QSharedPointer<QueryModel> model, const QString &className, const QString &propertyName);
+  void addModel(QueryModelType type, QSharedPointer<QueryModel> model, const QString &className,
+                const QString &propertyName);
   void addSelectModel(const QString &className, QSharedPointer<QueryModel> model);
   void addInsertModel(const QString &className, QSharedPointer<QueryModel> model);
   void addUpdateModel(const QString &className, QSharedPointer<QueryModel> model);
   void addDeleteModel(const QString &className, QSharedPointer<QueryModel> model);
   void addColumnUpdateModel(const QString &className, const QString &propertyName, QSharedPointer<QueryModel> model);
 
-  QSharedPointer<QueryModel> getModel(QueryModelType type, const QString &className, const QString &propertyName = QString());
+  QSharedPointer<QueryModel> getModel(QueryModelType type, const QString &className,
+                                      const QString &propertyName = QString());
   QSharedPointer<QueryModel> getSelectModel(const QString &className);
   QSharedPointer<QueryModel> getInsertModel(const QString &className);
   QSharedPointer<QueryModel> getUpdateModel(const QString &className);

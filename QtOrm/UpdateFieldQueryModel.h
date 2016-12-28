@@ -21,7 +21,6 @@ protected:
 protected:
   QString propertyName;
 };
-
 }
 }
 #endif // UPDATEFIELDQUERYMODEL_H

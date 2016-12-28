@@ -28,7 +28,7 @@ protected:
   static QMap<QString, QSharedPointer<ClassMapBase>> mappedClass;
 };
 
-template<typename T>
+template <typename T>
 void ConfigurationMap::checkParent() {
   static_assert(std::is_base_of<ClassMapBase, T>(), "Type was not inherited from ClassMapBase");
 }

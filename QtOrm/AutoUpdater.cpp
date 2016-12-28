@@ -47,8 +47,8 @@ void AutoUpdater::connectToAllProperties(QSharedPointer<QObject> object) {
     } else {
       if (classBase->getIdProperty()->getName() != propertyName)
         qWarning() << QString("Property %1 from class %2 has not Notify signal!")
-                        .arg(propertyName)
-                        .arg(object->metaObject()->className());
+                          .arg(propertyName)
+                          .arg(object->metaObject()->className());
     }
   }
 }

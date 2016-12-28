@@ -24,21 +24,21 @@ public:
 };
 
 template <typename T>
-ClassMap<T>::ClassMap() : ClassMapBase() {
+ClassMap<T>::ClassMap()
+    : ClassMapBase() {
   (void)static_cast<QObject *>((T *)0);
   qRegisterMetaType<QSharedPointer<T>>();
   setMetaObject(T::staticMetaObject);
 }
 
-template<typename T>
+template <typename T>
 ClassMap<T>::~ClassMap() {
-
 }
 
 template <typename T>
 QVariant ClassMap<T>::getVariantByObjectList(QList<QSharedPointer<QObject>> value) {
   QList<QSharedPointer<T>> lst;
-  for (QSharedPointer<QObject> &item : value){
+  for (QSharedPointer<QObject> &item : value) {
     lst.append(item.objectCast<T>());
   }
 

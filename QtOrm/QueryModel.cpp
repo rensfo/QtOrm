@@ -18,7 +18,7 @@ void QueryModel::setMainTableModel(QSharedPointer<QueryTableModel> &value) {
   mainTableModel = value;
 }
 
-QSharedPointer<ClassMapBase> QueryModel::getClassBase() const{
+QSharedPointer<ClassMapBase> QueryModel::getClassBase() const {
   return classBase;
 }
 

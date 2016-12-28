@@ -39,7 +39,8 @@ QSqlQuery SimpleSqlBuilder::updateOneColumnQuery(const QString &propertyName) {
   this->propertyName = propertyName;
 
   using namespace std::placeholders;
-  std::function<void(QSqlQuery &)> updateColumnBindFunction = std::bind(&QtOrm::Sql::SimpleSqlBuilder::bindOneColumnUpdate, this, _1);
+  std::function<void(QSqlQuery &)> updateColumnBindFunction =
+      std::bind(&QtOrm::Sql::SimpleSqlBuilder::bindOneColumnUpdate, this, _1);
   return prepareSqlQuery(QueryModelType::UpdateColumn, updateColumnBindFunction);
 }
 
@@ -60,7 +61,7 @@ SimpleSqlBuilder &SimpleSqlBuilder::operator=(const SimpleSqlBuilder &other) {
   database = other.getDatabase();
   classBase = other.getClassBase();
   queryModel = other.getQueryModel();
-  queryCache  = other.getQueryCache();
+  queryCache = other.getQueryCache();
 
   return *this;
 }

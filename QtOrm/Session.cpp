@@ -37,14 +37,12 @@ void Session::clearReestr() {
   reestr->clear();
 }
 
-void Session::clearQueryCache()
-{
+void Session::clearQueryCache() {
   queryCache->clear();
 }
 
-void Session::removeFromCache(QSharedPointer<QObject> object)
-{
-  if(reestr) {
+void Session::removeFromCache(QSharedPointer<QObject> object) {
+  if (reestr) {
     reestr->remove(object);
   }
 }
@@ -54,7 +52,7 @@ Query Session::createQuery() {
   query.setDatabase(database);
   query.setReestr(reestr);
   query.setQueryCache(queryCache);
-  if(autoUpdate){
+  if (autoUpdate) {
     query.setUpdater(updater);
   }
 

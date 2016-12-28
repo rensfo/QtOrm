@@ -16,7 +16,7 @@ void ClassMapBase::setTable(const QString &table) {
   this->table = table;
 }
 
-const QMap<QString, QSharedPointer<PropertyMap> > ClassMapBase::getProperties() const {
+const QMap<QString, QSharedPointer<PropertyMap>> ClassMapBase::getProperties() const {
   return properties;
 }
 
@@ -125,13 +125,13 @@ QString ClassMapBase::getTypeNameOfProperty(const QMetaObject &meta, const QStri
 
   QString sharedPointerClassName = "QSharedPointer<";
 
-  if(refClass.contains(sharedPointerClassName)){
+  if (refClass.contains(sharedPointerClassName)) {
     int begin = sharedPointerClassName.size();
     int length = refClass.size() - begin - 1;
     refClass = refClass.mid(begin, length);
   }
 
-  if (refClass.right(1) == "*"){
+  if (refClass.right(1) == "*") {
     refClass = refClass.left(refClass.size() - 1);
   }
 

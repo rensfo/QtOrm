@@ -55,9 +55,9 @@ QSharedPointer<QObject> Reestr::value(const QString &table, const QString &id) {
 
 QSharedPointer<QObject> Reestr::value(QObject *object) {
   QString className = object->metaObject()->className();
-  if(data.contains(className)){
-    for(QSharedPointer<QObject> &reestrObject : data[className]){
-      if(reestrObject.data() == object){
+  if (data.contains(className)) {
+    for (QSharedPointer<QObject> &reestrObject : data[className]) {
+      if (reestrObject.data() == object) {
         return reestrObject;
       }
     }

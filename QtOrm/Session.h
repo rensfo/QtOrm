@@ -41,9 +41,9 @@ public:
   template <class T>
   QList<QSharedPointer<T>> getList(const GroupConditions &conditions);
   template <class T>
-  QList<QSharedPointer<QObject> > getObjectList();
+  QList<QSharedPointer<QObject>> getObjectList();
   template <class T>
-  QList<QSharedPointer<QObject> > getObjectList(const QString &property, const QVariant &value);
+  QList<QSharedPointer<QObject>> getObjectList(const QString &property, const QVariant &value);
   template <class T>
   QList<QSharedPointer<QObject>> getObjectList(const GroupConditions &conditions);
   template <class T>
@@ -152,7 +152,7 @@ QList<QSharedPointer<QObject>> Session::getObjectList(const GroupConditions &con
 template <class T>
 QList<QSharedPointer<T>> Session::convertListTo(QList<QSharedPointer<QObject>> list) {
   QList<QSharedPointer<T>> convertedList;
-  for(QSharedPointer<QObject> &item : list) {
+  for (QSharedPointer<QObject> &item : list) {
     convertedList.append(item.objectCast<T>());
   }
 
@@ -179,6 +179,5 @@ void Session::refresh(QSharedPointer<T> &object) {
   QSharedPointer<QObject> qobject = object.template objectCast<QObject>();
   query.refresh(qobject);
 }
-
 }
 #endif // SESSION_H

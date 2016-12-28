@@ -56,6 +56,7 @@ public:
   static QString getTypeNameOfProperty(const QMetaObject &meta, const QString &prop);
 
   bool propertiesContains(const QString &propertyName);
+
 private:
   PropertyMap &createProperty(QString propertyName);
   void checkToExistProperty(const QString &property);

@@ -19,7 +19,7 @@ QString UpdateFieldQueryModel::getPropertyName() const {
   return propertyName;
 }
 
-void UpdateFieldQueryModel::setPropertyName(const QString &value){
+void UpdateFieldQueryModel::setPropertyName(const QString &value) {
   propertyName = value;
 }
 
@@ -49,6 +49,5 @@ QSharedPointer<QueryTableModel> UpdateFieldQueryModel::buildQueryTableModel() {
 
   return queryTableModel;
 }
-
 }
 }

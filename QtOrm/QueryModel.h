@@ -12,13 +12,7 @@ namespace Sql {
 
 using Mapping::ClassMapBase;
 
-enum class QueryModelType : int {
-  Select,
-  Insert,
-  Update,
-  Delete,
-  UpdateColumn
-};
+enum class QueryModelType : int { Select, Insert, Update, Delete, UpdateColumn };
 
 class QueryModel : public QObject {
   Q_OBJECT
@@ -34,8 +28,6 @@ public:
 
 protected:
   void setMainTableModel(QSharedPointer<QueryTableModel> &value);
-
-//  QSharedPointer<QueryTableModel> buildQueryTableModel(QSharedPointer<ClassMapBase> classBase);
 
 protected:
   QSharedPointer<QueryTableModel> mainTableModel;

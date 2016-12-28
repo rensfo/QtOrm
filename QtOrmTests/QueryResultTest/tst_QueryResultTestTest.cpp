@@ -42,6 +42,10 @@ private Q_SLOTS:
   void autoUpdate();
   void operationBetween();
   void operationIn();
+  void operationGreater();
+  void operationGreaterOrEqual();
+  void operationLess();
+  void operationLessOrEqual();
 
 private:
   bool openConnection();
@@ -324,9 +328,66 @@ void QueryResultTestTest::operationBetween() {
 
 void QueryResultTestTest::operationIn() {
   try {
-//    connect(&session, &Session::executedSql, [](QString sql){ qDebug() << sql; });
+    //    connect(&session, &Session::executedSql, [](QString sql){ qDebug() << sql; });
     GroupConditions where;
-    where.addIn("id", { 3, 4 });
+    where.addIn("id", {3, 4});
+    auto listA = session.getList<A>(where);
+
+    QCOMPARE(listA.count(), 2);
+    return;
+  } catch (QtOrm::Exception &e) {
+    qDebug() << e.getMessage();
+  }
+  QVERIFY(false);
+}
+
+void QueryResultTestTest::operationGreater() {
+  try {
+    //    connect(&session, &Session::executedSql, [](QString sql){ qDebug() << sql; });
+    GroupConditions where;
+    where.addGreater("id", 3);
+    auto listA = session.getList<A>(where);
+
+    QCOMPARE(listA.count(), 1);
+    return;
+  } catch (QtOrm::Exception &e) {
+    qDebug() << e.getMessage();
+  }
+  QVERIFY(false);
+}
+
+void QueryResultTestTest::operationGreaterOrEqual() {
+  try {
+    GroupConditions where;
+    where.addGreaterOrEqual("id", 3);
+    auto listA = session.getList<A>(where);
+
+    QCOMPARE(listA.count(), 2);
+    return;
+  } catch (QtOrm::Exception &e) {
+    qDebug() << e.getMessage();
+  }
+  QVERIFY(false);
+}
+
+void QueryResultTestTest::operationLess() {
+  try {
+    GroupConditions where;
+    where.addLess("id", 3);
+    auto listA = session.getList<A>(where);
+
+    QCOMPARE(listA.count(), 1);
+    return;
+  } catch (QtOrm::Exception &e) {
+    qDebug() << e.getMessage();
+  }
+  QVERIFY(false);
+}
+
+void QueryResultTestTest::operationLessOrEqual() {
+  try {
+    GroupConditions where;
+    where.addLessOrEqual("id", 3);
     auto listA = session.getList<A>(where);
 
     QCOMPARE(listA.count(), 2);

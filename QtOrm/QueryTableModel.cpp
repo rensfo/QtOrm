@@ -22,7 +22,7 @@ void QueryTableModel::addColumn(const QString &name) {
   columns.append(name);
 }
 
-QList<QSharedPointer<QueryJoin> > QueryTableModel::getJoins() const {
+QList<QSharedPointer<QueryJoin>> QueryTableModel::getJoins() const {
   return joins;
 }
 
