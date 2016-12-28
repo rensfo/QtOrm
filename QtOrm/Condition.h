@@ -23,7 +23,7 @@ public:
   void setOperation(const Operation &value);
 
   QList<QVariant> getValues() const;
-  void setValues(const QList<QVariant> &value);
+  void setValues(const QVariantList &value);
   void setValue(const QVariant &value);
   void clearValues();
 
@@ -36,9 +36,8 @@ private:
   QString column;
   QString propertyName;
   Operation operation = Operation::None;
-  QList<QVariant> values;
+  QVariantList values;
 };
-
 }
 }
 #endif // CONDITION_H

@@ -122,8 +122,8 @@ void QueryResultTestTest::oneColumnTwoTimesInWhere() {
 
     GroupConditions gc;
     gc.setOperation(GroupOperation::Or);
-    gc.addConditionEqual("code_1", "code1");
-    gc.addConditionEqual("code_1", "code2");
+    gc.addEqual("code_1", "code1");
+    gc.addEqual("code_1", "code2");
 
     QList<QSharedPointer<A>> listA = session.getList<A>(gc);
 
@@ -198,7 +198,7 @@ void QueryResultTestTest::updateObject() {
 
 void QueryResultTestTest::where() {
   GroupConditions where;
-  where.addConditionEqual("code_1", "code2");
+  where.addEqual("code_1", "code2");
   auto a = session.getList<A>(where);
 
   QCOMPARE(a.count(), 1);

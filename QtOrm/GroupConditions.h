@@ -2,6 +2,7 @@
 #define GROUPCONDITIONS_H
 
 #include <QObject>
+#include <QSharedPointer>
 
 #include "Condition.h"
 
@@ -19,17 +20,21 @@ public:
   GroupOperation getOperation() const;
   void setOperation(const GroupOperation &value);
 
-  QList<Condition *> getConditions() const;
-  void setConditions(const QList<Condition *> &value);
+  QList<QSharedPointer<Condition>> getConditions() const;
+  void setConditions(const QList<QSharedPointer<Condition>> &value);
 
-  QList<GroupConditions *> getGroups() const;
-  void setGroups(const QList<GroupConditions *> &value);
+  QList<QSharedPointer<GroupConditions>> getGroups() const;
+  void setGroups(const QList<QSharedPointer<GroupConditions>> &value);
 
   void addGroup(const GroupConditions &value);
   void addCondition(const Condition &value);
-  void addCondition(const QString &property, const Operation &operation, const QVariant &value);
-  void addConditionEqual(const QString &fieldName, const QVariant &value);
-  void removeFilter(Condition *value);
+
+  void addEqual(const QString &fieldName, const QVariant &value);
+  void addNotEqual(const QString &fieldName, const QVariant &value);
+  void addLike(const QString &fieldName, const QVariant &value);
+  void addBetween(const QString &fieldName, const QVariant &value1, const QVariant &value2);
+  void addIn(const QString &fieldName, const QVariantList &values);
+
   void clearConditions();
   void clearGroups();
   void clear();
@@ -37,10 +42,13 @@ public:
 
   GroupConditions &operator=(const GroupConditions &group);
 
-private:
+protected:
+  void addCondition(const QString &property, const Operation &operation, const QVariant &value);
+
+protected:
   GroupOperation operation = GroupOperation::And;
-  QList<Condition *> conditions;
-  QList<GroupConditions *> groups;
+  QList<QSharedPointer<Condition>> conditions;
+  QList<QSharedPointer<GroupConditions>> groups;
 };
 }
 }

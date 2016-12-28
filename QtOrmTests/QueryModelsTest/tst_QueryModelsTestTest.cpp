@@ -71,8 +71,8 @@ void QueryModelsTestTest::whereClause() {
 
   GroupConditions group;
   group.setOperation(GroupOperation::And);
-  group.addConditionEqual(classBase->getIdProperty()->getName(), 1);
-  group.addConditionEqual("code_1", "code1");
+  group.addEqual(classBase->getIdProperty()->getName(), 1);
+  group.addEqual("code_1", "code1");
 
   query.setConditions(group);
 
@@ -88,7 +88,7 @@ void QueryModelsTestTest::whereClauseUseColumn() {
   GroupConditions group;
   group.setOperation(GroupOperation::And);
 
-  group.addConditionEqual(classBase->getIdProperty()->getColumn(), 1);
+  group.addEqual(classBase->getIdProperty()->getColumn(), 1);
 
   Condition condition;
   condition.setColumn("code");
@@ -122,8 +122,8 @@ void QueryModelsTestTest::oneColumnTwoTimes() {
 
   GroupConditions group;
   group.setOperation(GroupOperation::Or);
-  group.addConditionEqual("code_1", "code1");
-  group.addConditionEqual("code_1", "code2");
+  group.addEqual("code_1", "code1");
+  group.addEqual("code_1", "code2");
 
   query.setConditions(group);
 

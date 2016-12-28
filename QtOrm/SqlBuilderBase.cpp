@@ -39,23 +39,24 @@ QString SqlBuilderBase::getPlaceHolder(const QString param) {
   return QString(":%1").arg(param);
 }
 
-void SqlBuilderBase::bindValues(QSqlQuery &query, const GroupConditions &conditions, const QMap<Condition *, QString> &placeHolders) {
-  for (Condition *f : conditions.getConditions()) {
+void SqlBuilderBase::bindValues(QSqlQuery &query, const GroupConditions &conditions,
+                                const QMap<QSharedPointer<Condition>, QString> &placeHolders) {
+  for (QSharedPointer<Condition> &f : conditions.getConditions()) {
     if (!f->getValues().isEmpty()) {
       QString placeHolder = placeHolders[f];
       query.bindValue(getPlaceHolder(placeHolder), f->getValues().first());
     }
   }
-  for (GroupConditions *g : conditions.getGroups()) {
+  for (QSharedPointer<GroupConditions> &g : conditions.getGroups()) {
     bindValues(query, *g, placeHolders);
   }
 }
 
 QSharedPointer<QueryModel> SqlBuilderBase::getQueryModel(QueryModelType queryType) {
   QString className = classBase->getClassName();
-  if(queryCache) {
-    if(QSharedPointer<QueryModel> model = queryCache->getModel(queryType, className, propertyName)) {
-      if(queryType == QueryModelType::Select){
+  if (queryCache) {
+    if (QSharedPointer<QueryModel> model = queryCache->getModel(queryType, className, propertyName)) {
+      if (queryType == QueryModelType::Select) {
         QSharedPointer<SelectQueryModel> selectModel = model.objectCast<SelectQueryModel>();
         selectModel->setConditions(conditions);
       }
@@ -66,84 +67,77 @@ QSharedPointer<QueryModel> SqlBuilderBase::getQueryModel(QueryModelType queryTyp
   return createModelAndAddToCache(queryType);
 }
 
-QSharedPointer<QueryModel> SqlBuilderBase::createModelAndAddToCache(QueryModelType queryType)
-{
+QSharedPointer<QueryModel> SqlBuilderBase::createModelAndAddToCache(QueryModelType queryType) {
   QString className = classBase->getClassName();
   QSharedPointer<QueryModel> newModel = createModel(queryType);
-  if(queryCache) {
+  if (queryCache) {
     queryCache->addModel(queryType, newModel, className, propertyName);
   }
 
   return newModel;
 }
 
-QSharedPointer<QueryModel> SqlBuilderBase::createModel(QueryModelType queryType)
-{
+QSharedPointer<QueryModel> SqlBuilderBase::createModel(QueryModelType queryType) {
   QSharedPointer<QueryModel> result;
 
-  switch (queryType)
-  {
-    case QueryModelType::Select: {
-      QSharedPointer<SelectQueryModel> selectModel = QSharedPointer<SelectQueryModel>::create();
-      selectModel->setClassBase(classBase);
-      selectModel->buildModel();
-      selectModel->setConditions(conditions);
-      result = selectModel;
+  switch (queryType) {
+  case QueryModelType::Select: {
+    QSharedPointer<SelectQueryModel> selectModel = QSharedPointer<SelectQueryModel>::create();
+    selectModel->setClassBase(classBase);
+    selectModel->buildModel();
+    selectModel->setConditions(conditions);
+    result = selectModel;
     break;
-    }
-    case QueryModelType::Insert:{
-      QSharedPointer<InsertQueryModel> insertModel = QSharedPointer<InsertQueryModel>::create();
-      insertModel->setClassBase(classBase);
-      insertModel->setHasLastInsertedIdFeature(hasLastInsertedIdFeature());
-      insertModel->buildModel();
-      result = insertModel;
-      break;
-    }
-    case QueryModelType::Update: {
-      QSharedPointer<UpdateQueryModel> updateModel = QSharedPointer<UpdateQueryModel>::create();
-      updateModel->setClassBase(classBase);
-      updateModel->buildModel();
-      result = updateModel;
-      break;
-    }
-    case QueryModelType::UpdateColumn: {
-      QSharedPointer<UpdateFieldQueryModel> updateColumnModel = QSharedPointer<UpdateFieldQueryModel>::create();
-      updateColumnModel->setClassBase(classBase);
-      updateColumnModel->setPropertyName(propertyName);
-      updateColumnModel->buildModel();
-      result = updateColumnModel;
+  }
+  case QueryModelType::Insert: {
+    QSharedPointer<InsertQueryModel> insertModel = QSharedPointer<InsertQueryModel>::create();
+    insertModel->setClassBase(classBase);
+    insertModel->setHasLastInsertedIdFeature(hasLastInsertedIdFeature());
+    insertModel->buildModel();
+    result = insertModel;
     break;
-    }
-    case QueryModelType::Delete: {
-      QSharedPointer<DeleteQueryModel> deleteModel = QSharedPointer<DeleteQueryModel>::create();
-      deleteModel->setClassBase(classBase);
-      deleteModel->buildModel();
-      result = deleteModel;
+  }
+  case QueryModelType::Update: {
+    QSharedPointer<UpdateQueryModel> updateModel = QSharedPointer<UpdateQueryModel>::create();
+    updateModel->setClassBase(classBase);
+    updateModel->buildModel();
+    result = updateModel;
     break;
-    }
-    //throw exception
+  }
+  case QueryModelType::UpdateColumn: {
+    QSharedPointer<UpdateFieldQueryModel> updateColumnModel = QSharedPointer<UpdateFieldQueryModel>::create();
+    updateColumnModel->setClassBase(classBase);
+    updateColumnModel->setPropertyName(propertyName);
+    updateColumnModel->buildModel();
+    result = updateColumnModel;
+    break;
+  }
+  case QueryModelType::Delete: {
+    QSharedPointer<DeleteQueryModel> deleteModel = QSharedPointer<DeleteQueryModel>::create();
+    deleteModel->setClassBase(classBase);
+    deleteModel->buildModel();
+    result = deleteModel;
+    break;
+  }
+    // throw exception
   }
 
   return result;
 }
 
-bool SqlBuilderBase::hasLastInsertedIdFeature()
-{
+bool SqlBuilderBase::hasLastInsertedIdFeature() {
   return database.driver()->hasFeature(QSqlDriver::LastInsertId) && database.driverName() != "QPSQL";
 }
 
-QSharedPointer<QueryCache> SqlBuilderBase::getQueryCache() const
-{
+QSharedPointer<QueryCache> SqlBuilderBase::getQueryCache() const {
   return queryCache;
 }
 
-void SqlBuilderBase::setQueryCache(QSharedPointer<QueryCache> value)
-{
+void SqlBuilderBase::setQueryCache(QSharedPointer<QueryCache> value) {
   queryCache = value;
 }
 
-QSharedPointer<QueryModel> SqlBuilderBase::getQueryModel() const
-{
+QSharedPointer<QueryModel> SqlBuilderBase::getQueryModel() const {
   return queryModel;
 }
 

@@ -26,7 +26,7 @@ public:
 
   virtual QString getSqlText() override;
 
-  QMap<Condition *, QString> getConditionPlaceholder() const;
+  QMap<QSharedPointer<Condition>, QString> getConditionPlaceholder() const;
   void clearPlaceHolders();
 
   virtual void buildModel() override;
@@ -43,8 +43,8 @@ protected:
   QString groupOperationToString(GroupOperation groupOperation) const;
   virtual QString getLikeCondition(const QString &fieldName) const;
   QString operationToString(const Condition &filter) const;
-  QString conditionToString(Condition *condition);
-  Operation operationToSqlStandart(Condition *condition);
+  QString conditionToString(QSharedPointer<Condition> &condition);
+  Operation operationToSqlStandart(const QSharedPointer<Condition> &condition);
   short calculateCountUsedColumn(const QString &value);
 
 protected:
@@ -54,7 +54,7 @@ protected:
   QString from;
   QString where;
   GroupConditions conditions;
-  QMap<Condition *, QString> conditionPlaceholder;
+  QMap<QSharedPointer<Condition>, QString> conditionPlaceholder;
 };
 }
 }

@@ -28,9 +28,10 @@ public:
   explicit Query(QObject *parent = nullptr);
   Query(const Query &other);
   virtual QSharedPointer<QObject> getById(const QString &className, const QVariant &id);
-  virtual QList<QSharedPointer<QObject> > getListObject(const QString &className, const QString &property = QString(), const QString &column = QString(),
-                                          const QVariant &value = QVariant());
-  virtual QList<QSharedPointer<QObject> > getListObject(const QString &className, const GroupConditions &conditions);
+  virtual QList<QSharedPointer<QObject>> getListObject(const QString &className, const QString &property = QString(),
+                                                       const QString &column = QString(),
+                                                       const QVariant &value = QVariant());
+  virtual QList<QSharedPointer<QObject>> getListObject(const QString &className, const GroupConditions &conditions);
   virtual void saveObject(QSharedPointer<QObject> &object);
   virtual void deleteObject(QSharedPointer<QObject> &object);
   virtual void refresh(QSharedPointer<QObject> &object);
@@ -59,23 +60,30 @@ protected:
   void insertObject(QSharedPointer<QObject> &object);
   void updateObject(QSharedPointer<QObject> &object);
   virtual void executeQuery(QSqlQuery &query);
-  QList<QSharedPointer<QObject> > getList(QSqlQuery &query, const QueryModel &queryModel);
+  QList<QSharedPointer<QObject>> getList(QSqlQuery &query, const QueryModel &queryModel);
 
-  void fillObject(QSharedPointer<QObject> &object, QSharedPointer<QueryTableModel> &queryTableModel, const QSqlRecord &record);
-  void fillOneToMany(const QList<QSharedPointer<OneToMany>> &relations, const QString &idProperty, QSharedPointer<QObject> object);
-  void fillOneToOne(QSharedPointer<QObject> object, QSharedPointer<QueryTableModel> queryTableModel, const QSqlRecord &record);
-  QSharedPointer<QObject> getObject(const QSqlRecord &record, const QSharedPointer<ClassMapBase> &classBase, const QString &tableAlias, QSharedPointer<QueryTableModel> queryTableModel);
+  void fillObject(QSharedPointer<QObject> &object, QSharedPointer<QueryTableModel> &queryTableModel,
+                  const QSqlRecord &record);
+  void fillOneToMany(const QList<QSharedPointer<OneToMany>> &relations, const QString &idProperty,
+                     QSharedPointer<QObject> object);
+  void fillOneToOne(QSharedPointer<QObject> object, QSharedPointer<QueryTableModel> queryTableModel,
+                    const QSqlRecord &record);
+  QSharedPointer<QObject> getObject(const QSqlRecord &record, const QSharedPointer<ClassMapBase> &classBase,
+                                    const QString &tableAlias, QSharedPointer<QueryTableModel> queryTableModel);
   void objectSetProperty(QSharedPointer<QObject> object, const QString &propertyName, const QVariant &value);
   QSharedPointer<QObject> createNewInstance(QSharedPointer<ClassMapBase> classBase);
-  bool reestrContainsObject(QSharedPointer<ClassMapBase> classBase, const QSqlRecord &record, const QString &tableAlias);
-  QSharedPointer<QObject> getObjectFromReestr(QSharedPointer<ClassMapBase> classBase, const QSqlRecord &record, const QString &tableAlias);
-  void insertObjectIntoReestr(QSharedPointer<ClassMapBase> classBase, const QSqlRecord &record, QSharedPointer<QObject> object,
-                              const QString &tableAlias);
+  bool reestrContainsObject(QSharedPointer<ClassMapBase> classBase, const QSqlRecord &record,
+                            const QString &tableAlias);
+  QSharedPointer<QObject> getObjectFromReestr(QSharedPointer<ClassMapBase> classBase, const QSqlRecord &record,
+                                              const QString &tableAlias);
+  void insertObjectIntoReestr(QSharedPointer<ClassMapBase> classBase, const QSqlRecord &record,
+                              QSharedPointer<QObject> object, const QString &tableAlias);
   void insertObjectIntoReestr(QSharedPointer<ClassMapBase> classBase, QSharedPointer<QObject> object, QVariant idValue);
   void removeObjectFromReestr(QSharedPointer<QObject> object);
   QVariant getIdFromRecord(QSharedPointer<ClassMapBase> classBase, const QSqlRecord &record, const QString &tableAlias);
 
-  void refreshObjectData(QSharedPointer<QObject> object, QSharedPointer<QueryTableModel> queryTableModel, const QSqlRecord &record);
+  void refreshObjectData(QSharedPointer<QObject> object, QSharedPointer<QueryTableModel> queryTableModel,
+                         const QSqlRecord &record);
 
   QString getSqlTextWithBindParams(QSqlQuery &query);
 

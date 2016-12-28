@@ -19,31 +19,31 @@ GroupOperation GroupConditions::getOperation() const {
 void GroupConditions::setOperation(const GroupOperation &value) {
   operation = value;
 }
-QList<Condition *> GroupConditions::getConditions() const {
+QList<QSharedPointer<Condition>> GroupConditions::getConditions() const {
   return conditions;
 }
 
-void GroupConditions::setConditions(const QList<Condition *> &value) {
+void GroupConditions::setConditions(const QList<QSharedPointer<Condition>> &value) {
   conditions = value;
 }
-QList<GroupConditions *> GroupConditions::getGroups() const {
+QList<QSharedPointer<GroupConditions>> GroupConditions::getGroups() const {
   return groups;
 }
 
-void GroupConditions::setGroups(const QList<GroupConditions *> &value) {
+void GroupConditions::setGroups(const QList<QSharedPointer<GroupConditions>> &value) {
   groups = value;
 }
 
 void GroupConditions::addGroup(const GroupConditions &value) {
-  groups.append(new GroupConditions(value));
+  groups.append(QSharedPointer<GroupConditions>::create(value));
 }
 
 void GroupConditions::addCondition(const Condition &value) {
-  conditions.append(new Condition(value));
+  conditions.append(QSharedPointer<Condition>::create(value));
 }
 
 void GroupConditions::addCondition(const QString &property, const Operation &operation, const QVariant &value) {
-  Condition newFilter(this);
+  Condition newFilter;
   newFilter.setPropertyName(property);
   newFilter.setOperation(operation);
   newFilter.setValue(value);
@@ -51,12 +51,30 @@ void GroupConditions::addCondition(const QString &property, const Operation &ope
   addCondition(newFilter);
 }
 
-void GroupConditions::addConditionEqual(const QString &fieldName, const QVariant &value) {
+void GroupConditions::addEqual(const QString &fieldName, const QVariant &value) {
   addCondition(fieldName, Operation::Equal, value);
 }
 
-void GroupConditions::removeFilter(Condition *value) {
-  conditions.removeAll(value);
+void GroupConditions::addNotEqual(const QString &fieldName, const QVariant &value) {
+  addCondition(fieldName, Operation::NotEqual, value);
+}
+
+void GroupConditions::addLike(const QString &fieldName, const QVariant &value) {
+  addCondition(fieldName, Operation::Like, value);
+}
+
+void GroupConditions::addBetween(const QString &fieldName, const QVariant &value1, const QVariant &value2) {
+  QVariantList values = {value1, value2};
+  addCondition(fieldName, Operation::Between, values);
+}
+
+void GroupConditions::addIn(const QString &fieldName, const QVariantList &values) {
+  Condition newFilter;
+  newFilter.setPropertyName(fieldName);
+  newFilter.setOperation(Operation::In);
+  newFilter.setValues(values);
+
+  addCondition(newFilter);
 }
 
 void GroupConditions::clearConditions() {

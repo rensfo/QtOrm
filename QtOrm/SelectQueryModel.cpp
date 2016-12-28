@@ -39,7 +39,7 @@ QString SelectQueryModel::buildFromClause() {
 
 QString SelectQueryModel::buildWhereClause() {
   QString groupConditionText = GroupConditionToString(conditions);
-  if(groupConditionText.isEmpty())
+  if (groupConditionText.isEmpty())
     return QString();
 
   return "where " + groupConditionText;
@@ -47,20 +47,17 @@ QString SelectQueryModel::buildWhereClause() {
 
 QString SelectQueryModel::GroupConditionToString(const GroupConditions &groupConditions) {
   QString whereClause;
-  for (Condition *condition : groupConditions.getConditions()) {
+  for (QSharedPointer<Condition> &condition : groupConditions.getConditions()) {
     QString groupOp = groupOperationToString(groupConditions.getOperation());
     QString conditionText = conditionToString(condition);
-    if(whereClause.isEmpty())
-    {
+    if (whereClause.isEmpty()) {
       whereClause = conditionText;
-    }
-    else
-    {
+    } else {
       whereClause += QString(" %1 %2").arg(groupOp).arg(conditionText);
     }
   }
 
-  for (GroupConditions *group : groupConditions.getGroups()) {
+  for (QSharedPointer<GroupConditions> &group : groupConditions.getGroups()) {
     QString groupOp = whereClause.isEmpty() ? "" : groupOperationToString(groupConditions.getOperation());
     QString groupWhere = GroupConditionToString(*group);
     if (!groupWhere.isEmpty())
@@ -95,16 +92,12 @@ QString SelectQueryModel::operationToString(const Condition &filter) const {
   return operationString;
 }
 
-QString SelectQueryModel::conditionToString(Condition *condition)
-{
+QString SelectQueryModel::conditionToString(QSharedPointer<Condition> &condition) {
   QString conditionString;
   QString columnName;
-  if(condition->getPropertyName().isEmpty())
-  {
+  if (condition->getPropertyName().isEmpty()) {
     columnName = condition->getColumn();
-  }
-  else
-  {
+  } else {
     columnName = classBase->getProperty(condition->getPropertyName())->getColumn();
   }
 
@@ -115,71 +108,60 @@ QString SelectQueryModel::conditionToString(Condition *condition)
 
   short count = calculateCountUsedColumn(columnName);
 
-  if(count)
-  {
+  if (count) {
     placeHolder = QString("%1_%2").arg(columnName).arg(count);
   }
 
   QString fullColumnName = QString("%1.%2").arg(tableAlias).arg(columnName);
-  switch(operation)
-  {
-    case Operation::Like:
-      conditionString = QString("%1 %2 '%' || :%3 || '%'").arg(fullColumnName).arg(OperationStrings[operation]);
-      conditionPlaceholder.insert(condition, placeHolder);
+  switch (operation) {
+  case Operation::Like:
+    conditionString = QString("%1 %2 '%' || :%3 || '%'").arg(fullColumnName).arg(OperationStrings[operation]);
+    conditionPlaceholder.insert(condition, placeHolder);
     break;
-    case Operation::IsNull:
-    case Operation::IsNotNull:
-      conditionString = QString("%1 %2").arg(fullColumnName).arg(OperationStrings[operation]);
+  case Operation::IsNull:
+  case Operation::IsNotNull:
+    conditionString = QString("%1 %2").arg(fullColumnName).arg(OperationStrings[operation]);
     break;
-    case Operation::In:
-    {
-      QStringList placeHolders;
-      for(int i = 1; i <= condition->getValues().count(); ++i)
-      {
-        placeHolders.append(QString(":%1_%2").arg(placeHolder).arg(i));
-      }
-      conditionString = QString("%1 %2 (%3)").arg(fullColumnName).arg(OperationStrings[operation]).arg(placeHolders.join(", "));
+  case Operation::In: {
+    QStringList placeHolders;
+    for (int i = 1; i <= condition->getValues().count(); ++i) {
+      placeHolders.append(QString(":%1_%2").arg(placeHolder).arg(i));
     }
-    break;
-    case Operation::Between:
-    {
-      conditionString = QString("%1 %2 :%3_1 and %3_2 ").arg(fullColumnName).arg(OperationStrings[operation]).append(placeHolder);
-    }
-    break;
-    default:
-      conditionString = QString("%1 %2 :%3").arg(fullColumnName).arg(OperationStrings[operation]).arg(placeHolder);
-      conditionPlaceholder.insert(condition, placeHolder);
+    conditionString =
+        QString("%1 %2 (%3)").arg(fullColumnName).arg(OperationStrings[operation]).arg(placeHolders.join(", "));
+  } break;
+  case Operation::Between: {
+    conditionString =
+        QString("%1 %2 :%3_1 and %3_2 ").arg(fullColumnName).arg(OperationStrings[operation]).append(placeHolder);
+  } break;
+  default:
+    conditionString = QString("%1 %2 :%3").arg(fullColumnName).arg(OperationStrings[operation]).arg(placeHolder);
+    conditionPlaceholder.insert(condition, placeHolder);
   }
 
   return conditionString;
 }
 
-Operation SelectQueryModel::operationToSqlStandart(Condition *condition)
-{
+Operation SelectQueryModel::operationToSqlStandart(const QSharedPointer<Condition> &condition) {
   Operation operation = condition->getOperation();
   bool conditionIsNull = condition->getValues().first().isNull();
-  if(operation == Operation::Equal && conditionIsNull)
-  {
+  if (operation == Operation::Equal && conditionIsNull) {
     return Operation::IsNull;
   }
 
-  if(operation == Operation::NotEqual && conditionIsNull)
-  {
+  if (operation == Operation::NotEqual && conditionIsNull) {
     return Operation::IsNotNull;
   }
 
   return operation;
 }
 
-short SelectQueryModel::calculateCountUsedColumn(const QString &value)
-{
+short SelectQueryModel::calculateCountUsedColumn(const QString &value) {
   short count = 0;
 
-  for(Condition *condition : conditionPlaceholder.keys())
-  {
+  for (QSharedPointer<Condition> &condition : conditionPlaceholder.keys()) {
     QString columnName = classBase->getProperty(condition->getPropertyName())->getColumn();
-    if(columnName == value)
-    {
+    if (columnName == value) {
       count++;
     }
   }
@@ -187,13 +169,11 @@ short SelectQueryModel::calculateCountUsedColumn(const QString &value)
   return count;
 }
 
-QMap<Condition *, QString> SelectQueryModel::getConditionPlaceholder() const
-{
+QMap<QSharedPointer<Condition>, QString> SelectQueryModel::getConditionPlaceholder() const {
   return conditionPlaceholder;
 }
 
-void SelectQueryModel::clearPlaceHolders()
-{
+void SelectQueryModel::clearPlaceHolders() {
   conditionPlaceholder.clear();
 }
 

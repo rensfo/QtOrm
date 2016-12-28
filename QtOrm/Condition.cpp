@@ -57,13 +57,11 @@ void Condition::addValue(const QVariant &value) {
   values.append(value);
 }
 
-QString Condition::getColumn() const
-{
+QString Condition::getColumn() const {
   return column;
 }
 
-void Condition::setColumn(const QString &value)
-{
+void Condition::setColumn(const QString &value) {
   column = value;
 }
 }
