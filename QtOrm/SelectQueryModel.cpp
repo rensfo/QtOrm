@@ -132,12 +132,12 @@ QString SelectQueryModel::conditionToString(QSharedPointer<Condition> &condition
   } break;
   case Operation::Between: {
     conditionString =
-        QString("%1 %2 :%3_1 and %3_2 ").arg(fullColumnName).arg(OperationStrings[operation]).append(placeHolder);
+        QString("%1 %2 :%3_1 and :%3_2 ").arg(fullColumnName).arg(OperationStrings[operation]).arg(placeHolder);
   } break;
   default:
     conditionString = QString("%1 %2 :%3").arg(fullColumnName).arg(OperationStrings[operation]).arg(placeHolder);
-    conditionPlaceholder.insert(condition, placeHolder);
   }
+  conditionPlaceholder.insert(condition, placeHolder);
 
   return conditionString;
 }

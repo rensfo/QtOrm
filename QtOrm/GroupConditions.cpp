@@ -51,6 +51,16 @@ void GroupConditions::addCondition(const QString &property, const Operation &ope
   addCondition(newFilter);
 }
 
+void GroupConditions::addCondition(const QString &property, const Operation &operation, const QVariantList &values)
+{
+  Condition newFilter;
+  newFilter.setPropertyName(property);
+  newFilter.setOperation(operation);
+  newFilter.setValues(values);
+
+  addCondition(newFilter);
+}
+
 void GroupConditions::addEqual(const QString &fieldName, const QVariant &value) {
   addCondition(fieldName, Operation::Equal, value);
 }
@@ -69,12 +79,7 @@ void GroupConditions::addBetween(const QString &fieldName, const QVariant &value
 }
 
 void GroupConditions::addIn(const QString &fieldName, const QVariantList &values) {
-  Condition newFilter;
-  newFilter.setPropertyName(fieldName);
-  newFilter.setOperation(Operation::In);
-  newFilter.setValues(values);
-
-  addCondition(newFilter);
+  addCondition(fieldName, Operation::In, values);
 }
 
 void GroupConditions::clearConditions() {

@@ -22,7 +22,7 @@ public:
   Operation getOperation() const;
   void setOperation(const Operation &value);
 
-  QList<QVariant> getValues() const;
+  QVariantList getValues() const;
   void setValues(const QVariantList &value);
   void setValue(const QVariant &value);
   void clearValues();

@@ -37,7 +37,7 @@ void Condition::setOperation(const Operation &value) {
   operation = value;
 }
 
-QList<QVariant> Condition::getValues() const {
+QVariantList Condition::getValues() const {
   return values;
 }
 

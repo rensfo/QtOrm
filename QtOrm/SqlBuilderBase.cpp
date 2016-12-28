@@ -29,26 +29,44 @@ QSqlQuery SqlBuilderBase::selectQuery() {
   query.prepare(queryModel->getSqlText());
 
   QSharedPointer<SelectQueryModel> selectQueryModel = queryModel.objectCast<SelectQueryModel>();
-  bindValues(query, conditions, selectQueryModel->getConditionPlaceholder());
+  QSharedPointer<GroupConditions> sharedConditions = QSharedPointer<GroupConditions>::create(conditions);
+  bindValues(query, sharedConditions, selectQueryModel->getConditionPlaceholder());
   selectQueryModel->clearPlaceHolders();
 
   return query;
 }
 
-QString SqlBuilderBase::getPlaceHolder(const QString param) {
+QString SqlBuilderBase::getPlaceHolder(const QString &param) {
   return QString(":%1").arg(param);
 }
 
-void SqlBuilderBase::bindValues(QSqlQuery &query, const GroupConditions &conditions,
+void SqlBuilderBase::bindValues(QSqlQuery &query, const QSharedPointer<GroupConditions> &conditions,
                                 const QMap<QSharedPointer<Condition>, QString> &placeHolders) {
-  for (QSharedPointer<Condition> &f : conditions.getConditions()) {
-    if (!f->getValues().isEmpty()) {
-      QString placeHolder = placeHolders[f];
-      query.bindValue(getPlaceHolder(placeHolder), f->getValues().first());
+  for (QSharedPointer<Condition> &condition : conditions->getConditions()) {
+    if (!condition->getValues().isEmpty()) {
+      QString placeHolder = placeHolders[condition];
+
+      switch (condition->getOperation()) {
+        {
+        case Operation::Between:
+        case Operation::In: {
+          QString almostReadyPlaceHolder = getPlaceHolder(placeHolder);
+          int i = 1;
+          for (QVariant &value : condition->getValues()) {
+            QString valuePlaceholder = QString("%1_%2").arg(almostReadyPlaceHolder).arg(i);
+            query.bindValue(valuePlaceholder, value);
+            i++;
+          }
+          break;
+        }
+        default:
+          query.bindValue(getPlaceHolder(placeHolder), condition->getValues().first());
+        }
+      }
+      for (QSharedPointer<GroupConditions> &g : conditions->getGroups()) {
+        bindValues(query, g, placeHolders);
+      }
     }
-  }
-  for (QSharedPointer<GroupConditions> &g : conditions.getGroups()) {
-    bindValues(query, *g, placeHolders);
   }
 }
 

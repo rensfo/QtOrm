@@ -40,6 +40,8 @@ private Q_SLOTS:
   void deleteChildAndRefresh();
   void childrenOneToOneParent();
   void autoUpdate();
+  void operationBetween();
+  void operationIn();
 
 private:
   bool openConnection();
@@ -52,7 +54,7 @@ private:
   bool dropDatabase(const QString &dbName);
   void closeConnection();
 
-  template<typename T>
+  template <typename T>
   T find(QList<T> container, std::function<bool(T)> func);
 
 private:
@@ -209,7 +211,7 @@ void QueryResultTestTest::refreshObject() {
     QSqlQuery query(db);
 
     QSharedPointer<A> a = session.get<A>("code_1", "code2");
-    if(query.exec("update A set code = null where code = 'code2'")) {
+    if (query.exec("update A set code = null where code = 'code2'")) {
       session.refresh<A>(a);
       QCOMPARE(a->getCode(), QString(""));
 
@@ -229,15 +231,14 @@ void QueryResultTestTest::refreshChildObject() {
     QSqlQuery query(db);
 
     QSharedPointer<A> a = session.get<A>("code_1", "code2");
-    if(query.exec("update B set code = 'code2.2.1' where code = 'code2.2'")) {
+    if (query.exec("update B set code = 'code2.2.1' where code = 'code2.2'")) {
       session.refresh(a);
 
-      std::function<bool(QSharedPointer<B>)> func = [](QSharedPointer<B> item){
-        return item->getCode() == "code2.2.1";
-      };
+      std::function<bool(QSharedPointer<B>)> func =
+          [](QSharedPointer<B> item) { return item->getCode() == "code2.2.1"; };
       QSharedPointer<B> updatedB = this->find<QSharedPointer<B>>(a->getChild(), func);
       QVERIFY(updatedB != nullptr);
-      if(updatedB) {
+      if (updatedB) {
         updatedB->setCode("code2.2");
         session.saveObject(updatedB);
       }
@@ -256,7 +257,7 @@ void QueryResultTestTest::deleteChildAndRefresh() {
     QSqlQuery query(db);
 
     QSharedPointer<A> a = session.get<A>("code_1", "code2");
-    if(query.exec("delete from B where code = 'code2.2'")) {
+    if (query.exec("delete from B where code = 'code2.2'")) {
       session.refresh(a);
       QCOMPARE(a->getChild().count(), 2);
       return;
@@ -281,7 +282,6 @@ void QueryResultTestTest::childrenOneToOneParent() {
 }
 
 void QueryResultTestTest::autoUpdate() {
-
   try {
     session.clearReestr();
     session.clearQueryCache();
@@ -289,7 +289,7 @@ void QueryResultTestTest::autoUpdate() {
 
     QString newCode = "code2.2";
     QString oldCode = "code2";
-//    connect(&session, &Session::executedSql, [](QString sql){ qDebug() << sql; });
+
     auto a = session.get<A>("code_1", oldCode);
     a->setCode(newCode);
 
@@ -300,6 +300,36 @@ void QueryResultTestTest::autoUpdate() {
     a->setCode(oldCode);
     session.setAutoUpdate(false);
     session.clearReestr();
+    return;
+  } catch (QtOrm::Exception &e) {
+    qDebug() << e.getMessage();
+  }
+  QVERIFY(false);
+}
+
+void QueryResultTestTest::operationBetween() {
+  try {
+    //    connect(&session, &Session::executedSql, [](QString sql){ qDebug() << sql; });
+    GroupConditions where;
+    where.addBetween("id", 2, 3);
+    auto listA = session.getList<A>(where);
+
+    QCOMPARE(listA.count(), 2);
+    return;
+  } catch (QtOrm::Exception &e) {
+    qDebug() << e.getMessage();
+  }
+  QVERIFY(false);
+}
+
+void QueryResultTestTest::operationIn() {
+  try {
+    connect(&session, &Session::executedSql, [](QString sql){ qDebug() << sql; });
+    GroupConditions where;
+    where.addIn("id", { 2, 3 });
+    auto listA = session.getList<A>(where);
+
+    QCOMPARE(listA.count(), 2);
     return;
   } catch (QtOrm::Exception &e) {
     qDebug() << e.getMessage();
@@ -360,10 +390,10 @@ void QueryResultTestTest::closeConnection() {
   db.close();
 }
 
-template<typename T>
+template <typename T>
 T QueryResultTestTest::find(QList<T> container, std::function<bool(T)> func) {
-  for(T element : container) {
-    if(func(element)){
+  for (T element : container) {
+    if (func(element)) {
       return element;
     }
   }

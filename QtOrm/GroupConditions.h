@@ -44,6 +44,7 @@ public:
 
 protected:
   void addCondition(const QString &property, const Operation &operation, const QVariant &value);
+  void addCondition(const QString &property, const Operation &operation, const QVariantList &values);
 
 protected:
   GroupOperation operation = GroupOperation::And;

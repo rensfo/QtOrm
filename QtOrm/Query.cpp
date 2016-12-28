@@ -68,7 +68,7 @@ QList<QSharedPointer<QObject>> Query::getListObject(const QString &className, co
   QSqlQuery query = sqlBuilder.selectQuery();
   executeQuery(query);
 
-  return getList(query, *sqlBuilder.getQueryModel());
+  return getList(query, sqlBuilder.getQueryModel());
 }
 
 void Query::saveObject(QSharedPointer<QObject> &object) {
@@ -192,13 +192,13 @@ void Query::executeQuery(QSqlQuery &query) {
   emit executedSql(executedQuery);
 }
 
-QList<QSharedPointer<QObject>> Query::getList(QSqlQuery &query, const QueryModel &queryModel) {
+QList<QSharedPointer<QObject>> Query::getList(QSqlQuery &query, const QSharedPointer<QueryModel> &queryModel) {
   QList<QSharedPointer<QObject>> objects;
-  QSharedPointer<ClassMapBase> classBase = queryModel.getClassBase();
-  QString mainTableAlias = queryModel.getMainTableModel()->getAlias();
+  QSharedPointer<ClassMapBase> classBase = queryModel->getClassBase();
+  QString mainTableAlias = queryModel->getMainTableModel()->getAlias();
   while (query.next()) {
     QSharedPointer<QObject> newObject =
-        getObject(query.record(), classBase, mainTableAlias, queryModel.getMainTableModel());
+        getObject(query.record(), classBase, mainTableAlias, queryModel->getMainTableModel());
     objects.append(newObject);
   }
 

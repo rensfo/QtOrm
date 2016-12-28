@@ -60,7 +60,7 @@ protected:
   void insertObject(QSharedPointer<QObject> &object);
   void updateObject(QSharedPointer<QObject> &object);
   virtual void executeQuery(QSqlQuery &query);
-  QList<QSharedPointer<QObject>> getList(QSqlQuery &query, const QueryModel &queryModel);
+  QList<QSharedPointer<QObject>> getList(QSqlQuery &query, const QSharedPointer<QueryModel> &queryModel);
 
   void fillObject(QSharedPointer<QObject> &object, QSharedPointer<QueryTableModel> &queryTableModel,
                   const QSqlRecord &record);
