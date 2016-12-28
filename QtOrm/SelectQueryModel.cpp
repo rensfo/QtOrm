@@ -214,7 +214,7 @@ QSharedPointer<QueryTableModel> SelectQueryModel::buildQueryTableModel(QSharedPo
 }
 
 QString SelectQueryModel::getSqlText() {
-  return select + " " + from + " " + where;
+  return QString("%1 %2 %3").arg(select).arg(from).arg(where);
 }
 
 GroupConditions SelectQueryModel::getConditions() const {
@@ -236,7 +236,7 @@ void SelectQueryModel::buildSelectAndFromClause() {
   select = buildSelectClause();
   from = buildFromClause();
 
-  sqlText = select + " " + from;
+  sqlText = QString("%1 %2").arg(select).arg(from);
 }
 
 QString SelectQueryModel::getSelect() const {
