@@ -39,7 +39,7 @@ protected:
   QString buildSelectClause();
   QString buildFromClause();
   QString buildWhereClause();
-  QString GroupConditionToString(const GroupConditions &conditions);
+  QString GroupConditionToString(const QSharedPointer<GroupConditions> &conditions);
   QString groupOperationToString(GroupOperation groupOperation) const;
   virtual QString getLikeCondition(const QString &fieldName) const;
   QString operationToString(const Condition &filter) const;

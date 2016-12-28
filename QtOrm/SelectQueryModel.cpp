@@ -38,17 +38,18 @@ QString SelectQueryModel::buildFromClause() {
 }
 
 QString SelectQueryModel::buildWhereClause() {
-  QString groupConditionText = GroupConditionToString(conditions);
+  QSharedPointer<GroupConditions> sharedConditions = QSharedPointer<GroupConditions>::create(conditions);
+  QString groupConditionText = GroupConditionToString(sharedConditions);
   if (groupConditionText.isEmpty())
     return QString();
 
   return "where " + groupConditionText;
 }
 
-QString SelectQueryModel::GroupConditionToString(const GroupConditions &groupConditions) {
+QString SelectQueryModel::GroupConditionToString(const QSharedPointer<GroupConditions> &groupConditions) {
   QString whereClause;
-  for (QSharedPointer<Condition> &condition : groupConditions.getConditions()) {
-    QString groupOp = groupOperationToString(groupConditions.getOperation());
+  for (QSharedPointer<Condition> &condition : groupConditions->getConditions()) {
+    QString groupOp = groupOperationToString(groupConditions->getOperation());
     QString conditionText = conditionToString(condition);
     if (whereClause.isEmpty()) {
       whereClause = conditionText;
@@ -57,9 +58,9 @@ QString SelectQueryModel::GroupConditionToString(const GroupConditions &groupCon
     }
   }
 
-  for (QSharedPointer<GroupConditions> &group : groupConditions.getGroups()) {
-    QString groupOp = whereClause.isEmpty() ? "" : groupOperationToString(groupConditions.getOperation());
-    QString groupWhere = GroupConditionToString(*group);
+  for (QSharedPointer<GroupConditions> &group : groupConditions->getGroups()) {
+    QString groupOp = whereClause.isEmpty() ? "" : groupOperationToString(groupConditions->getOperation());
+    QString groupWhere = GroupConditionToString(group);
     if (!groupWhere.isEmpty())
       whereClause += QString("%1 (%2)").arg(groupOp).arg(groupWhere);
   }
