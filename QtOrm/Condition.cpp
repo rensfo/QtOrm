@@ -53,10 +53,6 @@ void Condition::clearValues() {
   values.clear();
 }
 
-void Condition::addValue(const QVariant &value) {
-  values.append(value);
-}
-
 QString Condition::getColumn() const {
   return column;
 }

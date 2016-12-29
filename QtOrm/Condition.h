@@ -27,12 +27,10 @@ public:
   void setValue(const QVariant &value);
   void clearValues();
 
-  void addValue(const QVariant &value);
-
   QString getColumn() const;
   void setColumn(const QString &value);
 
-private:
+protected:
   QString column;
   QString propertyName;
   Operation operation = Operation::None;
