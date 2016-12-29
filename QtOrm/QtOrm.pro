@@ -24,24 +24,24 @@ HEADERS += PropertyMap.h \
     Session.h \
     SimpleSqlBuilder.h \
     SqlBuilderBase.h \
-    OneToMany.h \
-    OneToOne.h \
     Query.h \
-    Relation.h \
     Operation.h \
     Condition.h \
     GroupConditions.h \
     Reestr.h \
     AutoUpdater.h \
-    QueryModel.h \
     QueryTableModel.h \
     QueryJoin.h \
-    SelectQueryModel.h \
-    InsertQueryModel.h \
-    DeleteQueryModel.h \
-    UpdateQueryModel.h \
     QueryCache.h \
-    UpdateFieldQueryModel.h
+    Relations/Relation.h \
+    Relations/OneToMany.h \
+    Relations/OneToOne.h \
+    QueryModels/QueryModel.h \
+    QueryModels/SelectQueryModel.h \
+    QueryModels/InsertQueryModel.h \
+    QueryModels/DeleteQueryModel.h \
+    QueryModels/UpdateQueryModel.h \
+    QueryModels/UpdateFieldQueryModel.h
 
 SOURCES += PropertyMap.cpp \
     ConfigurationMap.cpp \
@@ -50,23 +50,23 @@ SOURCES += PropertyMap.cpp \
     Session.cpp \
     SimpleSqlBuilder.cpp \
     SqlBuilderBase.cpp \
-    OneToMany.cpp \
-    OneToOne.cpp \
     Query.cpp \
-    Relation.cpp \
     Condition.cpp \
     GroupConditions.cpp \
     Reestr.cpp \
     AutoUpdater.cpp \
-    QueryModel.cpp \
     QueryTableModel.cpp \
     QueryJoin.cpp \
-    SelectQueryModel.cpp \
-    InsertQueryModel.cpp \
-    DeleteQueryModel.cpp \
-    UpdateQueryModel.cpp \
     QueryCache.cpp \
-    UpdateFieldQueryModel.cpp
+    Relations/Relation.cpp \
+    Relations/OneToMany.cpp \
+    Relations/OneToOne.cpp \
+    QueryModels/QueryModel.cpp \
+    QueryModels/SelectQueryModel.cpp \
+    QueryModels/InsertQueryModel.cpp \
+    QueryModels/DeleteQueryModel.cpp \
+    QueryModels/UpdateQueryModel.cpp \
+    QueryModels/UpdateFieldQueryModel.cpp
 
 OTHER_FILES += QtOrmInclude.pri
 

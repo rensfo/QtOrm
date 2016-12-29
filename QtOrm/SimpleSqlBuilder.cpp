@@ -6,11 +6,11 @@
 #include <QStringList>
 
 #include "ConfigurationMap.h"
-#include "DeleteQueryModel.h"
-#include "InsertQueryModel.h"
-#include "OneToMany.h"
-#include "UpdateFieldQueryModel.h"
-#include "UpdateQueryModel.h"
+#include "QueryModels/DeleteQueryModel.h"
+#include "QueryModels/InsertQueryModel.h"
+#include "Relations/OneToMany.h"
+#include "QueryModels/UpdateFieldQueryModel.h"
+#include "QueryModels/UpdateQueryModel.h"
 
 namespace QtOrm {
 namespace Sql {

@@ -1,6 +1,6 @@
 #include "UpdateQueryModel.h"
 
-#include "OneToOne.h"
+#include "Relations/OneToOne.h"
 
 namespace QtOrm {
 namespace Sql {

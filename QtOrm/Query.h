@@ -11,9 +11,9 @@
 #include "AutoUpdater.h"
 #include "ClassMapBase.h"
 #include "GroupConditions.h"
-#include "OneToOne.h"
+#include "Relations/OneToOne.h"
 #include "QueryCache.h"
-#include "QueryModel.h"
+#include "QueryModels/QueryModel.h"
 #include "Reestr.h"
 #include "SimpleSqlBuilder.h"
 

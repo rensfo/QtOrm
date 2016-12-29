@@ -4,7 +4,7 @@
 #include <QObject>
 #include <QSharedPointer>
 
-#include "QueryModel.h"
+#include "QueryModels/QueryModel.h"
 
 namespace QtOrm {
 

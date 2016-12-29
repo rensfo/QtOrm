@@ -9,8 +9,8 @@
 #include <QString>
 
 #include "Exception.h"
-#include "OneToMany.h"
-#include "OneToOne.h"
+#include "Relations/OneToMany.h"
+#include "Relations/OneToOne.h"
 #include "PropertyMap.h"
 
 namespace QtOrm {

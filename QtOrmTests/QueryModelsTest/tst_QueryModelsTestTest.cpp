@@ -11,10 +11,10 @@
 
 #include "Sql.h"
 
-#include "SelectQueryModel.h"
-#include "DeleteQueryModel.h"
-#include "InsertQueryModel.h"
-#include "UpdateQueryModel.h"
+#include "QueryModels/SelectQueryModel.h"
+#include "QueryModels/DeleteQueryModel.h"
+#include "QueryModels/InsertQueryModel.h"
+#include "QueryModels/UpdateQueryModel.h"
 
 using namespace QtOrm;
 using namespace Sql;

@@ -7,11 +7,11 @@
 
 #include "ClassMapBase.h"
 #include "ConfigurationMap.h"
-#include "DeleteQueryModel.h"
-#include "InsertQueryModel.h"
-#include "SelectQueryModel.h"
-#include "UpdateFieldQueryModel.h"
-#include "UpdateQueryModel.h"
+#include "QueryModels/DeleteQueryModel.h"
+#include "QueryModels/InsertQueryModel.h"
+#include "QueryModels/SelectQueryModel.h"
+#include "QueryModels/UpdateFieldQueryModel.h"
+#include "QueryModels/UpdateQueryModel.h"
 
 #include <QDebug>
 

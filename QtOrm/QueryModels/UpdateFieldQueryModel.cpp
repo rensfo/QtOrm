@@ -1,6 +1,6 @@
 #include "UpdateFieldQueryModel.h"
 
-#include "OneToOne.h"
+#include "Relations/OneToOne.h"
 #include "PropertyMap.h"
 
 namespace QtOrm {

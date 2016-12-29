@@ -41,10 +41,18 @@ SOURCES += tst_QueryModelsTestTest.cpp \
     KindA.cpp \
     TypeA.cpp
 
-HEADERS += $$PWD/../../QtOrm/*.h
-SOURCES += $$PWD/../../QtOrm/*.cpp
+QTORM_PATH = $$PWD/../../QtOrm
+QTORM_QUERY_MODELS_PATH = $$QTORM_PATH/QueryModels
+QTORM_RELATIONS_PATH = $$QTORM_PATH/Relations
 
-INCLUDEPATH += ../../QtOrm
+HEADERS += $$QTORM_PATH/*.h \
+           $$QTORM_QUERY_MODELS_PATH/*.h \
+           $$QTORM_RELATIONS_PATH/*.h
+SOURCES += $$QTORM_PATH/*.cpp \
+           $$QTORM_QUERY_MODELS_PATH/*.cpp \
+           $$QTORM_RELATIONS_PATH/*.cpp
+
+INCLUDEPATH += $$QTORM_PATH $$QTORM_QUERY_MODELS_PATH $$QTORM_RELATIONS_PATH
 DEPENDPATH += $$INCLUDEPATH
 
 DEFINES += SRCDIR=\\\"$$PWD/\\\"
