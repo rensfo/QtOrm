@@ -1,4 +1,5 @@
 #include "GroupConditions.h"
+#include "Conditions/ConditionFactory.h"
 
 namespace QtOrm {
 namespace Sql {
@@ -38,24 +39,22 @@ void GroupConditions::addGroup(const GroupConditions &value) {
   groups.append(QSharedPointer<GroupConditions>::create(value));
 }
 
-void GroupConditions::addCondition(const Condition &value) {
-  conditions.append(QSharedPointer<Condition>::create(value));
+//void GroupConditions::addCondition(const Condition &value) {
+//  conditions.append(QSharedPointer<Condition>::create(value));
+//}
+
+void GroupConditions::addCondition(const QSharedPointer<Condition> &value) {
+  conditions.append(value);
 }
 
 void GroupConditions::addCondition(const QString &property, const Operation &operation, const QVariant &value) {
-  Condition newFilter;
-  newFilter.setPropertyName(property);
-  newFilter.setOperation(operation);
-  newFilter.setValue(value);
+  QSharedPointer<Condition> newFilter = ConditionFactory::create(property, operation, value);
 
   addCondition(newFilter);
 }
 
 void GroupConditions::addCondition(const QString &property, const Operation &operation, const QVariantList &values) {
-  Condition newFilter;
-  newFilter.setPropertyName(property);
-  newFilter.setOperation(operation);
-  newFilter.setValues(values);
+  QSharedPointer<Condition> newFilter = ConditionFactory::create(property, operation, values);
 
   addCondition(newFilter);
 }

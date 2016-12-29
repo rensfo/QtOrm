@@ -15,6 +15,7 @@
 #include "QueryModels/DeleteQueryModel.h"
 #include "QueryModels/InsertQueryModel.h"
 #include "QueryModels/UpdateQueryModel.h"
+#include "Conditions/ConditionFactory.h"
 
 using namespace QtOrm;
 using namespace Sql;
@@ -90,10 +91,7 @@ void QueryModelsTestTest::whereClauseUseColumn() {
 
   group.addEqual(classBase->getIdProperty()->getColumn(), 1);
 
-  Condition condition;
-  condition.setColumn("code");
-  condition.setValue("code1");
-  condition.setOperation(Operation::Equal);
+  QSharedPointer<Condition> condition = ConditionFactory::createByColumn("code", Operation::Equal, "code1");
   group.addCondition(condition);
 
   query.setConditions(group);

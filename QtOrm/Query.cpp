@@ -10,6 +10,7 @@
 
 #include "ConfigurationMap.h"
 #include "SimpleSqlBuilder.h"
+#include "Conditions/ConditionFactory.h"
 
 namespace QtOrm {
 namespace Sql {
@@ -45,15 +46,9 @@ QList<QSharedPointer<QObject>> Query::getListObject(const QString &className, co
                                                     const QString &column, const QVariant &value) {
   GroupConditions group;
   if (!property.isEmpty() || !column.isEmpty()) {
-    Condition filter(this);
-    if (property.isEmpty()) {
-      filter.setColumn(column);
-    } else {
-      filter.setPropertyName(property);
-    }
-    filter.setOperation(Operation::Equal);
-    filter.setValue(value);
-    group.addCondition(filter);
+    QSharedPointer<Condition> condition =
+        ConditionFactory::create(property, column, Operation::Equal, QVariantList{value});
+    group.addCondition(condition);
   }
 
   return getListObject(className, group);

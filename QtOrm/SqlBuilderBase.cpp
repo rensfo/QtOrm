@@ -12,8 +12,8 @@
 #include "QueryModels/SelectQueryModel.h"
 #include "QueryModels/UpdateFieldQueryModel.h"
 #include "QueryModels/UpdateQueryModel.h"
-
-#include <QDebug>
+#include "Conditions/ConditionBetween.h"
+#include "Conditions/ConditionIn.h"
 
 namespace QtOrm {
 namespace Sql {
@@ -46,23 +46,20 @@ void SqlBuilderBase::bindValues(QSqlQuery &query, const QSharedPointer<GroupCond
     if (!condition->getValues().isEmpty()) {
       QString placeHolder = placeHolders[condition];
 
-      switch (condition->getOperation()) {
-        {
-        case Operation::Between:
-        case Operation::In: {
-          QString almostReadyPlaceHolder = getPlaceHolder(placeHolder);
-          int i = 1;
-          for (QVariant &value : condition->getValues()) {
-            QString valuePlaceholder = QString("%1_%2").arg(almostReadyPlaceHolder).arg(i);
-            query.bindValue(valuePlaceholder, value);
-            i++;
-          }
-          break;
+      bool betweenOrIn = condition.dynamicCast<ConditionBetween>() || condition.dynamicCast<ConditionIn>();
+
+      if (betweenOrIn) {
+        QString almostReadyPlaceHolder = getPlaceHolder(placeHolder);
+        int i = 1;
+        for (QVariant &value : condition->getValues()) {
+          QString valuePlaceholder = QString("%1_%2").arg(almostReadyPlaceHolder).arg(i);
+          query.bindValue(valuePlaceholder, value);
+          i++;
         }
-        default:
-          query.bindValue(getPlaceHolder(placeHolder), condition->getValues().first());
-        }
+      } else {
+        query.bindValue(getPlaceHolder(placeHolder), condition->getValues().first());
       }
+
       for (QSharedPointer<GroupConditions> &g : conditions->getGroups()) {
         bindValues(query, g, placeHolders);
       }
