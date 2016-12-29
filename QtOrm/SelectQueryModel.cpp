@@ -116,8 +116,10 @@ QString SelectQueryModel::conditionToString(QSharedPointer<Condition> &condition
   QString fullColumnName = QString("%1.%2").arg(tableAlias).arg(columnName);
   switch (operation) {
   case Operation::Like:
-    conditionString = QString("%1 %2 '%' || :%3 || '%'").arg(fullColumnName).arg(OperationStrings[operation]);
-    conditionPlaceholder.insert(condition, placeHolder);
+    conditionString = QString("%1 %2 '%' || :%3 || '%'")
+        .arg(fullColumnName)
+        .arg(OperationStrings[operation])
+        .arg(placeHolder);
     break;
   case Operation::IsNull:
   case Operation::IsNotNull:
@@ -126,7 +128,7 @@ QString SelectQueryModel::conditionToString(QSharedPointer<Condition> &condition
   case Operation::In: {
     QStringList placeHolders;
     for (int i = 1; i <= condition->getValues().count(); ++i) {
-      placeHolders.append(QString(":%1_%2").arg(placeHolder).arg(i));
+      placeHolders << QString(":%1_%2").arg(placeHolder).arg(i);
     }
     conditionString =
         QString("%1 %2 (%3)").arg(fullColumnName).arg(OperationStrings[operation]).arg(placeHolders.join(", "));

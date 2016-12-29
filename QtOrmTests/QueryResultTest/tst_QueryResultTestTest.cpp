@@ -46,6 +46,7 @@ private Q_SLOTS:
   void operationGreaterOrEqual();
   void operationLess();
   void operationLessOrEqual();
+  void operationLike();
 
 private:
   bool openConnection();
@@ -388,6 +389,20 @@ void QueryResultTestTest::operationLessOrEqual() {
   try {
     GroupConditions where;
     where.addLessOrEqual("id", 3);
+    auto listA = session.getList<A>(where);
+
+    QCOMPARE(listA.count(), 2);
+    return;
+  } catch (QtOrm::Exception &e) {
+    qDebug() << e.getMessage();
+  }
+  QVERIFY(false);
+}
+
+void QueryResultTestTest::operationLike() {
+  try {
+    GroupConditions where;
+    where.addLike("code_1", "code");
     auto listA = session.getList<A>(where);
 
     QCOMPARE(listA.count(), 2);
