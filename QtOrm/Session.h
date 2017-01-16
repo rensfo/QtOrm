@@ -36,9 +36,13 @@ public:
   template <class T>
   QSharedPointer<T> get(const QString &property, const QVariant &value);
   template <class T>
+  QSharedPointer<T> get(const QString &property, Operation operation, const QVariant &value);
+  template <class T>
   QList<QSharedPointer<T>> getList();
   template <class T>
   QList<QSharedPointer<T>> getList(const QString &property, const QVariant &value);
+  template <class T>
+  QList<QSharedPointer<T>> getList(const QString &property, Operation operation, const QVariant &value);
   template <class T>
   QList<QSharedPointer<T>> getList(const GroupConditions &conditions);
   template <class T>
@@ -104,7 +108,12 @@ QSharedPointer<T> Session::get(const QSharedPointer<Condition> &filter) {
 
 template <class T>
 QSharedPointer<T> Session::get(const QString &property, const QVariant &value) {
-  QSharedPointer<Condition> c = ConditionFactory::create(property, Operation::Equal, value);
+  return get<T>(property, Operation::Equal, value);
+}
+
+template <class T>
+QSharedPointer<T> Session::get(const QString &property, Operation operation, const QVariant &value) {
+  QSharedPointer<Condition> c = ConditionFactory::create(property, operation, value);
 
   return this->get<T>(c);
 }
@@ -116,7 +125,12 @@ QList<QSharedPointer<T>> Session::getList() {
 
 template <class T>
 QList<QSharedPointer<T>> Session::getList(const QString &property, const QVariant &value) {
-  return convertListTo<T>(getObjectList<T>(property, value));
+  return getList<T>(property, Operation::Equal, value);
+}
+
+template <class T>
+QList<QSharedPointer<T>> Session::getList(const QString &property, Operation operation, const QVariant &value) {
+  return convertListTo<T>(getObjectList<T>(property, operation, value));
 }
 
 template <class T>
@@ -126,20 +140,14 @@ QList<QSharedPointer<T>> Session::getList(const GroupConditions &conditions) {
 
 template <class T>
 QList<QSharedPointer<QObject>> Session::getObjectList() {
-  QString className = T::staticMetaObject.className();
-  Query query = createQuery();
-  QList<QSharedPointer<QObject>> result = query.getListObject(className, QString(), QVariant());
-
-  return result;
+  return getObjectList<T>(QString(), QVariant());
 }
 
 template <class T>
 QList<QSharedPointer<QObject>> Session::getObjectList(const QString &property, const QVariant &value) {
-  QString className = T::staticMetaObject.className();
-  Query query = createQuery();
-  QList<QSharedPointer<QObject>> result = query.getListObject(className, property, value);
-
-  return result;
+  GroupConditions conditions;
+  conditions.addEqual(property, value);
+  return getObjectList<T>(conditions);
 }
 
 template <class T>
