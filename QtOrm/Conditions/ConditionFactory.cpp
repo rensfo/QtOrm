@@ -14,27 +14,12 @@
 namespace QtOrm {
 namespace Sql {
 
-QSharedPointer<Condition> ConditionFactory::createByColumn(const QString &column, Operation operation,
-                                                           const QVariant &value) {
-  return createByColumn(column, operation, QVariantList{ value });
-}
-
-QSharedPointer<Condition> ConditionFactory::createByColumn(const QString &column, Operation operation,
-                                                           const QVariantList &values) {
-  return create(QString(), column, operation, values);
-}
-
 QSharedPointer<Condition> ConditionFactory::create(const QString &property, Operation operation,
                                                    const QVariant &value) {
-  return create(property, operation, QVariantList{ value });
+  return create(property, operation, QVariantList{value});
 }
 
 QSharedPointer<Condition> ConditionFactory::create(const QString &property, Operation operation,
-                                                   const QVariantList &values) {
-  return create(property, QString(), operation, values);
-}
-
-QSharedPointer<Condition> ConditionFactory::create(const QString &property, const QString &column, Operation operation,
                                                    const QVariantList &values) {
 
   Operation rightOperation = operation;
@@ -86,7 +71,7 @@ QSharedPointer<Condition> ConditionFactory::create(const QString &property, cons
     break;
   }
 
-  condition->setColumn(column);
+  //  condition->setColumn(column);
   condition->setProperty(property);
   condition->setValues(values);
 

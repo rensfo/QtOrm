@@ -29,7 +29,7 @@ QSharedPointer<QObject> Query::getById(const QString &className, const QVariant 
   if (reestr->contains(classBase->getTable(), id.toString()))
     return reestr->value(classBase->getTable(), id.toString());
 
-  auto list = getListObject(className, classBase->getIdProperty()->getName(), QString(), id);
+  auto list = getListObject(className, classBase->getIdPropertyName(), id);
 
   if (list.size() == 0) {
     return QSharedPointer<QObject>();
@@ -42,12 +42,11 @@ QSharedPointer<QObject> Query::getById(const QString &className, const QVariant 
   return list.takeFirst();
 }
 
-QList<QSharedPointer<QObject>> Query::getListObject(const QString &className, const QString &property,
-                                                    const QString &column, const QVariant &value) {
+QList<QSharedPointer<QObject>> Query::getListObject(const QString &className, const QString &property, const QVariant &value) {
   GroupConditions group;
-  if (!property.isEmpty() || !column.isEmpty()) {
+  if (!property.isEmpty()) {
     QSharedPointer<Condition> condition =
-        ConditionFactory::create(property, column, Operation::Equal, QVariantList{value});
+        ConditionFactory::create(property, Operation::Equal, QVariantList{value});
     group.addCondition(condition);
   }
 
@@ -58,7 +57,8 @@ QList<QSharedPointer<QObject>> Query::getListObject(const QString &className, co
   QSharedPointer<ClassMapBase> classBase = ConfigurationMap::getMappedClass(className);
 
   SimpleSqlBuilder sqlBuilder = createSimpleSqlBuilder(classBase);
-  sqlBuilder.setConditions(conditions);
+  GroupConditions replacedConditions = replacePropertyToColumn(classBase, conditions);
+  sqlBuilder.setConditions(replacedConditions);
 
   QSqlQuery query = sqlBuilder.selectQuery();
   executeQuery(query);
@@ -220,7 +220,7 @@ void Query::fillOneToMany(const QList<QSharedPointer<OneToMany>> &relations, con
     QString column = oneToMany->getColumn();
     QVariant value = object->property(idProperty.toStdString().data());
 
-    QList<QSharedPointer<QObject>> qobjectList = getListObject(refClass, QString(), column, value);
+    QList<QSharedPointer<QObject>> qobjectList = getListObject(refClass, column, value);
 
     QSharedPointer<ClassMapBase> refClassBase = ConfigurationMap::getMappedClass(oneToMany->getRefClass());
     QVariant var = refClassBase->getVariantByObjectList(qobjectList);
@@ -355,7 +355,7 @@ void Query::refreshObjectData(QSharedPointer<QObject> object, QSharedPointer<Que
     QSharedPointer<ClassMapBase> refClassBase = ConfigurationMap::getMappedClass(oneToMany->getRefClass());
     QString refColumn = oneToMany->getColumn();
     QList<QSharedPointer<QObject>> newChildren =
-        getListObject(refClassBase->getClassName(), QString(), refColumn, idValue);
+        getListObject(refClassBase->getClassName(), refColumn, idValue);
 
     QVariant propertyValue = object->property(oneToMany->getProperty().toStdString().data());
     QList<QSharedPointer<QObject>> currentChildren = refClassBase->getObjectListByVariant(propertyValue);
@@ -500,6 +500,27 @@ SimpleSqlBuilder Query::createSimpleSqlBuilder(QSharedPointer<ClassMapBase> &cla
   sqlBuilder.setClassBase(classBase);
 
   return sqlBuilder;
+}
+
+GroupConditions Query::replacePropertyToColumn(QSharedPointer<ClassMapBase> &classBase, const GroupConditions &conditions) {
+  GroupConditions result;
+  result.setOperation(conditions.getOperation());
+
+  for(QSharedPointer<Condition> &condition: conditions.getConditions()){
+    QSharedPointer<Condition> newCondition = condition->clone();
+
+    if(classBase->containsProperty(newCondition->getProperty())){
+      QString column = classBase->getColumnProperty(newCondition->getProperty());
+      newCondition->setProperty(column);
+    }
+    result.addCondition(newCondition);
+  }
+
+  for(QSharedPointer<GroupConditions> &group: conditions.getGroups()){
+    result.addGroup(replacePropertyToColumn(classBase, *group.data()));
+  }
+
+  return result;
 }
 
 QSharedPointer<AutoUpdater> Query::getUpdater() const {

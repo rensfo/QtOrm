@@ -100,7 +100,7 @@ void SimpleSqlBuilder::bindUpdate(QSqlQuery &query) {
 void SimpleSqlBuilder::bindOneColumnUpdate(QSqlQuery &query) {
   QSharedPointer<PropertyMap> idProperty = classBase->getIdProperty();
   bindQueryParams(query, idProperty);
-  if (classBase->propertiesContains(propertyName)) {
+  if (classBase->containsProperty(propertyName)) {
     bindQueryParams(query, classBase->getProperty(propertyName));
   } else {
     QSharedPointer<OneToOne> oneToOne = classBase->findOneToOneByPropertyName(propertyName);

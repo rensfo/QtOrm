@@ -8,10 +8,11 @@ namespace Sql {
 
 class ConditionLessOrEqual : public Condition {
 public:
-  ConditionLessOrEqual();
+  using Condition::Condition;
   ~ConditionLessOrEqual();
 
   virtual QString toSqlString(const QString &tableName, const QString &placeholder) const override;
+  virtual QSharedPointer<Condition> clone() override;
 };
 }
 }

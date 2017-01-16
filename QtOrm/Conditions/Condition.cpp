@@ -12,10 +12,15 @@ Condition::Condition(const QString &property, const QVariant &value) : Condition
   this->values.append(value);
 }
 
+Condition::Condition(const QString &property, const QVariantList &values) : Condition() {
+  this->property = property;
+  this->values = values;
+}
+
 Condition::Condition(const Condition &other) : Condition() {
-  operationSymbol = other.getOperationSymbol();
+//  operationSymbol = other.getOperationSymbol();
   values = other.getValues();
-  column = other.getColumn();
+//  column = other.getColumn();
   property = other.getProperty();
 }
 
@@ -38,17 +43,13 @@ void Condition::clearValues() {
   values.clear();
 }
 
-QString Condition::getColumn() const {
-  return column;
-}
+//QString Condition::getColumn() const {
+//  return column;
+//}
 
-void Condition::setColumn(const QString &value) {
-  column = value;
-}
-
-QString Condition::getOperationSymbol() const {
-  return operationSymbol;
-}
+//void Condition::setColumn(const QString &value) {
+//  column = value;
+//}
 
 QString Condition::getProperty() const
 {

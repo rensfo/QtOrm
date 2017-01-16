@@ -8,10 +8,11 @@ namespace Sql {
 
 class ConditionIsNotNull : public Condition {
 public:
-  ConditionIsNotNull();
+  using Condition::Condition;
   ~ConditionIsNotNull();
 
   virtual QString toSqlString(const QString &tableName, const QString &placeholder) const override;
+  virtual QSharedPointer<Condition> clone() override;
 };
 }
 }

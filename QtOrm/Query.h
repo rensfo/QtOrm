@@ -29,7 +29,6 @@ public:
   Query(const Query &other);
   virtual QSharedPointer<QObject> getById(const QString &className, const QVariant &id);
   virtual QList<QSharedPointer<QObject>> getListObject(const QString &className, const QString &property = QString(),
-                                                       const QString &column = QString(),
                                                        const QVariant &value = QVariant());
   virtual QList<QSharedPointer<QObject>> getListObject(const QString &className, const GroupConditions &conditions);
   virtual void saveObject(QSharedPointer<QObject> &object);
@@ -103,6 +102,7 @@ protected:
   QString getQueryColumn(QSharedPointer<QueryTableModel> queryTableModel, QSharedPointer<PropertyMap> property);
   bool tryReopenDatabaseConnectionIfNeed();
   SimpleSqlBuilder createSimpleSqlBuilder(QSharedPointer<ClassMapBase> &classBase);
+  GroupConditions replacePropertyToColumn(QSharedPointer<ClassMapBase> &classBase, const GroupConditions &conditions);
 
 protected:
   QSharedPointer<Reestr> reestr;

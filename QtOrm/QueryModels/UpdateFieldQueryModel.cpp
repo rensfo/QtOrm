@@ -34,7 +34,7 @@ QSharedPointer<QueryTableModel> UpdateFieldQueryModel::buildQueryTableModel() {
   }
 
   QString tableColumnName = "";
-  if (classBase->propertiesContains(propertyName)) {
+  if (classBase->containsProperty(propertyName)) {
     QSharedPointer<PropertyMap> property = classBase->getProperty(propertyName);
     tableColumnName = property->getColumn();
   } else {

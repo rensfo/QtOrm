@@ -128,7 +128,7 @@ template <class T>
 QList<QSharedPointer<QObject>> Session::getObjectList() {
   QString className = T::staticMetaObject.className();
   Query query = createQuery();
-  QList<QSharedPointer<QObject>> result = query.getListObject(className, QString(), QString(), QVariant());
+  QList<QSharedPointer<QObject>> result = query.getListObject(className, QString(), QVariant());
 
   return result;
 }
@@ -137,7 +137,7 @@ template <class T>
 QList<QSharedPointer<QObject>> Session::getObjectList(const QString &property, const QVariant &value) {
   QString className = T::staticMetaObject.className();
   Query query = createQuery();
-  QList<QSharedPointer<QObject>> result = query.getListObject(className, property, QString(), value);
+  QList<QSharedPointer<QObject>> result = query.getListObject(className, property, value);
 
   return result;
 }

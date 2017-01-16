@@ -36,7 +36,11 @@ public:
   void setMetaObject(const QMetaObject &classMetaObject);
 
   QSharedPointer<PropertyMap> getIdProperty() const;
+  QString getColumnIdProperty();
+  QString getIdPropertyName();
+
   QSharedPointer<PropertyMap> getProperty(const QString &property);
+  QString getColumnProperty(const QString &property);
 
   OneToMany &oneToMany(const QString &property);
   OneToOne &oneToOne(const QString &property);
@@ -55,7 +59,7 @@ public:
   static QString getTypeNameOfProperty(QSharedPointer<QObject> obj, const QString &prop);
   static QString getTypeNameOfProperty(const QMetaObject &meta, const QString &prop);
 
-  bool propertiesContains(const QString &propertyName);
+  bool containsProperty(const QString &propertyName);
 
 private:
   PropertyMap &createProperty(QString propertyName);

@@ -79,10 +79,10 @@ QString SelectQueryModel::getLikeCondition(const QString &fieldName) const {
 
 QString SelectQueryModel::conditionToString(QSharedPointer<Condition> &condition) {
   QString conditionString;
-  if (condition->getColumn().isEmpty()) {
-    condition->setColumn(classBase->getProperty(condition->getProperty())->getColumn());
-  }
-  QString columnName = condition->getColumn();
+//  if (condition->getColumn().isEmpty()) {
+//    condition->setColumn(classBase->getProperty(condition->getProperty())->getColumn());
+//  }
+  QString columnName = condition->getProperty();
 
   QString tableAlias = mainTableModel->getAlias();
   QString placeHolder = columnName;
@@ -104,7 +104,7 @@ short SelectQueryModel::calculateCountUsedColumn(const QString &value) {
   short count = 0;
 
   for (QSharedPointer<Condition> &condition : conditionPlaceholder.keys()) {
-    QString columnName = condition->getColumn();
+    QString columnName = condition->getProperty();
     if (columnName == value) {
       count++;
     }

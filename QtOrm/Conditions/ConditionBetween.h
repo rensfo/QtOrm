@@ -8,10 +8,11 @@ namespace Sql {
 
 class ConditionBetween : public Condition {
 public:
-  ConditionBetween();
+  using Condition::Condition;
   ~ConditionBetween();
 
   virtual QString toSqlString(const QString &tableName, const QString &placeholder) const override;
+  virtual QSharedPointer<Condition> clone() override;
 };
 }
 }

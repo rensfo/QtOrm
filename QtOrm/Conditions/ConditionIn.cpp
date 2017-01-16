@@ -3,9 +3,6 @@
 namespace QtOrm {
 namespace Sql {
 
-ConditionIn::ConditionIn() : Condition() {
-}
-
 ConditionIn::~ConditionIn() {
 }
 
@@ -15,7 +12,11 @@ QString QtOrm::Sql::ConditionIn::toSqlString(const QString &tableName, const QSt
     placeholders << QString(":%1_%2").arg(placeholder).arg(i);
   }
 
-  return QString("%1.%2  in (%3)").arg(tableName).arg(column).arg(placeholders.join(", "));
+  return QString("%1.%2  in (%3)").arg(tableName).arg(property).arg(placeholders.join(", "));
+}
+
+QSharedPointer<QtOrm::Sql::Condition> QtOrm::Sql::ConditionIn::clone() {
+  return this->cloneBase<ConditionIn>();
 }
 }
 }

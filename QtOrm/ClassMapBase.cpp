@@ -63,8 +63,23 @@ QSharedPointer<PropertyMap> ClassMapBase::getIdProperty() const {
   return properties.value(idProperty);
 }
 
+QString ClassMapBase::getColumnIdProperty() {
+  return properties.value(idProperty)->getColumn();
+}
+
+QString ClassMapBase::getIdPropertyName() {
+  return properties.value(idProperty)->getName();
+}
+
 QSharedPointer<PropertyMap> ClassMapBase::getProperty(const QString &property) {
   return properties.value(property);
+}
+
+QString ClassMapBase::getColumnProperty(const QString &property) {
+  if (!properties.contains(property))
+    return QString();
+
+  return getProperty(property)->getColumn();
 }
 
 OneToMany &ClassMapBase::oneToMany(const QString &property) {
@@ -138,7 +153,7 @@ QString ClassMapBase::getTypeNameOfProperty(const QMetaObject &meta, const QStri
   return refClass;
 }
 
-bool ClassMapBase::propertiesContains(const QString &propertyName) {
+bool ClassMapBase::containsProperty(const QString &propertyName) {
   return properties.contains(propertyName);
 }
 

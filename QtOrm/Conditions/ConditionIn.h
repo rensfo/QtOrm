@@ -9,10 +9,11 @@ namespace Sql {
 class ConditionIn : public Condition
 {
 public:
-  ConditionIn();
+  using Condition::Condition;
   ~ConditionIn();
 
   virtual QString toSqlString(const QString &tableName, const QString &placeholder) const override;
+  virtual QSharedPointer<Condition> clone() override;
 };
 }
 }

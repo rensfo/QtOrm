@@ -73,7 +73,7 @@ void QueryModelsTestTest::whereClause() {
   GroupConditions group;
   group.setOperation(GroupOperation::And);
   group.addEqual(classBase->getIdProperty()->getName(), 1);
-  group.addEqual("code_1", "code1");
+  group.addEqual("code", "code1");
 
   query.setConditions(group);
 
@@ -90,9 +90,10 @@ void QueryModelsTestTest::whereClauseUseColumn() {
   group.setOperation(GroupOperation::And);
 
   group.addEqual(classBase->getIdProperty()->getColumn(), 1);
+  group.addEqual("code", "code1");
 
-  QSharedPointer<Condition> condition = ConditionFactory::createByColumn("code", Operation::Equal, "code1");
-  group.addCondition(condition);
+//  QSharedPointer<Condition> condition = ConditionFactory::createByColumn("code", Operation::Equal, "code1");
+//  group.addCondition(condition);
 
   query.setConditions(group);
 
@@ -120,8 +121,8 @@ void QueryModelsTestTest::oneColumnTwoTimes() {
 
   GroupConditions group;
   group.setOperation(GroupOperation::Or);
-  group.addEqual("code_1", "code1");
-  group.addEqual("code_1", "code2");
+  group.addEqual("code", "code1");
+  group.addEqual("code", "code2");
 
   query.setConditions(group);
 
