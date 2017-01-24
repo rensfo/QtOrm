@@ -55,14 +55,14 @@ void AutoUpdater::connectToAllProperties(QSharedPointer<QObject> object) {
 
 void AutoUpdater::onObjectPropertyChanged() {
   QObject *sender = this->sender();
-  QSharedPointer<QObject> sharedSender = reestr->value(sender);
+  QSharedPointer<QObject> sharedSender = registry->value(sender);
   if (sharedSender) {
     QString senderPropertyName = getPropertyName(sharedSender, senderSignalIndex());
 
     using Sql::Query;
     Query query;
     query.setDatabase(database);
-    query.setReestr(reestr);
+    query.setRegistry(registry);
     query.setQueryCache(queryCache);
 
     connect(&query, &Query::executedSql, this, &AutoUpdater::executedSql);
@@ -98,11 +98,11 @@ void AutoUpdater::setDatabase(const QSqlDatabase &value) {
   database = value;
 }
 
-QSharedPointer<Reestr> AutoUpdater::getReestr() const {
-  return reestr;
+QSharedPointer<Registry> AutoUpdater::getRegistry() const {
+  return registry;
 }
 
-void AutoUpdater::setReestr(QSharedPointer<Reestr> value) {
-  reestr = value;
+void AutoUpdater::setRegistry(QSharedPointer<Registry> value) {
+  registry = value;
 }
 }

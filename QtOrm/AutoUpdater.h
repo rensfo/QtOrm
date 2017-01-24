@@ -6,7 +6,7 @@
 #include <QSqlDatabase>
 
 #include "QueryCache.h"
-#include "Reestr.h"
+#include "Registry.h"
 
 namespace QtOrm {
 
@@ -15,8 +15,8 @@ class AutoUpdater : public QObject {
 public:
   explicit AutoUpdater(QObject *parent = nullptr);
 
-  QSharedPointer<Reestr> getReestr() const;
-  void setReestr(QSharedPointer<Reestr> value);
+  QSharedPointer<Registry> getRegistry() const;
+  void setRegistry(QSharedPointer<Registry> value);
 
   QSqlDatabase getDatabase() const;
   void setDatabase(const QSqlDatabase &value);
@@ -41,7 +41,7 @@ protected:
 
 protected:
   QMetaMethod onObjectPropertyChangedMethod;
-  QSharedPointer<Reestr> reestr;
+  QSharedPointer<Registry> registry;
   QSqlDatabase database;
   QSharedPointer<QueryCache> queryCache;
 };

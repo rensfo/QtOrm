@@ -28,7 +28,7 @@ private Q_SLOTS:
   void initTestCase();
   void cleanupTestCase();
   void unregisteredClass();
-  void objectFromReestr();
+  void objectFromRegistry();
   void oneTableTwoTimesInQuery();
   void oneColumnTwoTimesInWhere();
   void insertObject();
@@ -97,13 +97,13 @@ void QueryResultTestTest::unregisteredClass() {
   QVERIFY(false);
 }
 
-void QueryResultTestTest::objectFromReestr() {
+void QueryResultTestTest::objectFromRegistry() {
   try {
     registerClasses();
     QSharedPointer<A> a = session.getById<A>(1);
-    QSharedPointer<A> aFromReestr = session.getById<A>(1);
+    QSharedPointer<A> aFromRegistry = session.getById<A>(1);
 
-    QVERIFY(a == aFromReestr);
+    QVERIFY(a == aFromRegistry);
   } catch (QtOrm::Exception &e) {
     qDebug() << e.getMessage();
 
@@ -148,7 +148,7 @@ void QueryResultTestTest::insertObject() {
     a->setCode("code10");
     session.saveObject(a);
 
-    session.clearReestr();
+    session.clearRegistry();
 
     a->deleteLater();
 
@@ -181,7 +181,7 @@ void QueryResultTestTest::deleteObject() {
 
 void QueryResultTestTest::updateObject() {
   try {
-    session.clearReestr();
+    session.clearRegistry();
     session.setAutoUpdate(false);
 
     QSharedPointer<A> a = session.getById<A>(3);
@@ -189,7 +189,7 @@ void QueryResultTestTest::updateObject() {
     a->setCode("x");
     session.saveObject(a);
 
-    session.clearReestr();
+    session.clearRegistry();
 
     a->deleteLater();
 
@@ -288,7 +288,7 @@ void QueryResultTestTest::childrenOneToOneParent() {
 
 void QueryResultTestTest::autoUpdate() {
   try {
-    session.clearReestr();
+    session.clearRegistry();
     session.clearQueryCache();
     session.setAutoUpdate(true);
 
@@ -298,13 +298,13 @@ void QueryResultTestTest::autoUpdate() {
     auto a = session.get<A>("code_1", oldCode);
     a->setCode(newCode);
 
-    session.clearReestr();
+    session.clearRegistry();
     a = session.get<A>("code_1", newCode);
     QCOMPARE(a->getCode(), newCode);
 
     a->setCode(oldCode);
     session.setAutoUpdate(false);
-    session.clearReestr();
+    session.clearRegistry();
     return;
   } catch (QtOrm::Exception &e) {
     qDebug() << e.getMessage();

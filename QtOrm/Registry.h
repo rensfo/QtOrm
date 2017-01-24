@@ -1,5 +1,5 @@
-#ifndef REESTR_H
-#define REESTR_H
+#ifndef REGISTRY_H
+#define REGISTRY_H
 
 #include <QHash>
 #include <QObject>
@@ -7,13 +7,13 @@
 
 namespace QtOrm {
 
-class Reestr : public QObject {
+class Registry : public QObject {
   Q_OBJECT
 
-  using ReestrData = QHash<QString, QSharedPointer<QObject>>;
+  using RegistryData = QHash<QString, QSharedPointer<QObject>>;
 
 public:
-  explicit Reestr(QObject *parent = nullptr);
+  explicit Registry(QObject *parent = nullptr);
   bool contains(const QString &table, const QString &id);
   void insert(const QString &table, const QString &id, QSharedPointer<QObject> object);
   void remove(const QString &table, const QString &id);
@@ -24,7 +24,7 @@ public:
   void clear();
 
 private:
-  QHash<QString, ReestrData> data;
+  QHash<QString, RegistryData> data;
 };
 }
-#endif // REESTR_H
+#endif // REGISTRY_H

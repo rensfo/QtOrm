@@ -14,7 +14,7 @@
 #include "Relations/OneToOne.h"
 #include "QueryCache.h"
 #include "QueryModels/QueryModel.h"
-#include "Reestr.h"
+#include "Registry.h"
 #include "SimpleSqlBuilder.h"
 
 namespace QtOrm {
@@ -39,8 +39,8 @@ public:
   QSqlDatabase getDatabase() const;
   void setDatabase(const QSqlDatabase &value);
 
-  QSharedPointer<Reestr> getReestr() const;
-  void setReestr(QSharedPointer<Reestr> value);
+  QSharedPointer<Registry> getRegistry() const;
+  void setRegistry(QSharedPointer<Registry> value);
 
   QSharedPointer<QueryCache> getQueryCache() const;
   void setQueryCache(QSharedPointer<QueryCache> value);
@@ -71,14 +71,14 @@ protected:
                                     const QString &tableAlias, QSharedPointer<QueryTableModel> queryTableModel);
   void objectSetProperty(QSharedPointer<QObject> object, const QString &propertyName, const QVariant &value);
   QSharedPointer<QObject> createNewInstance(QSharedPointer<ClassMapBase> classBase);
-  bool reestrContainsObject(QSharedPointer<ClassMapBase> classBase, const QSqlRecord &record,
+  bool registryContainsObject(QSharedPointer<ClassMapBase> classBase, const QSqlRecord &record,
                             const QString &tableAlias);
-  QSharedPointer<QObject> getObjectFromReestr(QSharedPointer<ClassMapBase> classBase, const QSqlRecord &record,
+  QSharedPointer<QObject> getObjectFromRegistry(QSharedPointer<ClassMapBase> classBase, const QSqlRecord &record,
                                               const QString &tableAlias);
-  void insertObjectIntoReestr(QSharedPointer<ClassMapBase> classBase, const QSqlRecord &record,
+  void insertObjectIntoRegistry(QSharedPointer<ClassMapBase> classBase, const QSqlRecord &record,
                               QSharedPointer<QObject> object, const QString &tableAlias);
-  void insertObjectIntoReestr(QSharedPointer<ClassMapBase> classBase, QSharedPointer<QObject> object, QVariant idValue);
-  void removeObjectFromReestr(QSharedPointer<QObject> object);
+  void insertObjectIntoRegistry(QSharedPointer<ClassMapBase> classBase, QSharedPointer<QObject> object, QVariant idValue);
+  void removeObjectFromRegistry(QSharedPointer<QObject> object);
   QVariant getIdFromRecord(QSharedPointer<ClassMapBase> classBase, const QSqlRecord &record, const QString &tableAlias);
 
   void refreshObjectData(QSharedPointer<QObject> object, QSharedPointer<QueryTableModel> queryTableModel,
@@ -105,7 +105,7 @@ protected:
   GroupConditions replacePropertyToColumn(QSharedPointer<ClassMapBase> &classBase, const GroupConditions &conditions);
 
 protected:
-  QSharedPointer<Reestr> reestr;
+  QSharedPointer<Registry> registry;
   QSqlDatabase database;
   QSharedPointer<QueryCache> queryCache;
   QList<QSharedPointer<QObject>> refreshedObject;

@@ -60,7 +60,7 @@ public:
   bool getAutoUpdate() const;
   void setAutoUpdate(bool value);
 
-  void clearReestr();
+  void clearRegistry();
   void clearQueryCache();
 
   void removeFromCache(QSharedPointer<QObject> object);
@@ -75,7 +75,7 @@ signals:
 
 protected:
   QSqlDatabase database;
-  QSharedPointer<Reestr> reestr;
+  QSharedPointer<Registry> registry;
   QSharedPointer<AutoUpdater> updater;
   bool autoUpdate = false;
   QSharedPointer<QueryCache> queryCache;

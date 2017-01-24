@@ -5,11 +5,11 @@
 
 namespace QtOrm {
 Session::Session(QObject *parent) : QObject(parent) {
-  reestr = QSharedPointer<Reestr>::create();
+  registry = QSharedPointer<Registry>::create();
   queryCache = QSharedPointer<QueryCache>::create();
 
   updater = QSharedPointer<AutoUpdater>::create();
-  updater->setReestr(reestr);
+  updater->setRegistry(registry);
   updater->setQueryCache(queryCache);
   connect(updater.data(), &AutoUpdater::executedSql, this, &Session::executedSql);
 }
@@ -33,8 +33,8 @@ void Session::setAutoUpdate(bool value) {
   }
 }
 
-void Session::clearReestr() {
-  reestr->clear();
+void Session::clearRegistry() {
+  registry->clear();
 }
 
 void Session::clearQueryCache() {
@@ -42,15 +42,15 @@ void Session::clearQueryCache() {
 }
 
 void Session::removeFromCache(QSharedPointer<QObject> object) {
-  if (reestr) {
-    reestr->remove(object);
+  if (registry) {
+    registry->remove(object);
   }
 }
 
 Query Session::createQuery() {
   Query query;
   query.setDatabase(database);
-  query.setReestr(reestr);
+  query.setRegistry(registry);
   query.setQueryCache(queryCache);
   if (autoUpdate) {
     query.setUpdater(updater);

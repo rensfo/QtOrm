@@ -26,7 +26,6 @@ HEADERS += PropertyMap.h \
     SqlBuilderBase.h \
     Query.h \
     GroupConditions.h \
-    Reestr.h \
     AutoUpdater.h \
     QueryTableModel.h \
     QueryJoin.h \
@@ -53,7 +52,8 @@ HEADERS += PropertyMap.h \
     Conditions/ConditionLess.h \
     Conditions/ConditionLessOrEqual.h \
     Conditions/ConditionFactory.h \
-    Conditions/ConditionLike.h
+    Conditions/ConditionLike.h \
+    Registry.h
 
 SOURCES += PropertyMap.cpp \
     ConfigurationMap.cpp \
@@ -64,7 +64,6 @@ SOURCES += PropertyMap.cpp \
     SqlBuilderBase.cpp \
     Query.cpp \
     GroupConditions.cpp \
-    Reestr.cpp \
     AutoUpdater.cpp \
     QueryTableModel.cpp \
     QueryJoin.cpp \
@@ -90,7 +89,8 @@ SOURCES += PropertyMap.cpp \
     Conditions/ConditionLess.cpp \
     Conditions/ConditionLessOrEqual.cpp \
     Conditions/ConditionFactory.cpp \
-    Conditions/ConditionLike.cpp
+    Conditions/ConditionLike.cpp \
+    Registry.cpp
 
 OTHER_FILES += QtOrmInclude.pri
 
