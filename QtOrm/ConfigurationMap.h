@@ -3,6 +3,7 @@
 
 #include <QMap>
 #include <QSharedPointer>
+#include <type_traits>
 
 #include "ClassMapBase.h"
 
@@ -15,6 +16,8 @@ public:
   ConfigurationMap();
   template <typename T>
   static void addMapping();
+  template <typename... Args>
+  static void addMappings();
   template <typename T>
   static void removeMapping();
   static QSharedPointer<ClassMapBase> getMappedClass(const QString &className);
@@ -25,8 +28,30 @@ public:
   static void checkParent();
 
 protected:
+  template <class ... Args>
+  static typename std::enable_if<sizeof...(Args) == 0>::type unpacking();
+
+  template <typename T, typename... Args>
+  static void unpacking();
+
+protected:
   static QMap<QString, QSharedPointer<ClassMapBase>> mappedClass;
 };
+
+template<typename... Args>
+void ConfigurationMap::addMappings() {
+  unpacking<Args...>();
+}
+
+template <typename... Args>
+typename std::enable_if<sizeof...(Args) == 0>::type ConfigurationMap::unpacking() {
+}
+
+template <typename T, typename... Args>
+void ConfigurationMap::unpacking() {
+  addMapping<T>();
+  unpacking<Args...>();
+}
 
 template <typename T>
 void ConfigurationMap::checkParent() {
