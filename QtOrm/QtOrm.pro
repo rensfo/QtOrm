@@ -41,18 +41,6 @@ HEADERS += PropertyMap.h \
     QueryModels/UpdateFieldQueryModel.h \
     Conditions/Operation.h \
     Conditions/Condition.h \
-    Conditions/ConditionEqual.h \
-    Conditions/ConditionNotEqual.h \
-    Conditions/ConditionIsNull.h \
-    Conditions/ConditionIsNotNull.h \
-    Conditions/ConditionIn.h \
-    Conditions/ConditionBetween.h \
-    Conditions/ConditionGreater.h \
-    Conditions/ConditionGreaterOrEqual.h \
-    Conditions/ConditionLess.h \
-    Conditions/ConditionLessOrEqual.h \
-    Conditions/ConditionFactory.h \
-    Conditions/ConditionLike.h \
     Registry.h
 
 SOURCES += PropertyMap.cpp \
@@ -78,18 +66,6 @@ SOURCES += PropertyMap.cpp \
     QueryModels/UpdateQueryModel.cpp \
     QueryModels/UpdateFieldQueryModel.cpp \
     Conditions/Condition.cpp \
-    Conditions/ConditionEqual.cpp \
-    Conditions/ConditionNotEqual.cpp \
-    Conditions/ConditionIsNull.cpp \
-    Conditions/ConditionIsNotNull.cpp \
-    Conditions/ConditionIn.cpp \
-    Conditions/ConditionBetween.cpp \
-    Conditions/ConditionGreater.cpp \
-    Conditions/ConditionGreaterOrEqual.cpp \
-    Conditions/ConditionLess.cpp \
-    Conditions/ConditionLessOrEqual.cpp \
-    Conditions/ConditionFactory.cpp \
-    Conditions/ConditionLike.cpp \
     Registry.cpp
 
 OTHER_FILES += QtOrmInclude.pri

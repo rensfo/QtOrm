@@ -43,6 +43,7 @@ protected:
   QString groupOperationToString(GroupOperation groupOperation) const;
   virtual QString getLikeCondition(const QString &fieldName) const;
   QString conditionToString(QSharedPointer<Condition> &condition);
+  QString conditionToStringBase(QSharedPointer<Condition> &condition, const QString tableAlias, const QString &placeholder);
   short calculateCountUsedColumn(const QString &value);
 
 protected:

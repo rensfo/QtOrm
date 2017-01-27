@@ -7,6 +7,18 @@ namespace Sql {
 
 using QtOrm::Config::ConfigurationMap;
 
+const QMap<Operation, QString> conditionSqlTemplates{{Operation::Between, QString("%1.%2 between :%3_1 and :%3_2 ")},
+                                                     {Operation::Equal, QString("%1.%2 = :%3")},
+                                                     {Operation::Greater, QString("%1.%2 > :%3")},
+                                                     {Operation::GreaterOrEqual, QString("%1.%2 >= :%3")},
+                                                     {Operation::In, QString("%1.%2  in (%3)")},
+                                                     {Operation::IsNotNull, QString("%1.%2 is not null")},
+                                                     {Operation::IsNull, QString("%1.%2 is null")},
+                                                     {Operation::Less, QString("%1.%2 < :%3")},
+                                                     {Operation::LessOrEqual, QString("%1.%2 <= :%3")},
+                                                     {Operation::Like, QString("%1.%2 like '%' || :%3 || '%'")},
+                                                     {Operation::NotEqual, QString("%1.%2 != :%3")}};
+
 SelectQueryModel::SelectQueryModel(QObject *parent) : QueryModel(parent) {
 }
 
@@ -79,9 +91,6 @@ QString SelectQueryModel::getLikeCondition(const QString &fieldName) const {
 
 QString SelectQueryModel::conditionToString(QSharedPointer<Condition> &condition) {
   QString conditionString;
-//  if (condition->getColumn().isEmpty()) {
-//    condition->setColumn(classBase->getProperty(condition->getProperty())->getColumn());
-//  }
   QString columnName = condition->getProperty();
 
   QString tableAlias = mainTableModel->getAlias();
@@ -93,11 +102,47 @@ QString SelectQueryModel::conditionToString(QSharedPointer<Condition> &condition
     placeHolder = QString("%1_%2").arg(columnName).arg(count);
   }
 
-  conditionString = condition->toSqlString(tableAlias, placeHolder);
+  //  conditionString = condition->toSqlString(tableAlias, placeHolder);
+  conditionString = conditionToStringBase(condition, tableAlias, placeHolder);
 
   conditionPlaceholder.insert(condition, placeHolder);
 
   return conditionString;
+}
+
+QString SelectQueryModel::conditionToStringBase(QSharedPointer<Condition> &condition, const QString tableAlias,
+                                                const QString &placeholder) {
+  QString result, sqlTemplate = conditionSqlTemplates[condition->getOperation()], property = condition->getProperty();
+  Operation operation = condition->getOperation();
+  switch (operation) {
+  case Operation::IsNotNull:
+  case Operation::IsNull:
+    result = sqlTemplate.arg(tableAlias).arg(property);
+    break;
+  case Operation::Equal:
+  case Operation::Greater:
+  case Operation::GreaterOrEqual:
+  case Operation::Less:
+  case Operation::LessOrEqual:
+  case Operation::Like:
+  case Operation::NotEqual:
+    result = sqlTemplate.arg(tableAlias).arg(property).arg(placeholder);
+    break;
+  case Operation::Between:
+    result = sqlTemplate.arg(tableAlias).arg(property).arg(placeholder);
+    break;
+  case Operation::In: {
+    QStringList placeholders;
+    for (int i = 1; i <= condition->getValues().count(); ++i) {
+      placeholders << QString(":%1_%2").arg(placeholder).arg(i);
+    }
+
+    result = sqlTemplate.arg(tableAlias).arg(property).arg(placeholders.join(", "));
+    break;
+  }
+  }
+
+  return result;
 }
 
 short SelectQueryModel::calculateCountUsedColumn(const QString &value) {

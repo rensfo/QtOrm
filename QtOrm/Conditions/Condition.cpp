@@ -2,25 +2,21 @@
 
 namespace QtOrm {
 namespace Sql {
-extern QMap<Operation, QString> OperationStrings;
 
 Condition::Condition() {
 }
 
-Condition::Condition(const QString &property, const QVariant &value) : Condition() {
-  this->property = property;
-  this->values.append(value);
+Condition::Condition(const QString &property, Operation operation, const QVariant &value)
+    : property(property), operation(operation), values({value}) {
 }
 
-Condition::Condition(const QString &property, const QVariantList &values) : Condition() {
-  this->property = property;
-  this->values = values;
+Condition::Condition(const QString &property, Operation operation, const QVariantList &values)
+    : property(property), operation(operation), values(values) {
 }
 
 Condition::Condition(const Condition &other) : Condition() {
-//  operationSymbol = other.getOperationSymbol();
   values = other.getValues();
-//  column = other.getColumn();
+  operation = other.getOperation();
   property = other.getProperty();
 }
 
@@ -43,22 +39,20 @@ void Condition::clearValues() {
   values.clear();
 }
 
-//QString Condition::getColumn() const {
-//  return column;
-//}
-
-//void Condition::setColumn(const QString &value) {
-//  column = value;
-//}
-
-QString Condition::getProperty() const
-{
+QString Condition::getProperty() const {
   return property;
 }
 
-void Condition::setProperty(const QString &value)
-{
+void Condition::setProperty(const QString &value) {
   property = value;
+}
+
+Operation Condition::getOperation() const {
+  return operation;
+}
+
+void Condition::setOperation(const Operation &value) {
+  operation = value;
 }
 }
 }

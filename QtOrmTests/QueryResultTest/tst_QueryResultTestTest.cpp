@@ -314,7 +314,7 @@ void QueryResultTestTest::autoUpdate() {
 
 void QueryResultTestTest::operationBetween() {
   try {
-    //    connect(&session, &Session::executedSql, [](QString sql){ qDebug() << sql; });
+//        connect(&session, &Session::executedSql, [](QString sql){ qDebug() << sql; });
     GroupConditions where;
     where.addBetween("id", 2, 3);
     auto listA = session.getList<A>(where);

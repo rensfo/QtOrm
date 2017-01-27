@@ -27,7 +27,6 @@ public:
   void setGroups(const QList<QSharedPointer<GroupConditions>> &value);
 
   void addGroup(const GroupConditions &value);
-//  void addCondition(const Condition &value);
   void addCondition(const QSharedPointer<Condition> &value);
 
   void addEqual(const QString &fieldName, const QVariant &value);

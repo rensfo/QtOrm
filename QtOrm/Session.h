@@ -15,7 +15,6 @@
 #include "GroupConditions.h"
 #include "Query.h"
 #include "SimpleSqlBuilder.h"
-#include "Conditions/ConditionFactory.h"
 
 namespace QtOrm {
 
@@ -113,7 +112,7 @@ QSharedPointer<T> Session::get(const QString &property, const QVariant &value) {
 
 template <class T>
 QSharedPointer<T> Session::get(const QString &property, Operation operation, const QVariant &value) {
-  QSharedPointer<Condition> c = ConditionFactory::create(property, operation, value);
+  QSharedPointer<Condition> c = QSharedPointer<Condition>::create(property, operation, value);
 
   return this->get<T>(c);
 }

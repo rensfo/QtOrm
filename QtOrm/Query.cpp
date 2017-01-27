@@ -10,7 +10,6 @@
 
 #include "ConfigurationMap.h"
 #include "SimpleSqlBuilder.h"
-#include "Conditions/ConditionFactory.h"
 
 namespace QtOrm {
 namespace Sql {
@@ -45,8 +44,7 @@ QSharedPointer<QObject> Query::getById(const QString &className, const QVariant 
 QList<QSharedPointer<QObject>> Query::getListObject(const QString &className, const QString &property, const QVariant &value) {
   GroupConditions group;
   if (!property.isEmpty()) {
-    QSharedPointer<Condition> condition =
-        ConditionFactory::create(property, Operation::Equal, QVariantList{value});
+    QSharedPointer<Condition> condition = QSharedPointer<Condition>::create(property, Operation::Equal, QVariantList{value});
     group.addCondition(condition);
   }
 
@@ -281,7 +279,7 @@ void Query::objectSetProperty(QSharedPointer<QObject> object, const QString &pro
 QSharedPointer<QObject> Query::createNewInstance(QSharedPointer<ClassMapBase> classBase) {
   QSharedPointer<QObject> newObject = QSharedPointer<QObject>(classBase->getMetaObject().newInstance());
   if (!newObject) {
-    throw InstanceNotCreatedException("Object instance was not created(Missing Q_INVOKABLE in constructor?)");
+    throw InstanceNotCreatedException("Object instance was not created(Missed Q_INVOKABLE in constructor?)");
   }
   return newObject;
 }
@@ -507,7 +505,8 @@ GroupConditions Query::replacePropertyToColumn(QSharedPointer<ClassMapBase> &cla
   result.setOperation(conditions.getOperation());
 
   for(QSharedPointer<Condition> &condition: conditions.getConditions()){
-    QSharedPointer<Condition> newCondition = condition->clone();
+//    QSharedPointer<Condition> newCondition = condition->clone();
+    QSharedPointer<Condition> newCondition = QSharedPointer<Condition>::create(*condition.data());
 
     if(classBase->containsProperty(newCondition->getProperty())){
       QString column = classBase->getColumnProperty(newCondition->getProperty());

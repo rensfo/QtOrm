@@ -12,8 +12,8 @@ namespace Sql {
 class Condition {
 public:
   Condition();
-  Condition(const QString &property, const QVariant &value);
-  Condition(const QString &property, const QVariantList &values);
+  Condition(const QString &property, Operation operation, const QVariant &value);
+  Condition(const QString &property, Operation operation, const QVariantList &values);
   Condition(const Condition &other);
   virtual ~Condition();
 
@@ -22,30 +22,17 @@ public:
   void setValue(const QVariant &value);
   void clearValues();
 
-//  QString getColumn() const;
-//  void setColumn(const QString &value);
-
-  virtual QString toSqlString(const QString &tableName, const QString &placeholder) const = 0;
-  virtual QSharedPointer<Condition> clone() = 0;
-
   QString getProperty() const;
   void setProperty(const QString &value);
 
-protected:
-  template<typename T>
-  QSharedPointer<Condition> cloneBase();
+  Operation getOperation() const;
+  void setOperation(const Operation &value);
 
 protected:
   QString property;
-//  QString column;
+  Operation operation = Operation::Equal;
   QVariantList values;
 };
-
-template<typename T>
-QSharedPointer<Condition> Condition::cloneBase(){
-  return QSharedPointer<T>::create(this->getProperty(), this->getValues());
-};
-
 }
 }
 #endif // CONDITION_H

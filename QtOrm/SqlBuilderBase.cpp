@@ -12,8 +12,6 @@
 #include "QueryModels/SelectQueryModel.h"
 #include "QueryModels/UpdateFieldQueryModel.h"
 #include "QueryModels/UpdateQueryModel.h"
-#include "Conditions/ConditionBetween.h"
-#include "Conditions/ConditionIn.h"
 
 namespace QtOrm {
 namespace Sql {
@@ -46,7 +44,10 @@ void SqlBuilderBase::bindValues(QSqlQuery &query, const QSharedPointer<GroupCond
     if (!condition->getValues().isEmpty()) {
       QString placeHolder = placeHolders[condition];
 
-      bool betweenOrIn = condition.dynamicCast<ConditionBetween>() || condition.dynamicCast<ConditionIn>();
+      QList<Operation> operations{Operation::Between, Operation::In};
+//      bool betweenOrIn = condition.dynamicCast<ConditionBetween>() || condition.dynamicCast<ConditionIn>();
+
+      bool betweenOrIn = operations.contains(condition->getOperation());
 
       if (betweenOrIn) {
         QString almostReadyPlaceHolder = getPlaceHolder(placeHolder);
