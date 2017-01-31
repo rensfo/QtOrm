@@ -7,9 +7,8 @@ namespace QtOrm {
 namespace Sql {
 
 class UpdateFieldQueryModel : public UpdateQueryModel {
-  Q_OBJECT
 public:
-  explicit UpdateFieldQueryModel(QObject *parent = nullptr);
+  UpdateFieldQueryModel();
   ~UpdateFieldQueryModel();
 
   QString getPropertyName() const;

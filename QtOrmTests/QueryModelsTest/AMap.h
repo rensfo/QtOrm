@@ -13,7 +13,7 @@ public:
 
   oneToOne("kindA").setTableColumn("idKindA");
 
-  oneToMany("child").setRefClass("B").setColumn("idA");
+  oneToMany("child").setRefClass("B").setColumn("idA").setOrderBy("code", Sort::DESC);
   }
 };
 

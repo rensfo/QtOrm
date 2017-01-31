@@ -7,7 +7,7 @@ namespace Sql {
 
 using QtOrm::Mapping::OneToOne;
 
-UpdateQueryModel::UpdateQueryModel(QObject *parent) : QueryModel(parent) {
+UpdateQueryModel::UpdateQueryModel() : QueryModel() {
 }
 
 UpdateQueryModel::~UpdateQueryModel() {

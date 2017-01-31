@@ -46,7 +46,7 @@ QSqlQuery SimpleSqlBuilder::updateOneColumnQuery(const QString &propertyName) {
 
 QSqlQuery SimpleSqlBuilder::deleteQuery() {
   queryModel = getQueryModel(QueryModelType::Delete);
-  QSharedPointer<DeleteQueryModel> deleteQueryModel = queryModel.objectCast<DeleteQueryModel>();
+  QSharedPointer<DeleteQueryModel> deleteQueryModel = queryModel.dynamicCast<DeleteQueryModel>();
   deleteQueryModel->buildModel();
   QString fullSqlText = deleteQueryModel->getSqlText();
   QSqlQuery query(database);

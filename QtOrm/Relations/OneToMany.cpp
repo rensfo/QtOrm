@@ -34,5 +34,21 @@ OneToMany &OneToMany::setSaveCascade(bool value) {
   saveCascade = value;
   return *this;
 }
+
+OneToMany &OneToMany::setOrderBy(const QString &property, Sort sort)
+{
+  return setOrderBy({{property, sort}});
+}
+
+OneToMany &OneToMany::setOrderBy(const QList<OrderColumn> &orderBy)
+{
+  this->orderBy = orderBy;
+  return *this;
+}
+
+QList<OrderColumn> OneToMany::getOrderBy()
+{
+  return orderBy;
+}
 }
 }

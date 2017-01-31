@@ -9,7 +9,7 @@ namespace Sql {
 using QtOrm::Mapping::OneToOne;
 using QtOrm::Mapping::PropertyMap;
 
-UpdateFieldQueryModel::UpdateFieldQueryModel(QObject *parent) : UpdateQueryModel(parent) {
+UpdateFieldQueryModel::UpdateFieldQueryModel() : UpdateQueryModel() {
 }
 
 QtOrm::Sql::UpdateFieldQueryModel::~UpdateFieldQueryModel() {

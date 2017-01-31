@@ -9,9 +9,8 @@ namespace QtOrm {
 namespace Sql {
 
 class DeleteQueryModel : public QueryModel {
-  Q_OBJECT
 public:
-  explicit DeleteQueryModel(QObject *parent = nullptr);
+  DeleteQueryModel();
   ~DeleteQueryModel();
   virtual void buildModel() override;
 

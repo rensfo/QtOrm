@@ -3,7 +3,7 @@
 namespace QtOrm {
 namespace Sql {
 
-DeleteQueryModel::DeleteQueryModel(QObject *parent) : QueryModel(parent) {
+DeleteQueryModel::DeleteQueryModel() : QueryModel() {
 }
 
 DeleteQueryModel::~DeleteQueryModel() {

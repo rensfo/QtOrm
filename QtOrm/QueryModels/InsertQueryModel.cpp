@@ -6,7 +6,7 @@ namespace Sql {
 
 using QtOrm::Mapping::OneToOne;
 
-InsertQueryModel::InsertQueryModel(QObject *parent) : QueryModel(parent) {
+InsertQueryModel::InsertQueryModel() {
 }
 
 InsertQueryModel::~InsertQueryModel() {

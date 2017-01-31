@@ -7,9 +7,8 @@ namespace QtOrm {
 namespace Sql {
 
 class InsertQueryModel : public QueryModel {
-  Q_OBJECT
 public:
-  explicit InsertQueryModel(QObject *parent = nullptr);
+  InsertQueryModel();
   ~InsertQueryModel();
 
   bool getHasLastInsertedIdFeature() const;

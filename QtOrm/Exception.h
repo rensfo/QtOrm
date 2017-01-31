@@ -6,8 +6,6 @@
 
 namespace QtOrm {
 
-enum class ErrorCode { Sql };
-
 class Exception : public QException {
 public:
   explicit Exception(const QString &message);

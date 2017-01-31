@@ -40,7 +40,7 @@ public:
   QString getIdPropertyName();
 
   QSharedPointer<PropertyMap> getProperty(const QString &property);
-  QString getColumnProperty(const QString &property);
+  QString getPropertyColumn(const QString &property);
 
   OneToMany &oneToMany(const QString &property);
   OneToOne &oneToOne(const QString &property);

@@ -3,7 +3,10 @@
 namespace QtOrm {
 namespace Sql {
 
-QueryModel::QueryModel(QObject *parent) : QObject(parent) {
+QueryModel::QueryModel() {
+}
+
+QueryModel::~QueryModel(){
 }
 
 QString QueryModel::getSqlText() {

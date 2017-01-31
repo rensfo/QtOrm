@@ -1,17 +1,14 @@
 #ifndef UPDATEQUERYMODEL_H
 #define UPDATEQUERYMODEL_H
 
-#include <QObject>
-
 #include "QueryModel.h"
 
 namespace QtOrm {
 namespace Sql {
 
 class UpdateQueryModel : public QueryModel {
-  Q_OBJECT
 public:
-  explicit UpdateQueryModel(QObject *parent = nullptr);
+  UpdateQueryModel();
   ~UpdateQueryModel();
   virtual void buildModel() override;
 

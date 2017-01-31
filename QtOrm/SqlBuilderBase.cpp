@@ -26,7 +26,7 @@ QSqlQuery SqlBuilderBase::selectQuery() {
   QSqlQuery query(database);
   query.prepare(queryModel->getSqlText());
 
-  QSharedPointer<SelectQueryModel> selectQueryModel = queryModel.objectCast<SelectQueryModel>();
+  QSharedPointer<SelectQueryModel> selectQueryModel = queryModel.dynamicCast<SelectQueryModel>();
   QSharedPointer<GroupConditions> sharedConditions = QSharedPointer<GroupConditions>::create(conditions);
   bindValues(query, sharedConditions, selectQueryModel->getConditionPlaceholder());
   selectQueryModel->clearPlaceHolders();
@@ -45,7 +45,7 @@ void SqlBuilderBase::bindValues(QSqlQuery &query, const QSharedPointer<GroupCond
       QString placeHolder = placeHolders[condition];
 
       QList<Operation> operations{Operation::Between, Operation::In};
-//      bool betweenOrIn = condition.dynamicCast<ConditionBetween>() || condition.dynamicCast<ConditionIn>();
+      //      bool betweenOrIn = condition.dynamicCast<ConditionBetween>() || condition.dynamicCast<ConditionIn>();
 
       bool betweenOrIn = operations.contains(condition->getOperation());
 
@@ -73,8 +73,9 @@ QSharedPointer<QueryModel> SqlBuilderBase::getQueryModel(QueryModelType queryTyp
   if (queryCache) {
     if (QSharedPointer<QueryModel> model = queryCache->getModel(queryType, className, propertyName)) {
       if (queryType == QueryModelType::Select) {
-        QSharedPointer<SelectQueryModel> selectModel = model.objectCast<SelectQueryModel>();
+        QSharedPointer<SelectQueryModel> selectModel = model.dynamicCast<SelectQueryModel>();
         selectModel->setConditions(conditions);
+        selectModel->setOrderColumns(orderBy);
       }
       return model;
     }
@@ -102,6 +103,7 @@ QSharedPointer<QueryModel> SqlBuilderBase::createModel(QueryModelType queryType)
     selectModel->setClassBase(classBase);
     selectModel->buildModel();
     selectModel->setConditions(conditions);
+    selectModel->setOrderColumns(orderBy);
     result = selectModel;
     break;
   }
@@ -143,6 +145,14 @@ QSharedPointer<QueryModel> SqlBuilderBase::createModel(QueryModelType queryType)
 
 bool SqlBuilderBase::hasLastInsertedIdFeature() {
   return database.driver()->hasFeature(QSqlDriver::LastInsertId) && database.driverName() != "QPSQL";
+}
+
+QList<OrderColumn> SqlBuilderBase::getOrderBy() const {
+  return orderBy;
+}
+
+void SqlBuilderBase::setOrderBy(const QList<OrderColumn> &value) {
+  orderBy = value;
 }
 
 QSharedPointer<QueryCache> SqlBuilderBase::getQueryCache() const {

@@ -75,7 +75,7 @@ QSharedPointer<PropertyMap> ClassMapBase::getProperty(const QString &property) {
   return properties.value(property);
 }
 
-QString ClassMapBase::getColumnProperty(const QString &property) {
+QString ClassMapBase::getPropertyColumn(const QString &property) {
   if (!properties.contains(property))
     return QString();
 
@@ -106,7 +106,7 @@ void ClassMapBase::checkToExistProperty(const QString &property) {
   int propertyIndex = classMetaObject.indexOfProperty(property.toStdString().data());
   if (propertyIndex == -1) {
     QString message =
-        QString::fromUtf8("Property %2 in class %1 not found").arg(classMetaObject.className()).arg(property);
+        QString::fromUtf8("Property %2 in class %1 did not found").arg(classMetaObject.className()).arg(property);
     throw PropertyNotFoundException(message);
   }
 }

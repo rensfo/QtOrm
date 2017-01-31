@@ -48,6 +48,10 @@ public:
   QSharedPointer<QueryCache> getQueryCache() const;
   void setQueryCache(QSharedPointer<QueryCache> value);
 
+
+  QList<OrderColumn> getOrderBy() const;
+  void setOrderBy(const QList<OrderColumn> &value);
+
 protected:
   QString getPlaceHolder(const QString &param);
   void bindValues(QSqlQuery &query, const QSharedPointer<GroupConditions> &conditions,
@@ -65,6 +69,7 @@ protected:
   QSharedPointer<QueryModel> queryModel;
   QSharedPointer<QueryCache> queryCache;
   QString propertyName;
+  QList<OrderColumn> orderBy;
 };
 }
 }

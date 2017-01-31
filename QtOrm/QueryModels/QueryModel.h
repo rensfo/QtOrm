@@ -1,8 +1,6 @@
 #ifndef QUERYMODEL_H
 #define QUERYMODEL_H
 
-#include <QObject>
-
 #include "ClassMapBase.h"
 #include "GroupConditions.h"
 #include "QueryTableModel.h"
@@ -14,10 +12,10 @@ using Mapping::ClassMapBase;
 
 enum class QueryModelType : int { Select, Insert, Update, Delete, UpdateColumn };
 
-class QueryModel : public QObject {
-  Q_OBJECT
+class QueryModel {
 public:
-  explicit QueryModel(QObject *parent = nullptr);
+  QueryModel();
+  virtual ~QueryModel();
   virtual QString getSqlText();
 
   QSharedPointer<QueryTableModel> getMainTableModel() const;

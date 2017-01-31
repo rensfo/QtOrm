@@ -35,6 +35,7 @@ private Q_SLOTS:
   void deleteObject();
   void updateObject();
   void where();
+  void orderBy();
   void refreshObject();
   void refreshChildObject();
   void deleteChildAndRefresh();
@@ -150,11 +151,11 @@ void QueryResultTestTest::insertObject() {
 
     session.clearRegistry();
 
-    a->deleteLater();
+//    a->deleteLater();
 
     a = session.get<A>("code_1", "code10");
 
-    a->deleteLater();
+//    a->deleteLater();
 
     QVERIFY(a);
   } catch (QtOrm::Exception &e) {
@@ -191,8 +192,6 @@ void QueryResultTestTest::updateObject() {
 
     session.clearRegistry();
 
-    a->deleteLater();
-
     a = session.getById<A>(3);
 
     QCOMPARE(a->getCode(), QString("x"));
@@ -209,6 +208,23 @@ void QueryResultTestTest::where() {
   auto a = session.getList<A>(where);
 
   QCOMPARE(a.count(), 1);
+}
+
+void QueryResultTestTest::orderBy()
+{
+  try {
+//            connect(&session, &Session::executedSql, [](QString sql){ qDebug() << sql; });
+    session.clearRegistry();
+    QSharedPointer<A> a = session.getById<A>(2);
+
+    QCOMPARE(a->getChild()[0]->getCode(), QString("code2.3"));
+    QCOMPARE(a->getChild()[1]->getCode(), QString("code2.2"));
+    QCOMPARE(a->getChild()[2]->getCode(), QString("code2.1"));
+
+  } catch (QtOrm::Exception &e) {
+    qDebug() << e.getMessage();
+    QVERIFY(false);
+  }
 }
 
 void QueryResultTestTest::refreshObject() {
@@ -314,7 +330,6 @@ void QueryResultTestTest::autoUpdate() {
 
 void QueryResultTestTest::operationBetween() {
   try {
-//        connect(&session, &Session::executedSql, [](QString sql){ qDebug() << sql; });
     GroupConditions where;
     where.addBetween("id", 2, 3);
     auto listA = session.getList<A>(where);

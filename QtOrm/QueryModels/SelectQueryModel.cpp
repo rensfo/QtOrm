@@ -19,7 +19,11 @@ const QMap<Operation, QString> conditionSqlTemplates{{Operation::Between, QStrin
                                                      {Operation::Like, QString("%1.%2 like '%' || :%3 || '%'")},
                                                      {Operation::NotEqual, QString("%1.%2 != :%3")}};
 
-SelectQueryModel::SelectQueryModel(QObject *parent) : QueryModel(parent) {
+const QMap<Sort, QString> sortStrings{{Sort::ASC, "ASC"}, {Sort::DESC, "DESC"}};
+
+const QMap<GroupOperation, QString> groupOperationStrings{{GroupOperation::And, "and"}, {GroupOperation::Or, "or"}};
+
+SelectQueryModel::SelectQueryModel() : QueryModel() {
 }
 
 SelectQueryModel::~SelectQueryModel() {
@@ -42,51 +46,59 @@ void SelectQueryModel::resetTableNumber() {
 }
 
 QString SelectQueryModel::buildSelectClause() {
-  return "select " + mainTableModel->getColumnsForSelectClause();
+  return selectTemplate.arg(mainTableModel->getColumnsForSelectClause());
 }
 
 QString SelectQueryModel::buildFromClause() {
-  return "from " + mainTableModel->getTablesForFromClause();
+  return fromTemplate.arg(mainTableModel->getTablesForFromClause());
 }
 
 QString SelectQueryModel::buildWhereClause() {
-  QSharedPointer<GroupConditions> sharedConditions = QSharedPointer<GroupConditions>::create(conditions);
-  QString groupConditionText = GroupConditionToString(sharedConditions);
-  if (groupConditionText.isEmpty())
+  if(conditions.isEmpty())
     return QString();
 
-  return "where " + groupConditionText;
+  QSharedPointer<GroupConditions> sharedConditions = QSharedPointer<GroupConditions>::create(conditions);
+  QString groupConditionText = groupConditionToString(sharedConditions);
+
+  return whereTemplate.arg(groupConditionText);
 }
 
-QString SelectQueryModel::GroupConditionToString(const QSharedPointer<GroupConditions> &groupConditions) {
-  QString whereClause;
+QString SelectQueryModel::buildOrderByClause() {
+  if (!orderColumns.count())
+    return QString();
+
+  QStringList orderColumnStrings;
+  for (auto orderColumn : orderColumns) {
+    orderColumnStrings << orderColumnToString(orderColumn);
+  }
+
+  return orderByTemplate.arg(orderColumnStrings.join(", "));
+}
+
+QString SelectQueryModel::orderColumnToString(OrderColumn &orderColumn) {
+  return orderColumnTemplate.arg(mainTableModel->getAlias())
+      .arg(orderColumn.orderProperty)
+      .arg(sortStrings[orderColumn.sort]);
+}
+
+QString SelectQueryModel::groupConditionToString(const QSharedPointer<GroupConditions> &groupConditions) {
+  if (groupConditions->isEmpty())
+    return QString();
+
+  QStringList conditionStringList;
   for (QSharedPointer<Condition> &condition : groupConditions->getConditions()) {
-    QString groupOp = groupOperationToString(groupConditions->getOperation());
-    QString conditionText = conditionToString(condition);
-    if (whereClause.isEmpty()) {
-      whereClause = conditionText;
-    } else {
-      whereClause += QString(" %1 %2").arg(groupOp).arg(conditionText);
-    }
+    conditionStringList << conditionToString(condition);
   }
 
   for (QSharedPointer<GroupConditions> &group : groupConditions->getGroups()) {
-    QString groupOp = whereClause.isEmpty() ? "" : groupOperationToString(groupConditions->getOperation());
-    QString groupWhere = GroupConditionToString(group);
-    if (!groupWhere.isEmpty())
-      whereClause += QString("%1 (%2)").arg(groupOp).arg(groupWhere);
+    if (group->isEmpty())
+      continue;
+
+    conditionStringList << QString("(%1)").arg(groupConditionToString(group));
   }
 
-  return whereClause;
-}
-
-QString SelectQueryModel::groupOperationToString(GroupOperation groupOperation) const {
-  return groupOperation == GroupOperation::And ? "and" : "or";
-}
-
-QString SelectQueryModel::getLikeCondition(const QString &fieldName) const {
-  QString tableName = mainTableModel->getName();
-  return QString("%1.%2 like '%' || :%2 || '%'").arg(tableName).arg(fieldName);
+  QString groupOp = groupOperationStrings[groupConditions->getOperation()];
+  return conditionStringList.join(QString(" %1 ").arg(groupOp));
 }
 
 QString SelectQueryModel::conditionToString(QSharedPointer<Condition> &condition) {
@@ -102,7 +114,6 @@ QString SelectQueryModel::conditionToString(QSharedPointer<Condition> &condition
     placeHolder = QString("%1_%2").arg(columnName).arg(count);
   }
 
-  //  conditionString = condition->toSqlString(tableAlias, placeHolder);
   conditionString = conditionToStringBase(condition, tableAlias, placeHolder);
 
   conditionPlaceholder.insert(condition, placeHolder);
@@ -158,6 +169,15 @@ short SelectQueryModel::calculateCountUsedColumn(const QString &value) {
   return count;
 }
 
+QList<OrderColumn> SelectQueryModel::getOrderColumns() const {
+  return orderColumns;
+}
+
+void SelectQueryModel::setOrderColumns(const QList<OrderColumn> &value) {
+  orderColumns = value;
+  orderBy = buildOrderByClause();
+}
+
 QMap<QSharedPointer<Condition>, QString> SelectQueryModel::getConditionPlaceholder() const {
   return conditionPlaceholder;
 }
@@ -202,7 +222,11 @@ QSharedPointer<QueryTableModel> SelectQueryModel::buildQueryTableModel(QSharedPo
 }
 
 QString SelectQueryModel::getSqlText() {
-  return QString("%1 %2 %3").arg(select).arg(from).arg(where);
+  return QString("%1 %2 %3 %4")
+      .arg(select)
+      .arg(from)
+      .arg(where)
+      .arg(orderBy);
 }
 
 GroupConditions SelectQueryModel::getConditions() const {

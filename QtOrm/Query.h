@@ -29,8 +29,8 @@ public:
   Query(const Query &other);
   virtual QSharedPointer<QObject> getById(const QString &className, const QVariant &id);
   virtual QList<QSharedPointer<QObject>> getListObject(const QString &className, const QString &property = QString(),
-                                                       const QVariant &value = QVariant());
-  virtual QList<QSharedPointer<QObject>> getListObject(const QString &className, const GroupConditions &conditions);
+                                                       const QVariant &value = QVariant(), const QList<OrderColumn> &orderBy = QList<OrderColumn>());
+  virtual QList<QSharedPointer<QObject>> getListObject(const QString &className, const GroupConditions &conditions, const QList<OrderColumn> &orderBy = QList<OrderColumn>());
   virtual void saveObject(QSharedPointer<QObject> &object);
   virtual void deleteObject(QSharedPointer<QObject> &object);
   virtual void refresh(QSharedPointer<QObject> &object);
@@ -103,6 +103,8 @@ protected:
   bool tryReopenDatabaseConnectionIfNeed();
   SimpleSqlBuilder createSimpleSqlBuilder(QSharedPointer<ClassMapBase> &classBase);
   GroupConditions replacePropertyToColumn(QSharedPointer<ClassMapBase> &classBase, const GroupConditions &conditions);
+  QList<OrderColumn> replacePropertyToColumn(QSharedPointer<ClassMapBase> &classBase, const QList<OrderColumn> &orderColumns);
+  QString getColumn(QSharedPointer<ClassMapBase> &classBase, const QString &property);
 
 protected:
   QSharedPointer<Registry> registry;

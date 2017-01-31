@@ -17,6 +17,7 @@ public:
   virtual QSqlQuery updateQuery() override;
   virtual QSqlQuery updateOneColumnQuery(const QString &propertyName) override;
   virtual QSqlQuery deleteQuery() override;
+
   SimpleSqlBuilder &operator=(const SimpleSqlBuilder &other);
 
 protected:
