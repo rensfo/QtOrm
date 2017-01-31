@@ -54,7 +54,7 @@ QString SelectQueryModel::buildFromClause() {
 }
 
 QString SelectQueryModel::buildWhereClause() {
-  if(conditions.isEmpty())
+  if (conditions.isEmpty())
     return QString();
 
   QSharedPointer<GroupConditions> sharedConditions = QSharedPointer<GroupConditions>::create(conditions);
@@ -222,11 +222,7 @@ QSharedPointer<QueryTableModel> SelectQueryModel::buildQueryTableModel(QSharedPo
 }
 
 QString SelectQueryModel::getSqlText() {
-  return QString("%1 %2 %3 %4")
-      .arg(select)
-      .arg(from)
-      .arg(where)
-      .arg(orderBy);
+  return QString("%1 %2 %3 %4").arg(select).arg(from).arg(where).arg(orderBy);
 }
 
 GroupConditions SelectQueryModel::getConditions() const {
