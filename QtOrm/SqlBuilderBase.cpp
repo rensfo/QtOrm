@@ -60,11 +60,11 @@ void SqlBuilderBase::bindValues(QSqlQuery &query, const QSharedPointer<GroupCond
       } else {
         query.bindValue(getPlaceHolder(placeHolder), condition->getValues().first());
       }
-
-      for (QSharedPointer<GroupConditions> &g : conditions->getGroups()) {
-        bindValues(query, g, placeHolders);
-      }
     }
+  }
+
+  for (QSharedPointer<GroupConditions> &g : conditions->getGroups()) {
+    bindValues(query, g, placeHolders);
   }
 }
 
