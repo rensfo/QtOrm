@@ -97,6 +97,8 @@ void Query::insertObject(QSharedPointer<QObject> &object) {
   insertObjectIntoRegistry(classBase, object, newId);
 
   saveAllOneToMany(object);
+
+  connectToAllProperties(object);
 }
 
 void Query::updateObject(QSharedPointer<QObject> &object) {
@@ -265,9 +267,7 @@ QSharedPointer<QObject> Query::getObject(const QSqlRecord &record, const QShared
     fillOneToOne(object, queryTableModel, record);
     fillOneToMany(classBase->getOneToManyRelations(), classBase->getIdProperty()->getName(), object);
 
-    if (updater) {
-      updater->connectToAllProperties(object);
-    }
+    connectToAllProperties(object);
   }
 
   return object;
@@ -545,6 +545,13 @@ QString Query::getColumn(QSharedPointer<ClassMapBase> &classBase, const QString 
   }
 
   return property;
+}
+
+void Query::connectToAllProperties(QSharedPointer<QObject> &object)
+{
+  if (updater) {
+    updater->connectToAllProperties(object);
+  }
 }
 
 QSharedPointer<AutoUpdater> Query::getUpdater() const {

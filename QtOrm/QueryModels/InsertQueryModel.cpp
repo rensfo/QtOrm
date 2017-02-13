@@ -20,39 +20,36 @@ void InsertQueryModel::buildModel() {
 QSharedPointer<QueryTableModel> InsertQueryModel::buildQueryTableModel() {
   QSharedPointer<QueryTableModel> queryTableModel = QSharedPointer<QueryTableModel>::create();
   queryTableModel->setName(classBase->getTable());
+  idColumn = classBase->getColumnIdProperty();
   for (auto property : classBase->getProperties()) {
     if (property->getIsId()) {
-      idColumn = property->getColumn();
       continue;
     }
 
     queryTableModel->addColumn(property->getColumn());
   }
 
-  for (QSharedPointer<OneToOne> oneToOne : classBase->getOneToOneRelations())
-    queryTableModel->addColumn(oneToOne->getTableColumn());
+  for (QSharedPointer<OneToOne> oneToOne : classBase->getOneToOneRelations()){
+    QString oneToOneColumn = oneToOne->getTableColumn();
+    if(!queryTableModel->getColumns().contains(oneToOneColumn)){
+      queryTableModel->addColumn(oneToOneColumn);
+    }
+  }
 
   return queryTableModel;
 }
 
 QString InsertQueryModel::buildSql() {
-  QString columns, placeholders;
+  QStringList columns, placeholders;
   for (QString column : mainTableModel->getColumns()) {
-    if (columns.isEmpty())
-      columns += column;
-    else
-      columns += ", " + column;
-
-    if (placeholders.isEmpty())
-      placeholders += ":" + column;
-    else
-      placeholders += ", :" + column;
+    columns << column;
+    placeholders << ":" + column;
   }
 
   if (hasLastInsertedIdFeature)
-    return insertTemplateWithLastInsertedId.arg(mainTableModel->getName()).arg(columns).arg(placeholders);
+    return insertTemplateWithLastInsertedId.arg(mainTableModel->getName()).arg(columns.join(", ")).arg(placeholders.join(", "));
 
-  return insertTemplate.arg(mainTableModel->getName()).arg(columns).arg(placeholders).arg(idColumn);
+  return insertTemplate.arg(mainTableModel->getName()).arg(columns.join(", ")).arg(placeholders.join(", ")).arg(idColumn);
 }
 
 bool InsertQueryModel::getHasLastInsertedIdFeature() const {

@@ -43,7 +43,7 @@ void AutoUpdater::connectToAllProperties(QSharedPointer<QObject> object) {
     int propertyIndex = object->metaObject()->indexOfProperty(propertyName.toStdString().data());
     QMetaProperty property = object->metaObject()->property(propertyIndex);
     if (property.hasNotifySignal()) {
-      connect(object.data(), property.notifySignal(), this, onObjectPropertyChangedMethod);
+      connect(object.data(), property.notifySignal(), this, onObjectPropertyChangedMethod, Qt::UniqueConnection);
     } else {
       if (classBase->getIdProperty()->getName() != propertyName)
         qWarning() << QString("Property %1 from class %2 has not Notify signal!")

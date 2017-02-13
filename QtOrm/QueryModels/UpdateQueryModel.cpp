@@ -21,31 +21,33 @@ void UpdateQueryModel::buildModel() {
 QSharedPointer<QueryTableModel> UpdateQueryModel::buildQueryTableModel() {
   QSharedPointer<QueryTableModel> queryTableModel = QSharedPointer<QueryTableModel>::create();
   queryTableModel->setName(classBase->getTable());
+
+  idColumn = classBase->getColumnIdProperty();
   for (auto property : classBase->getProperties()) {
     if (property->getIsId()) {
-      idColumn = property->getColumn();
       continue;
     }
 
     queryTableModel->addColumn(property->getColumn());
   }
 
-  for (QSharedPointer<OneToOne> oneToOne : classBase->getOneToOneRelations())
-    queryTableModel->addColumn(oneToOne->getTableColumn());
+  for (QSharedPointer<OneToOne> oneToOne : classBase->getOneToOneRelations()){
+    QString oneToOneColumn = oneToOne->getTableColumn();
+    if(!queryTableModel->getColumns().contains(oneToOneColumn)){
+      queryTableModel->addColumn(oneToOneColumn);
+    }
+  }
 
   return queryTableModel;
 }
 
 QString UpdateQueryModel::buildSql() {
-  QString setClause;
+  QStringList setClause;
   for (QString column : mainTableModel->getColumns()) {
-    if (setClause.isEmpty())
-      setClause += QString("%1 = :%1").arg(column);
-    else
-      setClause += QString(", %1 = :%1").arg(column);
+    setClause << QString("%1 = :%1").arg(column);
   }
 
-  return updateTemplate.arg(mainTableModel->getName()).arg(setClause).arg(idColumn);
+  return updateTemplate.arg(mainTableModel->getName()).arg(setClause.join(", ")).arg(idColumn);
 }
 }
 }

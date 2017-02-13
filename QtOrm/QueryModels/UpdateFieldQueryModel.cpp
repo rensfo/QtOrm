@@ -26,12 +26,7 @@ void UpdateFieldQueryModel::setPropertyName(const QString &value) {
 QSharedPointer<QueryTableModel> UpdateFieldQueryModel::buildQueryTableModel() {
   QSharedPointer<QueryTableModel> queryTableModel = QSharedPointer<QueryTableModel>::create();
   queryTableModel->setName(classBase->getTable());
-  for (auto property : classBase->getProperties()) {
-    if (property->getIsId()) {
-      idColumn = property->getColumn();
-      continue;
-    }
-  }
+  idColumn = classBase->getColumnIdProperty();
 
   QString tableColumnName = "";
   if (classBase->containsProperty(propertyName)) {
@@ -43,9 +38,6 @@ QSharedPointer<QueryTableModel> UpdateFieldQueryModel::buildQueryTableModel() {
   }
 
   queryTableModel->addColumn(tableColumnName);
-
-  for (QSharedPointer<OneToOne> oneToOne : classBase->getOneToOneRelations())
-    queryTableModel->addColumn(oneToOne->getTableColumn());
 
   return queryTableModel;
 }

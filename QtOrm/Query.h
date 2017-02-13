@@ -105,6 +105,7 @@ protected:
   GroupConditions replacePropertyToColumn(QSharedPointer<ClassMapBase> &classBase, const GroupConditions &conditions);
   QList<OrderColumn> replacePropertyToColumn(QSharedPointer<ClassMapBase> &classBase, const QList<OrderColumn> &orderColumns);
   QString getColumn(QSharedPointer<ClassMapBase> &classBase, const QString &property);
+  void connectToAllProperties(QSharedPointer<QObject> &object);
 
 protected:
   QSharedPointer<Registry> registry;
