@@ -442,6 +442,7 @@ void Query::setRegistry(QSharedPointer<Registry> value) {
 }
 
 Query &Query::operator=(const Query &other) {
+  updater = other.getUpdater();
   registry = other.getRegistry();
   database = other.getDatabase();
   queryCache = other.getQueryCache();
