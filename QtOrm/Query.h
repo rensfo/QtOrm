@@ -70,7 +70,7 @@ protected:
   QSharedPointer<QObject> getObject(const QSqlRecord &record, const QSharedPointer<ClassMapBase> &classBase,
                                     const QString &tableAlias, QSharedPointer<QueryTableModel> queryTableModel);
   void objectSetProperty(QSharedPointer<QObject> object, const QString &propertyName, const QVariant &value);
-  QSharedPointer<QObject> createNewInstance(QSharedPointer<ClassMapBase> classBase);
+  QSharedPointer<QObject> createNewInstance(QSharedPointer<ClassMapBase> classBase, const QSqlRecord &record, const QSharedPointer<QueryTableModel> &model);
   bool registryContainsObject(QSharedPointer<ClassMapBase> classBase, const QSqlRecord &record,
                             const QString &tableAlias);
   QSharedPointer<QObject> getObjectFromRegistry(QSharedPointer<ClassMapBase> classBase, const QSqlRecord &record,

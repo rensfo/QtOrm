@@ -30,5 +30,17 @@ bool ConfigurationMap::isRegisterClass(const QString &className) {
 QStringList ConfigurationMap::getRegistredClasses() {
   return mappedClass.keys();
 }
+
+QList<QSharedPointer<ClassMapBase>> ConfigurationMap::getDerrivedClasses(const QString& value)
+{
+  QList<QSharedPointer<ClassMapBase>> derrivedClasses;
+  for(auto map : mappedClass.values())
+  {
+    if(map->isSubclass() && map->getSuperClassName() == value)
+      derrivedClasses << map;
+  }
+
+  return derrivedClasses;
+}
 }
 }

@@ -139,7 +139,7 @@ QList<QSharedPointer<T>> Session::getList(const GroupConditions &conditions) {
 
 template <class T>
 QList<QSharedPointer<QObject>> Session::getObjectList() {
-  return getObjectList<T>(QString(), QVariant());
+  return getObjectList<T>(GroupConditions());
 }
 
 template <class T>

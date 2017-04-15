@@ -199,8 +199,12 @@ QSharedPointer<QueryTableModel> SelectQueryModel::buildQueryTableModel(QSharedPo
   QSharedPointer<QueryTableModel> queryTableModel = QSharedPointer<QueryTableModel>::create();
   queryTableModel->setName(classBase->getTable());
 
-  for (auto property : classBase->getProperties()) {
-    queryTableModel->addColumn(property->getColumn());
+  queryTableModel->addColumns(classBase->getColumns());
+
+  QList<QSharedPointer<ClassMapBase>> derrivedClasses = ConfigurationMap::getDerrivedClasses(classBase->getClassName());
+  if (!derrivedClasses.isEmpty()) {
+    for (auto classMapBase : derrivedClasses)
+      queryTableModel->addColumns(classMapBase->getColumns());
   }
 
   for (auto oneToOne : classBase->getOneToOneRelations()) {

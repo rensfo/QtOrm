@@ -11,9 +11,9 @@
 
 #include "ConfigurationMap.h"
 #include "GroupConditions.h"
-#include "Relations/OneToOne.h"
 #include "QueryCache.h"
 #include "QueryModels/QueryModel.h"
+#include "Relations/OneToOne.h"
 
 namespace QtOrm {
 namespace Sql {
@@ -47,7 +47,6 @@ public:
 
   QSharedPointer<QueryCache> getQueryCache() const;
   void setQueryCache(QSharedPointer<QueryCache> value);
-
 
   QList<OrderColumn> getOrderBy() const;
   void setOrderBy(const QList<OrderColumn> &value);

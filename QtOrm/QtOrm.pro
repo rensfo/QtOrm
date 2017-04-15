@@ -42,7 +42,8 @@ HEADERS += PropertyMap.h \
     Conditions/Operation.h \
     Conditions/Condition.h \
     Registry.h \
-    QueryModels/OrderColumn.h
+    QueryModels/OrderColumn.h \
+    SubclassMap.h
 
 SOURCES += PropertyMap.cpp \
     ConfigurationMap.cpp \

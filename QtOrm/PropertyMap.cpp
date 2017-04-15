@@ -3,7 +3,7 @@
 namespace QtOrm {
 namespace Mapping {
 
-PropertyMap::PropertyMap() : isId(false) {
+PropertyMap::PropertyMap() {
 }
 
 PropertyMap::PropertyMap(QString name) : PropertyMap() {
@@ -40,6 +40,15 @@ PropertyMap &PropertyMap::setIsId(bool isId) {
 
 bool PropertyMap::getIsId() {
   return isId;
+}
+
+bool PropertyMap::getIsDiscriminator() const {
+  return isDiscriminator;
+}
+
+PropertyMap &PropertyMap::setIsDiscriminator(bool value) {
+  isDiscriminator = value;
+  return *this;
 }
 }
 }

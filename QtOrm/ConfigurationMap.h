@@ -26,6 +26,7 @@ public:
   static QStringList getRegistredClasses();
   template <typename T>
   static void checkParent();
+  static QList<QSharedPointer<ClassMapBase> > getDerrivedClasses(const QString& value);
 
 protected:
   template <class ... Args>

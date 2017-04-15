@@ -24,10 +24,14 @@ public:
   QString getUpdateFunction() const;
   void setUpdateFunction(const QString &value);
 
+  bool getIsDiscriminator() const;
+  PropertyMap &setIsDiscriminator(bool value);
+
 private:
   QString name;
   QString column;
-  bool isId;
+  bool isId = false;
+  bool isDiscriminator = false;
 };
 }
 }

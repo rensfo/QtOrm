@@ -26,7 +26,8 @@ QStringList sqlCreateSqlite{
     "create table D(id integer primary key autoincrement, idKindA integer, foreign key (idKindA)  references "
     "KindA(id))",
     "create table E(id integer primary key autoincrement, idC integer, idD integer, foreign key (idC)  references "
-    "C(id), foreign key (idD)  references D(id))"};
+    "C(id), foreign key (idD)  references D(id))",
+    "create table super_class_s(id integer primary key autoincrement, type integer not null, code text, int_val integer, str_val text)"};
 
 QStringList sqlFill{"insert into TypeA(code, name) values('code1', 'value1');",
                     "insert into TypeA(code, name) values('code2', 'value2');",
@@ -42,6 +43,10 @@ QStringList sqlFill{"insert into TypeA(code, name) values('code1', 'value1');",
                     "insert into B(idA, code) values(2, 'code2.3');",
                     "insert into C(idKindA) values(1);",
                     "insert into D(idKindA) values(2);",
-                    "insert into E(idC, idD) values(1, 1);"};
+                    "insert into E(idC, idD) values(1, 1);",
+                    "insert into super_class_s(type, code, int_val) values(1, 'one', 1);",
+                    "insert into super_class_s(type, code, int_val) values(1, 'three', 3);",
+                    "insert into super_class_s(type, code, str_val) values(2, 'two', 'Два');",
+                    "insert into super_class_s(type, code, str_val) values(2, 'four', 'Четыре');"};
 
 #endif // DML_H

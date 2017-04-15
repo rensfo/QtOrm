@@ -19,7 +19,13 @@ void QueryTableModel::clearJoins() {
 }
 
 void QueryTableModel::addColumn(const QString &name) {
-  columns.append(name);
+  if(!columns.contains(name))
+    columns.append(name);
+}
+
+void QueryTableModel::addColumns(const QStringList &names) {
+  for(auto n : names)
+    addColumn(n);
 }
 
 QList<QSharedPointer<QueryJoin>> QueryTableModel::getJoins() const {

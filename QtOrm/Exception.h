@@ -35,6 +35,11 @@ public:
   using Exception::Exception;
 };
 
+class DiscriminatorPropertyAlreadyRegistredException : public Exception {
+public:
+  using Exception::Exception;
+};
+
 class PropertyNotFoundException : public Exception {
 public:
   using Exception::Exception;

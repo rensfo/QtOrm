@@ -32,7 +32,13 @@ HEADERS += \
     $$QUERY_MODELS_TEST_PATH/D.h \
     $$QUERY_MODELS_TEST_PATH/E.h \
     $$QUERY_MODELS_TEST_PATH/DMap.h \
-    $$QUERY_MODELS_TEST_PATH/EMap.h
+    $$QUERY_MODELS_TEST_PATH/EMap.h \
+    $$QUERY_MODELS_TEST_PATH/SuperClassS.h \
+    $$QUERY_MODELS_TEST_PATH/SubClassS1.h \
+    $$QUERY_MODELS_TEST_PATH/SubClassS2.h \
+    $$QUERY_MODELS_TEST_PATH/SuperClassSMap.h \
+    $$QUERY_MODELS_TEST_PATH/SubClassS1Map.h \
+    $$QUERY_MODELS_TEST_PATH/SubClassS2Map.h
 
 SOURCES += tst_QueryResultTestTest.cpp \
     $$QUERY_MODELS_TEST_PATH/A.cpp \
@@ -41,7 +47,10 @@ SOURCES += tst_QueryResultTestTest.cpp \
     $$QUERY_MODELS_TEST_PATH/B.cpp \
     $$QUERY_MODELS_TEST_PATH/D.cpp \
     $$QUERY_MODELS_TEST_PATH/E.cpp \
-    $$QUERY_MODELS_TEST_PATH/C.cpp
+    $$QUERY_MODELS_TEST_PATH/C.cpp \
+    $$QUERY_MODELS_TEST_PATH/SuperClassS.cpp \
+    $$QUERY_MODELS_TEST_PATH/SubClassS1.cpp \
+    $$QUERY_MODELS_TEST_PATH/SubClassS2.cpp
 
 QTORM_PATH = $$PWD/../../QtOrm
 QTORM_QUERY_MODELS_PATH = $$QTORM_PATH/QueryModels

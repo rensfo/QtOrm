@@ -58,8 +58,10 @@ QList<QSharedPointer<QObject>> Query::getListObject(const QString &className, co
   QSharedPointer<ClassMapBase> classBase = ConfigurationMap::getMappedClass(className);
 
   SimpleSqlBuilder sqlBuilder = createSimpleSqlBuilder(classBase);
+
   QList<OrderColumn> replacedOrderBy = replacePropertyToColumn(classBase, orderBy);
   sqlBuilder.setOrderBy(replacedOrderBy);
+
   GroupConditions replacedConditions = replacePropertyToColumn(classBase, conditions);
   sqlBuilder.setConditions(replacedConditions);
 
@@ -225,7 +227,12 @@ void Query::fillOneToMany(const QList<QSharedPointer<OneToMany>> &relations, con
     QString column = oneToMany->getColumn();
     QVariant value = object->property(idProperty.toStdString().data());
 
-    QList<QSharedPointer<QObject>> qobjectList = getListObject(refClass, column, value, oneToMany->getOrderBy());
+    GroupConditions where;
+    where.addCondition(column, Operation::Equal, QVariantList{value});
+    if (!oneToMany->getCondition().isEmpty())
+      where.addGroup(oneToMany->getCondition());
+
+    QList<QSharedPointer<QObject>> qobjectList = getListObject(refClass, where, oneToMany->getOrderBy());
 
     QSharedPointer<ClassMapBase> refClassBase = ConfigurationMap::getMappedClass(oneToMany->getRefClass());
     QVariant var = refClassBase->getVariantByObjectList(qobjectList);
@@ -260,7 +267,7 @@ QSharedPointer<QObject> Query::getObject(const QSqlRecord &record, const QShared
   if (registryContainsObject(classBase, record, tableAlias)) {
     object = getObjectFromRegistry(classBase, record, tableAlias);
   } else {
-    object = createNewInstance(classBase);
+    object = createNewInstance(classBase, record, queryTableModel);
     insertObjectIntoRegistry(classBase, record, object, tableAlias);
 
     fillObject(object, queryTableModel, record);
@@ -281,10 +288,33 @@ void Query::objectSetProperty(QSharedPointer<QObject> object, const QString &pro
   }
 }
 
-QSharedPointer<QObject> Query::createNewInstance(QSharedPointer<ClassMapBase> classBase) {
-  QSharedPointer<QObject> newObject = QSharedPointer<QObject>(classBase->getMetaObject().newInstance());
-  if (!newObject) {
-    throw InstanceNotCreatedException("Object instance did not created(Missed Q_INVOKABLE in constructor?)");
+QSharedPointer<QObject> Query::createNewInstance(QSharedPointer<ClassMapBase> classBase, const QSqlRecord &record,
+                                                 const QSharedPointer<QueryTableModel> &model) {
+  QSharedPointer<QObject> newObject;
+  auto derrivedClasses = ConfigurationMap::getDerrivedClasses(classBase->getClassName());
+  if(derrivedClasses.isEmpty())
+  {
+    newObject = QSharedPointer<QObject>(classBase->getMetaObject().newInstance());
+  }
+  else
+  {
+    QString discrimanatorColumn = getQueryColumn(model, classBase->getDiscriminatorProperty());
+    QVariant recordValue = record.value(discrimanatorColumn);
+    for(auto dc : derrivedClasses)
+    {
+      QVariant discrimanatorValue = dc->getDiscrimanatorValue();
+      if(recordValue == discrimanatorValue)
+      {
+        newObject = QSharedPointer<QObject>(dc->getMetaObject().newInstance());
+        break;
+      }
+    }
+  }
+
+  if (!newObject)
+  {
+    QString message = QString("Object(%1) instance did not created(Missed Q_INVOKABLE in constructor?)").arg(classBase->getClassName());
+    throw InstanceNotCreatedException(message);
   }
   return newObject;
 }
@@ -305,22 +335,13 @@ QSharedPointer<QObject> Query::getObjectFromRegistry(QSharedPointer<ClassMapBase
 
 void Query::insertObjectIntoRegistry(QSharedPointer<ClassMapBase> classBase, const QSqlRecord &record,
                                      QSharedPointer<QObject> object, const QString &tableAlias) {
-  QString idColumn;
-  if (tableAlias.isEmpty()) {
-    idColumn = classBase->getIdProperty()->getColumn();
-  } else {
-    idColumn = tableAlias + "_" + classBase->getIdProperty()->getColumn();
-  }
-
-  QVariant idValue = record.value(idColumn);
-
+  QVariant idValue = getIdFromRecord(classBase, record, tableAlias);
   insertObjectIntoRegistry(classBase, object, idValue);
 }
 
 void Query::insertObjectIntoRegistry(QSharedPointer<ClassMapBase> classBase, QSharedPointer<QObject> object,
                                      QVariant idValue) {
   QString tableName = classBase->getTable();
-
   registry->insert(tableName, idValue.toString(), object);
 }
 
@@ -330,7 +351,10 @@ void Query::removeObjectFromRegistry(QSharedPointer<QObject> object) {
 
 QVariant Query::getIdFromRecord(QSharedPointer<ClassMapBase> classBase, const QSqlRecord &record,
                                 const QString &tableAlias) {
-  QString idColumn = tableAlias + "_" + classBase->getIdProperty()->getColumn();
+  QString idColumn = classBase->getColumnIdProperty();
+  if (!tableAlias.isEmpty())
+    idColumn = tableAlias + "_" + idColumn;
+
   return record.value(idColumn);
 }
 
@@ -548,8 +572,7 @@ QString Query::getColumn(QSharedPointer<ClassMapBase> &classBase, const QString 
   return property;
 }
 
-void Query::connectToAllProperties(QSharedPointer<QObject> &object)
-{
+void Query::connectToAllProperties(QSharedPointer<QObject> &object) {
   if (updater) {
     updater->connectToAllProperties(object);
   }

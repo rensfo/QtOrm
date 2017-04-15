@@ -7,6 +7,7 @@
 #include <QObject>
 #include <QSharedPointer>
 #include <QString>
+#include <qvariant.h>
 
 #include "Exception.h"
 #include "Relations/OneToMany.h"
@@ -21,49 +22,72 @@ class ClassMapBase : public QObject {
 public:
   explicit ClassMapBase(QObject *parent = nullptr);
 
-  QString getTable() const;
+  virtual QString getTable() const;
   void setTable(const QString &table);
 
   QString getClassName() const;
 
-  const QMap<QString, QSharedPointer<PropertyMap>> getProperties() const;
+  virtual QMap<QString, QSharedPointer<PropertyMap>> getProperties();
 
   PropertyMap &id(QString propertyName);
+  PropertyMap& id(const QString& propertyName, const QString& columnName);
+  PropertyMap& discriminator(const QString& propertyName);
+  PropertyMap& discriminator(const QString& propertyName, const QString& columnName);
   PropertyMap &map(QString propertyName);
   PropertyMap &map(QString propertyName, QString columnName);
 
   QMetaObject getMetaObject() const;
   void setMetaObject(const QMetaObject &classMetaObject);
 
-  QSharedPointer<PropertyMap> getIdProperty() const;
-  QString getColumnIdProperty();
-  QString getIdPropertyName();
+  virtual QSharedPointer<PropertyMap> getIdProperty() const;
+  virtual QString getColumnIdProperty() const;
+  virtual QString getIdPropertyName() const;
 
-  QSharedPointer<PropertyMap> getProperty(const QString &property);
-  QString getPropertyColumn(const QString &property);
+  virtual QSharedPointer<PropertyMap> getProperty(const QString &property);
+  virtual QString getPropertyColumn(const QString &property);
 
   OneToMany &oneToMany(const QString &property);
   OneToOne &oneToOne(const QString &property);
 
-  QList<QSharedPointer<OneToMany>> getOneToManyRelations() const;
-  QList<QSharedPointer<OneToOne>> getOneToOneRelations() const;
+  virtual QList<QSharedPointer<OneToMany>> getOneToManyRelations() const;
+  virtual QList<QSharedPointer<OneToOne>> getOneToOneRelations() const;
 
   virtual QVariant getVariantByObjectList(QList<QSharedPointer<QObject>> value) = 0;
   virtual QList<QSharedPointer<QObject>> getObjectListByVariant(QVariant &value) = 0;
   virtual QVariant getVariantByObject(QSharedPointer<QObject> value) = 0;
   virtual QSharedPointer<QObject> getObjectByVariant(QVariant &value) = 0;
 
-  QSharedPointer<OneToOne> findOneToOneByPropertyName(const QString &propertyName);
-  QSharedPointer<OneToMany> findOneToManyByPropertyName(const QString &propertyName);
+  virtual QSharedPointer<OneToOne> findOneToOneByPropertyName(const QString &propertyName);
+  virtual QSharedPointer<OneToMany> findOneToManyByPropertyName(const QString &propertyName);
 
   static QString getTypeNameOfProperty(QSharedPointer<QObject> obj, const QString &prop);
   static QString getTypeNameOfProperty(const QMetaObject &meta, const QString &prop);
 
-  bool containsProperty(const QString &propertyName);
+  virtual bool containsProperty(const QString &propertyName) const;
+  bool isSubclass() const;
+
+  QString getDiscriminatorPropertyName() const;
+  QString getDiscrimanatorColumn() const;
+  void setDiscriminatorProperty(const QString& value);
+  QSharedPointer<PropertyMap> getDiscriminatorProperty() const;
+
+  QString getSuperClassName() const;
+  QStringList getColumns();
+
+  QVariant getDiscrimanatorValue() const;
+  void setDiscrimanatorValue(const QVariant& value);
+
+  QSharedPointer<ClassMapBase> getSuperClass() const;
+
+protected:
+  void setSuperClass(const QSharedPointer<ClassMapBase>& value);
 
 private:
   PropertyMap &createProperty(QString propertyName);
   void checkToExistProperty(const QString &property);
+
+protected:
+  QVariant discrimanatorValue;
 
 private:
   QString table;
@@ -72,8 +96,10 @@ private:
   QList<QSharedPointer<OneToOne>> oneToOneRelations;
 
   QString idProperty;
+  QString discriminatorProperty;
 
   QMetaObject classMetaObject;
+  QSharedPointer<ClassMapBase> superClass;
 };
 }
 }

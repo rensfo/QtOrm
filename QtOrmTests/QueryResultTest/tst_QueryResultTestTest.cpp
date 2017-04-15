@@ -11,6 +11,9 @@
 #include "Exception.h"
 #include "KindAMap.h"
 #include "Session.h"
+#include "SubClassS1Map.h"
+#include "SubClassS2Map.h"
+#include "SuperClassSMap.h"
 #include "TypeAMap.h"
 #include "dml.h"
 
@@ -48,6 +51,8 @@ private Q_SLOTS:
   void operationLess();
   void operationLessOrEqual();
   void operationLike();
+  void inheritensOneTablePerHierarchySelect();
+  void inheritensOneTablePerHierarchyInsert();
 
 private:
   bool openConnection();
@@ -151,11 +156,11 @@ void QueryResultTestTest::insertObject() {
 
     session.clearRegistry();
 
-//    a->deleteLater();
+    //    a->deleteLater();
 
     a = session.get<A>("code_1", "code10");
 
-//    a->deleteLater();
+    //    a->deleteLater();
 
     QVERIFY(a);
   } catch (QtOrm::Exception &e) {
@@ -210,10 +215,9 @@ void QueryResultTestTest::where() {
   QCOMPARE(a.count(), 1);
 }
 
-void QueryResultTestTest::orderBy()
-{
+void QueryResultTestTest::orderBy() {
   try {
-//            connect(&session, &Session::executedSql, [](QString sql){ qDebug() << sql; });
+    //            connect(&session, &Session::executedSql, [](QString sql){ qDebug() << sql; });
     session.clearRegistry();
     QSharedPointer<A> a = session.getById<A>(2);
 
@@ -255,8 +259,9 @@ void QueryResultTestTest::refreshChildObject() {
     if (query.exec("update B set code = 'code2.2.1' where code = 'code2.2'")) {
       session.refresh(a);
 
-      std::function<bool(QSharedPointer<B>)> func =
-          [](QSharedPointer<B> item) { return item->getCode() == "code2.2.1"; };
+      std::function<bool(QSharedPointer<B>)> func = [](QSharedPointer<B> item) {
+        return item->getCode() == "code2.2.1";
+      };
       QSharedPointer<B> updatedB = this->find<QSharedPointer<B>>(a->getChild(), func);
       QVERIFY(updatedB != nullptr);
       if (updatedB) {
@@ -428,6 +433,37 @@ void QueryResultTestTest::operationLike() {
   QVERIFY(false);
 }
 
+void QueryResultTestTest::inheritensOneTablePerHierarchySelect() {
+  try {
+    auto supers = session.getList<SuperClassS>();
+
+    for (auto s : supers) {
+      bool result = true;
+      if (s->getId() == 1 || s->getId() == 2)
+        result = qobject_cast<SubClassS1 *>(s);
+      else
+        result = qobject_cast<SubClassS2 *>(s);
+
+      if (!result)
+        QVERIFY(false);
+    }
+    QVERIFY(true);
+    return;
+  } catch (QtOrm::Exception &e) {
+    qDebug() << e.getMessage();
+  }
+  QVERIFY(false);
+}
+
+void QueryResultTestTest::inheritensOneTablePerHierarchyInsert() {
+  try {
+
+  } catch (QtOrm::Exception &e) {
+    qDebug() << e.getMessage();
+  }
+  QVERIFY(false);
+}
+
 bool QueryResultTestTest::openConnection() {
   dropDatabase(dbName);
 
@@ -445,7 +481,8 @@ void QueryResultTestTest::configurateSession() {
 }
 
 void QueryResultTestTest::registerClasses() {
-  ConfigurationMap::addMappings<AMap, KindAMap, TypeAMap, BMap, CMap, DMap, EMap>();
+  ConfigurationMap::addMappings<AMap, KindAMap, TypeAMap, BMap, CMap, DMap, EMap, SuperClassSMap, SubClassS1Map,
+                                SubClassS2Map>();
 }
 
 bool QueryResultTestTest::createTables() {

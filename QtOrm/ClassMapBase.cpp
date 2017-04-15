@@ -16,7 +16,7 @@ void ClassMapBase::setTable(const QString &table) {
   this->table = table;
 }
 
-const QMap<QString, QSharedPointer<PropertyMap>> ClassMapBase::getProperties() const {
+QMap<QString, QSharedPointer<PropertyMap>> ClassMapBase::getProperties() {
   return properties;
 }
 
@@ -32,6 +32,24 @@ PropertyMap &ClassMapBase::id(QString propertyName) {
 
   idProperty = propertyName;
   return createProperty(propertyName).setColumn(propertyName).setIsId(true);
+}
+
+PropertyMap &ClassMapBase::id(const QString &propertyName, const QString &columnName) {
+  return id(propertyName).setColumn(columnName);
+}
+
+PropertyMap &ClassMapBase::discriminator(const QString &propertyName) {
+  if (!discriminatorProperty.isEmpty()) {
+    QString errorText = QString::fromUtf8("Discriminator field registred (%1.%2)").arg(getClassName()).arg(idProperty);
+    throw DiscriminatorPropertyAlreadyRegistredException(errorText);
+  }
+
+  discriminatorProperty = propertyName;
+  return createProperty(propertyName).setColumn(propertyName).setIsDiscriminator(true);
+}
+
+PropertyMap &ClassMapBase::discriminator(const QString &propertyName, const QString &columnName) {
+  return discriminator(propertyName).setColumn(columnName);
 }
 
 PropertyMap &ClassMapBase::map(QString propertyName) {
@@ -63,11 +81,11 @@ QSharedPointer<PropertyMap> ClassMapBase::getIdProperty() const {
   return properties.value(idProperty);
 }
 
-QString ClassMapBase::getColumnIdProperty() {
+QString ClassMapBase::getColumnIdProperty() const {
   return properties.value(idProperty)->getColumn();
 }
 
-QString ClassMapBase::getIdPropertyName() {
+QString ClassMapBase::getIdPropertyName() const {
   return properties.value(idProperty)->getName();
 }
 
@@ -153,8 +171,56 @@ QString ClassMapBase::getTypeNameOfProperty(const QMetaObject &meta, const QStri
   return refClass;
 }
 
-bool ClassMapBase::containsProperty(const QString &propertyName) {
+bool ClassMapBase::containsProperty(const QString &propertyName) const {
   return properties.contains(propertyName);
+}
+
+bool ClassMapBase::isSubclass() const {
+  return superClass.data();
+}
+
+QString ClassMapBase::getDiscriminatorPropertyName() const {
+  return discriminatorProperty;
+}
+
+QString ClassMapBase::getDiscrimanatorColumn() const {
+  return properties.value(discriminatorProperty)->getColumn();
+}
+
+void ClassMapBase::setDiscriminatorProperty(const QString &value) {
+  discriminatorProperty = value;
+}
+
+QSharedPointer<PropertyMap> ClassMapBase::getDiscriminatorProperty() const {
+  return properties.value(discriminatorProperty);
+}
+
+QString ClassMapBase::getSuperClassName() const {
+  return superClass->getClassName();
+}
+
+QStringList ClassMapBase::getColumns() {
+  QStringList columns;
+  for (auto property : getProperties())
+    columns << property->getColumn();
+
+  return columns;
+}
+
+QVariant ClassMapBase::getDiscrimanatorValue() const {
+  return discrimanatorValue;
+}
+
+void ClassMapBase::setDiscrimanatorValue(const QVariant &value) {
+  discrimanatorValue = value;
+}
+
+QSharedPointer<ClassMapBase> ClassMapBase::getSuperClass() const {
+  return superClass;
+}
+
+void ClassMapBase::setSuperClass(const QSharedPointer<ClassMapBase> &value) {
+  superClass = value;
 }
 
 QList<QSharedPointer<OneToMany>> ClassMapBase::getOneToManyRelations() const {

@@ -19,6 +19,7 @@ public:
   void clearJoins();
 
   void addColumn(const QString &name);
+  void addColumns(const QStringList& names);
 
   QList<QSharedPointer<QueryJoin>> getJoins() const;
 
