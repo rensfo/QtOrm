@@ -27,7 +27,7 @@ QSqlQuery SqlBuilderBase::selectQuery() {
   query.prepare(queryModel->getSqlText());
 
   QSharedPointer<SelectQueryModel> selectQueryModel = queryModel.dynamicCast<SelectQueryModel>();
-  QSharedPointer<GroupConditions> sharedConditions = QSharedPointer<GroupConditions>::create(conditions);
+  QSharedPointer<GroupConditions> sharedConditions = QSharedPointer<GroupConditions>::create(selectQueryModel->getConditions());
   bindValues(query, sharedConditions, selectQueryModel->getConditionPlaceholder());
   selectQueryModel->clearPlaceHolders();
 
@@ -77,6 +77,7 @@ QSharedPointer<QueryModel> SqlBuilderBase::getQueryModel(QueryModelType queryTyp
         selectModel->setConditions(conditions);
         selectModel->setOrderColumns(orderBy);
       }
+      model->buildModel();
       return model;
     }
   }

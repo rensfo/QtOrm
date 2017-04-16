@@ -66,10 +66,10 @@ public:
   virtual bool containsProperty(const QString &propertyName) const;
   bool isSubclass() const;
 
-  QString getDiscriminatorPropertyName() const;
-  QString getDiscrimanatorColumn() const;
+  virtual QString getDiscriminatorPropertyName() const;
+  virtual QString getDiscrimanatorColumn() const;
   void setDiscriminatorProperty(const QString& value);
-  QSharedPointer<PropertyMap> getDiscriminatorProperty() const;
+  virtual QSharedPointer<PropertyMap> getDiscriminatorProperty() const;
 
   QString getSuperClassName() const;
   QStringList getColumns();

@@ -62,8 +62,17 @@ QList<QSharedPointer<QObject>> Query::getListObject(const QString &className, co
   QList<OrderColumn> replacedOrderBy = replacePropertyToColumn(classBase, orderBy);
   sqlBuilder.setOrderBy(replacedOrderBy);
 
+  GroupConditions resultWhere;
+  if(classBase->isSubclass()){
+    resultWhere.addEqual(classBase->getDiscrimanatorColumn(), classBase->getDiscrimanatorValue());
+  }
+
   GroupConditions replacedConditions = replacePropertyToColumn(classBase, conditions);
-  sqlBuilder.setConditions(replacedConditions);
+  if(!replacedConditions.isEmpty()){
+    resultWhere.addGroup(replacedConditions);
+  }
+
+  sqlBuilder.setConditions(resultWhere);
 
   QSqlQuery query = sqlBuilder.selectQuery();
   executeQuery(query);

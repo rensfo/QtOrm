@@ -51,10 +51,13 @@ private Q_SLOTS:
   void operationLess();
   void operationLessOrEqual();
   void operationLike();
-  void inheritensOneTablePerHierarchySelect();
-  void inheritensOneTablePerHierarchyInsert();
+  // OneTablePerHierarchy
+  void OneTablePerHierarchySelect();
+  void OneTablePerHierarchyConcreteSelect();
+  void OneTablePerHierarchyInsert();
 
 private:
+  void enableLogSql();
   bool openConnection();
   void configurateSession();
   void registerClasses();
@@ -364,7 +367,6 @@ void QueryResultTestTest::operationIn() {
 
 void QueryResultTestTest::operationGreater() {
   try {
-    //    connect(&session, &Session::executedSql, [](QString sql){ qDebug() << sql; });
     GroupConditions where;
     where.addGreater("id", 3);
     auto listA = session.getList<A>(where);
@@ -433,7 +435,7 @@ void QueryResultTestTest::operationLike() {
   QVERIFY(false);
 }
 
-void QueryResultTestTest::inheritensOneTablePerHierarchySelect() {
+void QueryResultTestTest::OneTablePerHierarchySelect() {
   try {
     auto supers = session.getList<SuperClassS>();
 
@@ -455,13 +457,28 @@ void QueryResultTestTest::inheritensOneTablePerHierarchySelect() {
   QVERIFY(false);
 }
 
-void QueryResultTestTest::inheritensOneTablePerHierarchyInsert() {
+void QueryResultTestTest::OneTablePerHierarchyConcreteSelect() {
+  try {
+    auto subs = session.getList<SubClassS1>();
+    QCOMPARE(subs.count(), 2);
+    return;
+  } catch (QtOrm::Exception &e) {
+    qDebug() << e.getMessage();
+  }
+  QVERIFY(false);
+}
+
+void QueryResultTestTest::OneTablePerHierarchyInsert() {
   try {
 
   } catch (QtOrm::Exception &e) {
     qDebug() << e.getMessage();
   }
   QVERIFY(false);
+}
+
+void QueryResultTestTest::enableLogSql() {
+  connect(&session, &Session::executedSql, [](QString sql) { qDebug() << sql; });
 }
 
 bool QueryResultTestTest::openConnection() {
