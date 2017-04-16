@@ -9,7 +9,7 @@ class SubClassS1Map : public QtOrm::Mapping::SubclassMap<SuperClassS, SubClassS1
 public:
   SubClassS1Map()
   {
-    map("intVal", "int_val");
+    map("intVal", "int_val").setNull(0);
     setDiscrimanatorValue(1);
   }
 };

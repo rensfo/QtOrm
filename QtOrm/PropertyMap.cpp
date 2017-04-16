@@ -50,5 +50,14 @@ PropertyMap &PropertyMap::setIsDiscriminator(bool value) {
   isDiscriminator = value;
   return *this;
 }
+
+QVariant PropertyMap::getNull() const {
+  return null;
+}
+
+PropertyMap &PropertyMap::setNull(const QVariant &value) {
+  null = value;
+  return *this;
+}
 }
 }

@@ -51,7 +51,7 @@ private Q_SLOTS:
   void operationLess();
   void operationLessOrEqual();
   void operationLike();
-  // OneTablePerHierarchy
+  void nullValueUpdate();
   void OneTablePerHierarchySelect();
   void OneTablePerHierarchyConcreteSelect();
   void OneTablePerHierarchyInsert();
@@ -352,7 +352,6 @@ void QueryResultTestTest::operationBetween() {
 
 void QueryResultTestTest::operationIn() {
   try {
-    //    connect(&session, &Session::executedSql, [](QString sql){ qDebug() << sql; });
     GroupConditions where;
     where.addIn("id", {3, 4});
     auto listA = session.getList<A>(where);
@@ -428,6 +427,26 @@ void QueryResultTestTest::operationLike() {
     auto listA = session.getList<A>(where);
 
     QCOMPARE(listA.count(), 2);
+    return;
+  } catch (QtOrm::Exception &e) {
+    qDebug() << e.getMessage();
+  }
+  QVERIFY(false);
+}
+
+void QueryResultTestTest::nullValueUpdate() {
+  try {
+    auto sub = session.getById<SubClassS1>(1);
+    sub->setIntVal(0);
+    session.saveObject(sub);
+    if (!query.exec("select int_val from super_class_s where id = 1")) {
+      qDebug() << query.lastError().text();
+      QVERIFY(false);
+      return;
+    }
+
+    query.next();
+    QCOMPARE(query.value("int_val").isNull(), true);
     return;
   } catch (QtOrm::Exception &e) {
     qDebug() << e.getMessage();

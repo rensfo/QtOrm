@@ -8,9 +8,9 @@
 #include "ConfigurationMap.h"
 #include "QueryModels/DeleteQueryModel.h"
 #include "QueryModels/InsertQueryModel.h"
-#include "Relations/OneToMany.h"
 #include "QueryModels/UpdateFieldQueryModel.h"
 #include "QueryModels/UpdateQueryModel.h"
+#include "Relations/OneToMany.h"
 
 namespace QtOrm {
 namespace Sql {
@@ -67,32 +67,24 @@ SimpleSqlBuilder &SimpleSqlBuilder::operator=(const SimpleSqlBuilder &other) {
 }
 
 void SimpleSqlBuilder::bindInsert(QSqlQuery &query) {
-  for (auto prop : classBase->getProperties()) {
+  for (auto &prop : classBase->getProperties()) {
     if (prop->getIsId())
       continue;
-    query.bindValue(getPlaceHolder(prop->getColumn()), object->property(prop->getName().toStdString().c_str()));
+
+    bindQueryParams(query, prop);
   }
 
   for (auto oneToOne : classBase->getOneToOneRelations()) {
-    QVariant valFromProp = object->property(oneToOne->getProperty().toStdString().c_str());
-    QString refClassName = Mapping::ClassMapBase::getTypeNameOfProperty(object, oneToOne->getProperty());
-    QSharedPointer<ClassMapBase> refClassBase = ConfigurationMap::getMappedClass(refClassName);
-    QSharedPointer<QObject> objFromProp = refClassBase->getObjectByVariant(valFromProp);
-    QVariant val;
-    if (objFromProp) {
-      QString propRefClass = refClassBase->getIdProperty()->getName();
-      val = objFromProp->property(propRefClass.toStdString().c_str());
-    }
-    query.bindValue(getPlaceHolder(oneToOne->getTableColumn()), val);
+    bindQueryParams(query, oneToOne);
   }
 }
 
 void SimpleSqlBuilder::bindUpdate(QSqlQuery &query) {
-  for (QSharedPointer<PropertyMap> prop : classBase->getProperties()) {
+  for (auto &prop : classBase->getProperties()) {
     bindQueryParams(query, prop);
   }
 
-  for (QSharedPointer<OneToOne> oneToOne : classBase->getOneToOneRelations()) {
+  for (auto &oneToOne : classBase->getOneToOneRelations()) {
     bindQueryParams(query, oneToOne);
   }
 }
@@ -118,7 +110,11 @@ void SimpleSqlBuilder::bindDelete(QSqlQuery &query) {
 void SimpleSqlBuilder::bindQueryParams(QSqlQuery &query, QSharedPointer<PropertyMap> property) {
   QString placeHolder = getPlaceHolder(property->getColumn());
   QVariant propertyValue = object->property(property->getName().toStdString().c_str());
-  query.bindValue(placeHolder, propertyValue);
+  QVariant resultValue;
+  if (propertyValue != property->getNull()) {
+    resultValue = propertyValue;
+  }
+  query.bindValue(placeHolder, resultValue);
 }
 
 void SimpleSqlBuilder::bindQueryParams(QSqlQuery &query, QSharedPointer<OneToOne> oneToOne) {

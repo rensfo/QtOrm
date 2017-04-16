@@ -29,9 +29,9 @@ QSharedPointer<QueryTableModel> InsertQueryModel::buildQueryTableModel() {
     queryTableModel->addColumn(property->getColumn());
   }
 
-  for (QSharedPointer<OneToOne> oneToOne : classBase->getOneToOneRelations()){
+  for (QSharedPointer<OneToOne> oneToOne : classBase->getOneToOneRelations()) {
     QString oneToOneColumn = oneToOne->getTableColumn();
-    if(!queryTableModel->getColumns().contains(oneToOneColumn)){
+    if (!queryTableModel->getColumns().contains(oneToOneColumn)) {
       queryTableModel->addColumn(oneToOneColumn);
     }
   }
@@ -47,9 +47,14 @@ QString InsertQueryModel::buildSql() {
   }
 
   if (hasLastInsertedIdFeature)
-    return insertTemplateWithLastInsertedId.arg(mainTableModel->getName()).arg(columns.join(", ")).arg(placeholders.join(", "));
+    return insertTemplateWithLastInsertedId.arg(mainTableModel->getName())
+        .arg(columns.join(", "))
+        .arg(placeholders.join(", "));
 
-  return insertTemplate.arg(mainTableModel->getName()).arg(columns.join(", ")).arg(placeholders.join(", ")).arg(idColumn);
+  return insertTemplate.arg(mainTableModel->getName())
+      .arg(columns.join(", "))
+      .arg(placeholders.join(", "))
+      .arg(idColumn);
 }
 
 bool InsertQueryModel::getHasLastInsertedIdFeature() const {

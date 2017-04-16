@@ -2,6 +2,7 @@
 #define PROPERTYMAP_H
 
 #include <QString>
+#include <QVariant>
 
 namespace QtOrm {
 namespace Mapping {
@@ -27,11 +28,15 @@ public:
   bool getIsDiscriminator() const;
   PropertyMap &setIsDiscriminator(bool value);
 
+  QVariant getNull() const;
+  PropertyMap &setNull(const QVariant &value);
+
 private:
   QString name;
   QString column;
   bool isId = false;
   bool isDiscriminator = false;
+  QVariant null;
 };
 }
 }
