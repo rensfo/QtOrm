@@ -15,7 +15,7 @@ public:
   virtual QString getTable() const override;
 
   virtual QSharedPointer<PropertyMap> getIdProperty() const override;
-  virtual QString getColumnIdProperty() const override;
+  virtual QString getIdColumn() const override;
   virtual QString getIdPropertyName() const override;
 
   virtual QSharedPointer<PropertyMap> getProperty(const QString &property) override;
@@ -58,8 +58,8 @@ QSharedPointer<PropertyMap> SubclassMap<SUPER, T>::getIdProperty() const {
 }
 
 template <typename SUPER, typename T>
-QString SubclassMap<SUPER, T>::getColumnIdProperty() const {
-  return this->getSuperClass()->getColumnIdProperty();
+QString SubclassMap<SUPER, T>::getIdColumn() const {
+  return this->getSuperClass()->getIdColumn();
 }
 
 template <typename SUPER, typename T>

@@ -81,7 +81,7 @@ QSharedPointer<PropertyMap> ClassMapBase::getIdProperty() const {
   return properties.value(idProperty);
 }
 
-QString ClassMapBase::getColumnIdProperty() const {
+QString ClassMapBase::getIdColumn() const {
   return properties.value(idProperty)->getColumn();
 }
 

@@ -40,7 +40,7 @@ public:
   void setMetaObject(const QMetaObject &classMetaObject);
 
   virtual QSharedPointer<PropertyMap> getIdProperty() const;
-  virtual QString getColumnIdProperty() const;
+  virtual QString getIdColumn() const;
   virtual QString getIdPropertyName() const;
 
   virtual QSharedPointer<PropertyMap> getProperty(const QString &property);

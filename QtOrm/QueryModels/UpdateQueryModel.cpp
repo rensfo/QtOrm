@@ -22,7 +22,7 @@ QSharedPointer<QueryTableModel> UpdateQueryModel::buildQueryTableModel() {
   QSharedPointer<QueryTableModel> queryTableModel = QSharedPointer<QueryTableModel>::create();
   queryTableModel->setName(classBase->getTable());
 
-  idColumn = classBase->getColumnIdProperty();
+  idColumn = classBase->getIdColumn();
   for (auto property : classBase->getProperties()) {
     if (property->getIsId()) {
       continue;

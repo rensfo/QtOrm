@@ -27,6 +27,7 @@ public:
   template <typename T>
   static void checkParent();
   static QList<QSharedPointer<ClassMapBase> > getDerrivedClasses(const QString& value);
+  static bool isBaseClass(const QString& value);
 
 protected:
   template <class ... Args>

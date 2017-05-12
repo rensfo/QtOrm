@@ -200,29 +200,56 @@ QSharedPointer<QueryTableModel> SelectQueryModel::buildQueryTableModel(QSharedPo
   queryTableModel->setName(classBase->getTable());
 
   queryTableModel->addColumns(classBase->getColumns());
-
+  QList<QSharedPointer<Mapping::OneToOne>> oneToOneRelations = classBase->getOneToOneRelations();
   QList<QSharedPointer<ClassMapBase>> derrivedClasses = ConfigurationMap::getDerrivedClasses(classBase->getClassName());
   if (!derrivedClasses.isEmpty()) {
-    for (auto classMapBase : derrivedClasses)
+    for (auto classMapBase : derrivedClasses) {
       queryTableModel->addColumns(classMapBase->getColumns());
+      for (auto oneToOne : classMapBase->getOneToOneRelations()) {
+        if (!oneToOneRelations.contains(oneToOne)) {
+          oneToOneRelations << oneToOne;
+        }
+      }
+    }
   }
 
-  for (auto oneToOne : classBase->getOneToOneRelations()) {
+  for (auto oneToOne : oneToOneRelations) {
     QSharedPointer<QueryJoin> join = QSharedPointer<QueryJoin>::create();
     join->setType(JoinType::Left);
     join->setLeftTableColumnName(oneToOne->getTableColumn());
 
     QString property = oneToOne->getProperty();
     QString refClass = ClassMapBase::getTypeNameOfProperty(classBase->getMetaObject(), property);
+    if (refClass.isEmpty() && !derrivedClasses.isEmpty()) {
+      for (auto classMapBase : derrivedClasses) {
+        refClass = ClassMapBase::getTypeNameOfProperty(classMapBase->getMetaObject(), property);
+        if (!refClass.isEmpty())
+          break;
+      }
+    }
     QSharedPointer<ClassMapBase> refClassBase = ConfigurationMap::getMappedClass(refClass);
 
     join->setRigthTableColumnName(refClassBase->getIdProperty()->getColumn());
-    join->setQueryTableModel(buildQueryTableModel(refClassBase));
+    join->setQueryTableModel(buildQueryTableModelOneToOne(refClassBase));
 
     queryTableModel->appendJoin(join);
   }
 
   return queryTableModel;
+}
+
+QSharedPointer<QueryTableModel> SelectQueryModel::buildQueryTableModelOneToOne(QSharedPointer<ClassMapBase> classBase)
+{
+  bool isBase = ConfigurationMap::isBaseClass(classBase->getClassName());
+  if (isBase)
+  {
+    QSharedPointer<QueryTableModel> queryTableModel = QSharedPointer<QueryTableModel>::create();
+    queryTableModel->setName(classBase->getTable());
+    queryTableModel->addColumns({classBase->getIdColumn(), classBase->getDiscrimanatorColumn()});
+    return queryTableModel;
+  }
+
+  return buildQueryTableModel(classBase);
 }
 
 QString SelectQueryModel::getSqlText() {

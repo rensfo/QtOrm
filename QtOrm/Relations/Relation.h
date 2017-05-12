@@ -12,9 +12,11 @@ public:
   explicit Relation(QObject *parent = nullptr);
 
   bool getSaveCascade() const;
+  bool getDeleteCascade() const;
 
 protected:
   bool saveCascade = false;
+  bool deleteCascade = false;
 };
 }
 }

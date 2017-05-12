@@ -42,5 +42,10 @@ QList<QSharedPointer<ClassMapBase>> ConfigurationMap::getDerrivedClasses(const Q
 
   return derrivedClasses;
 }
+
+bool ConfigurationMap::isBaseClass(const QString&value)
+{
+  return !getDerrivedClasses(value).isEmpty();
+}
 }
 }

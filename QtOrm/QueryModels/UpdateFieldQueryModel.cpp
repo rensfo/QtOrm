@@ -26,7 +26,7 @@ void UpdateFieldQueryModel::setPropertyName(const QString &value) {
 QSharedPointer<QueryTableModel> UpdateFieldQueryModel::buildQueryTableModel() {
   QSharedPointer<QueryTableModel> queryTableModel = QSharedPointer<QueryTableModel>::create();
   queryTableModel->setName(classBase->getTable());
-  idColumn = classBase->getColumnIdProperty();
+  idColumn = classBase->getIdColumn();
 
   QString tableColumnName = "";
   if (classBase->containsProperty(propertyName)) {

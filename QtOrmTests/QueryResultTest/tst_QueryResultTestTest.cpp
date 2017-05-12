@@ -13,6 +13,7 @@
 #include "Session.h"
 #include "SubClassS1Map.h"
 #include "SubClassS2Map.h"
+#include "SubClassS3Map.h"
 #include "SuperClassSMap.h"
 #include "TypeAMap.h"
 #include "dml.h"
@@ -55,6 +56,7 @@ private Q_SLOTS:
   void OneTablePerHierarchySelect();
   void OneTablePerHierarchyConcreteSelect();
   void OneTablePerHierarchyInsert();
+  void TablePerHierarchySelectWithReference();
 
 private:
   void enableLogSql();
@@ -460,13 +462,20 @@ void QueryResultTestTest::OneTablePerHierarchySelect() {
 
     for (auto s : supers) {
       bool result = true;
-      if (s->getId() == 1 || s->getId() == 2)
+      QList<long> SubClassS1Ids{1, 2};
+      QList<long> SubClassS2Ids{3, 4};
+      if (SubClassS1Ids.contains(s->getId())){
         result = qobject_cast<SubClassS1 *>(s);
-      else
+      } else if(SubClassS2Ids.contains(s->getId())) {
         result = qobject_cast<SubClassS2 *>(s);
+      } else {
+        result = qobject_cast<SubClassS3 *>(s);
+      }
 
-      if (!result)
+      if (!result){
         QVERIFY(false);
+        return;
+      }
     }
     QVERIFY(true);
     return;
@@ -496,6 +505,20 @@ void QueryResultTestTest::OneTablePerHierarchyInsert() {
   QVERIFY(false);
 }
 
+void QueryResultTestTest::TablePerHierarchySelectWithReference()
+{
+  try {
+    QSharedPointer<SubClassS3> subS3 = session.getById<SubClassS3>(5);
+    if(subS3->getRef() && subS3->getRef().objectCast<SubClassS1>()){
+      QVERIFY(true);
+      return;
+    }
+  } catch (QtOrm::Exception &e) {
+    qDebug() << e.getMessage();
+  }
+  QVERIFY(false);
+}
+
 void QueryResultTestTest::enableLogSql() {
   connect(&session, &Session::executedSql, [](QString sql) { qDebug() << sql; });
 }
@@ -518,7 +541,7 @@ void QueryResultTestTest::configurateSession() {
 
 void QueryResultTestTest::registerClasses() {
   ConfigurationMap::addMappings<AMap, KindAMap, TypeAMap, BMap, CMap, DMap, EMap, SuperClassSMap, SubClassS1Map,
-                                SubClassS2Map>();
+                                SubClassS2Map, SubClassS3Map>();
 }
 
 bool QueryResultTestTest::createTables() {

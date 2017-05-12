@@ -28,6 +28,7 @@ public:
   OneToMany &setColumn(const QString &column);
 
   OneToMany &setSaveCascade(bool value);
+  OneToMany &setDeleteCascade(bool value);
   OneToMany &setOrderBy(const QString &property, Sort sort = Sort::ASC);
   OneToMany &setOrderBy(const QList<OrderColumn> &orderBy);
   QList<OrderColumn> getOrderBy();

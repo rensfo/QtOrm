@@ -69,7 +69,7 @@ protected:
                     const QSqlRecord &record);
   QSharedPointer<QObject> getObject(const QSqlRecord &record, const QSharedPointer<ClassMapBase> &classBase,
                                     const QString &tableAlias, QSharedPointer<QueryTableModel> queryTableModel);
-  void objectSetProperty(QSharedPointer<QObject> object, const QString &propertyName, const QVariant &value);
+  void setObjectProperty(QSharedPointer<QObject> object, const QString &propertyName, QVariant&value);
   QSharedPointer<QObject> createNewInstance(QSharedPointer<ClassMapBase> classBase, const QSqlRecord &record, const QSharedPointer<QueryTableModel> &model);
   bool registryContainsObject(QSharedPointer<ClassMapBase> classBase, const QSqlRecord &record,
                             const QString &tableAlias);
@@ -91,6 +91,9 @@ protected:
 
   void saveAllOneToMany(QSharedPointer<QObject> object);
   void saveOneToMany(QSharedPointer<QObject> object, QSharedPointer<OneToMany> oneToMany);
+
+  void deleteAllOneToMany(QSharedPointer<QObject> object);
+  void deleteOneToMany(QSharedPointer<QObject> object, const QSharedPointer<OneToMany> &oneToMany);
 
   void saveObjectWoStartTransaction(QSharedPointer<QObject> object);
 

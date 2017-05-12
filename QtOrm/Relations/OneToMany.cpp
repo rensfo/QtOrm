@@ -35,6 +35,12 @@ OneToMany &OneToMany::setSaveCascade(bool value) {
   return *this;
 }
 
+OneToMany&OneToMany::setDeleteCascade(bool value)
+{
+  deleteCascade = value;
+  return *this;
+}
+
 OneToMany &OneToMany::setOrderBy(const QString &property, Sort sort) {
   return setOrderBy({{property, sort}});
 }

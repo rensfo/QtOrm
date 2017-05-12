@@ -22,6 +22,7 @@ public:
   QString getWhere() const;
 
   QSharedPointer<QueryTableModel> buildQueryTableModel(QSharedPointer<ClassMapBase> classBase);
+  QSharedPointer<QueryTableModel> buildQueryTableModelOneToOne(QSharedPointer<ClassMapBase> classBase);
 
   virtual QString getSqlText() override;
 
