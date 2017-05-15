@@ -5,7 +5,7 @@ install:
  - sudo apt-get install -y qt5-default qttools5-dev-tools
 
 script:
-  - qmake QtOrm.pro -r CONFIG+=debug
+  - qmake QtOrm.pro -r -spec linux-g++ CONFIG+=debug
   - make
   - ./QtOrmTests/QueryModelsTest/tst_QueryModelsTestTest
   - ./QtOrmTests/QueryResultTest/tst_QueryResultTestTest
