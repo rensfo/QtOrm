@@ -1,4 +1,4 @@
-# QtOrm [![Build Status](https://travis-ci.org/rensfo/QtOrm.svg?branch=master)]
+# QtOrm [![Build Status](https://travis-ci.org/rensfo/QtOrm.svg?branch=master)](https://travis-ci.org/rensfo/QtOrm)
 
 #### Features:
 1. Select, save(insert or update) and delete.
