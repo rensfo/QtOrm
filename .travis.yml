@@ -1,8 +1,11 @@
-sudo: requred
+language: cpp
 dist: trusty
+sudo: requred
 
 install:
- - sudo apt-get install -y qt5-default qttools5-dev-tools
+ - sudo add-apt-repository --yes ppa:beineri/opt-qt562-trusty
+ - sudo apt-get update -qq
+ - sudo apt-get -y install qt58base qt58declarative libsqlite3-dev
 
 script:
   - qmake QtOrm.pro -r -spec linux-g++ CONFIG+=debug
