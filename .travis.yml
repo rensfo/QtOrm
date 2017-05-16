@@ -8,7 +8,7 @@ install:
  - sudo apt-get -y install qt56base qt56declarative libsqlite3-dev
 
 script:
-  - Source /opt/qt56/bin/qt56-env.sh
+  - source /opt/qt56/bin/qt56-env.sh
   - /opt/qt56/bin/qmake QtOrm.pro -r -spec linux-g++ CONFIG+=debug
   - make -j2
   - ./QtOrmTests/QueryModelsTest/tst_QueryModelsTestTest

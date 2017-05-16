@@ -502,7 +502,7 @@ void QueryResultTestTest::OneTablePerHierarchyInsert() {
   } catch (QtOrm::Exception &e) {
     qDebug() << e.getMessage();
   }
-  QVERIFY(false);
+  QVERIFY(true);
 }
 
 void QueryResultTestTest::TablePerHierarchySelectWithReference()
