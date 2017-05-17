@@ -152,23 +152,42 @@ QString ClassMapBase::getTypeNameOfProperty(QSharedPointer<QObject> obj, const Q
 }
 
 QString ClassMapBase::getTypeNameOfProperty(const QMetaObject &meta, const QString &prop) {
-  int propertyIndex = meta.indexOfProperty(prop.toStdString().data());
-  QMetaProperty metaProperty = meta.property(propertyIndex);
-  QString refClass = metaProperty.typeName();
+  QString propertyType = getPropertyType(meta, prop);
 
-  QString sharedPointerClassName = "QSharedPointer<";
-
-  if (refClass.contains(sharedPointerClassName)) {
-    int begin = sharedPointerClassName.size();
-    int length = refClass.size() - begin - 1;
-    refClass = refClass.mid(begin, length);
+  QRegExp rx("(\\w+<)*(\\w+)[*]*>*");
+  int pos = rx.indexIn(propertyType);
+  QString result;
+  if (pos > -1) {
+    result = rx.cap(2);
+  } else {
+    result = propertyType;
   }
 
-  if (refClass.right(1) == "*") {
-    refClass = refClass.left(refClass.size() - 1);
+  return result;
+}
+
+TypeKind ClassMapBase::getTypeKindOfProperty(QSharedPointer<QObject> &obj, const QString &prop) {
+  QString propertyType = getPropertyType(*obj->metaObject(), prop);
+
+  auto checker = [propertyType](const QString &pattern) -> bool {
+    QRegExp rx(pattern);
+    int pos = rx.indexIn(propertyType);
+    return pos > -1;
+  };
+
+  std::map<QString, TypeKind> checkPatterns{
+    {"^(QList<)*(.+)[*]>*$", TypeKind::Pointer},
+    {"^(QList<)*QSharedPointer<.+>(>)*$", TypeKind::SharedPointer},
+    {"^(QList<)*QWeakPointer<.+>(>)*$", TypeKind::WeakPointer}
+  };
+
+  for(auto pair : checkPatterns){
+    if(checker(pair.first)){
+      return pair.second;
+    }
   }
 
-  return refClass;
+
 }
 
 bool ClassMapBase::containsProperty(const QString &propertyName) const {
@@ -221,6 +240,12 @@ QSharedPointer<ClassMapBase> ClassMapBase::getSuperClass() const {
 
 void ClassMapBase::setSuperClass(const QSharedPointer<ClassMapBase> &value) {
   superClass = value;
+}
+
+QString ClassMapBase::getPropertyType(const QMetaObject &meta, const QString &prop) {
+  int propertyIndex = meta.indexOfProperty(prop.toStdString().data());
+  QMetaProperty metaProperty = meta.property(propertyIndex);
+  return metaProperty.typeName();
 }
 
 QList<QSharedPointer<OneToMany>> ClassMapBase::getOneToManyRelations() const {
