@@ -1,5 +1,6 @@
 #include "Query.h"
 
+#include <QDebug>
 #include <QMetaObject>
 #include <QMetaProperty>
 #include <QSharedPointer>
@@ -7,23 +8,27 @@
 #include <QSqlError>
 #include <QSqlField>
 #include <QSqlRecord>
-#include <QDebug>
 
 #include "ConfigurationMap.h"
 #include "SimpleSqlBuilder.h"
 
-namespace QtOrm {
-namespace Sql {
+namespace QtOrm
+{
+namespace Sql
+{
 
 using namespace Config;
-Query::Query(QObject *parent) : QObject(parent) {
+Query::Query(QObject* parent) : QObject(parent)
+{
 }
 
-Query::Query(const Query &other) : Query(other.parent()) {
+Query::Query(const Query& other) : Query(other.parent())
+{
   operator=(other);
 }
 
-QSharedPointer<QObject> Query::getById(const QString &className, const QVariant &id) {
+QSharedPointer<QObject> Query::getById(const QString& className, const QVariant& id)
+{
   QSharedPointer<ClassMapBase> classBase = ConfigurationMap::getMappedClass(className);
 
   if (registry->contains(classBase->getTable(), id.toString()))
@@ -31,7 +36,8 @@ QSharedPointer<QObject> Query::getById(const QString &className, const QVariant 
 
   auto list = getListObject(className, classBase->getIdPropertyName(), id);
 
-  if (list.size() == 0) {
+  if (list.size() == 0)
+  {
     return QSharedPointer<QObject>();
   }
 
@@ -42,10 +48,14 @@ QSharedPointer<QObject> Query::getById(const QString &className, const QVariant 
   return list.takeFirst();
 }
 
-QList<QSharedPointer<QObject>> Query::getListObject(const QString &className, const QString &property,
-                                                    const QVariant &value, const QList<OrderColumn> &orderBy) {
+QList<QSharedPointer<QObject>> Query::getListObject(const QString& className,
+                                                    const QString& property,
+                                                    const QVariant& value,
+                                                    const QList<OrderColumn>& orderBy)
+{
   GroupConditions group;
-  if (!property.isEmpty()) {
+  if (!property.isEmpty())
+  {
     QSharedPointer<Condition> condition =
         QSharedPointer<Condition>::create(property, Operation::Equal, QVariantList{value});
     group.addCondition(condition);
@@ -54,8 +64,9 @@ QList<QSharedPointer<QObject>> Query::getListObject(const QString &className, co
   return getListObject(className, group, orderBy);
 }
 
-QList<QSharedPointer<QObject>> Query::getListObject(const QString &className, const GroupConditions &conditions,
-                                                    const QList<OrderColumn> &orderBy) {
+QList<QSharedPointer<QObject>>
+Query::getListObject(const QString& className, const GroupConditions& conditions, const QList<OrderColumn>& orderBy)
+{
   QSharedPointer<ClassMapBase> classBase = ConfigurationMap::getMappedClass(className);
 
   SimpleSqlBuilder sqlBuilder = createSimpleSqlBuilder(classBase);
@@ -64,12 +75,14 @@ QList<QSharedPointer<QObject>> Query::getListObject(const QString &className, co
   sqlBuilder.setOrderBy(replacedOrderBy);
 
   GroupConditions resultWhere;
-  if(classBase->isSubclass()){
+  if (classBase->isSubclass())
+  {
     resultWhere.addEqual(classBase->getDiscrimanatorColumn(), classBase->getDiscrimanatorValue());
   }
 
   GroupConditions replacedConditions = replacePropertyToColumn(classBase, conditions);
-  if(!replacedConditions.isEmpty()){
+  if (!replacedConditions.isEmpty())
+  {
     resultWhere.addGroup(replacedConditions);
   }
 
@@ -81,13 +94,15 @@ QList<QSharedPointer<QObject>> Query::getListObject(const QString &className, co
   return getList(query, sqlBuilder.getQueryModel());
 }
 
-void Query::saveObject(QSharedPointer<QObject> &object) {
+void Query::saveObject(QSharedPointer<QObject>& object)
+{
   startTransaction();
   saveObjectWoStartTransaction(object);
   commit();
 }
 
-void Query::insertObject(QSharedPointer<QObject> &object) {
+void Query::insertObject(QSharedPointer<QObject>& object)
+{
   saveAllOneToOne(object);
 
   QSharedPointer<ClassMapBase> classBase = ConfigurationMap::getMappedClass(object);
@@ -99,9 +114,12 @@ void Query::insertObject(QSharedPointer<QObject> &object) {
   executeQuery(query);
 
   QVariant newId;
-  if (database.driver()->hasFeature(QSqlDriver::LastInsertId) && database.driverName() != "QPSQL") {
+  if (database.driver()->hasFeature(QSqlDriver::LastInsertId) && database.driverName() != "QPSQL")
+  {
     newId = query.lastInsertId();
-  } else {
+  }
+  else
+  {
     query.first();
     newId = query.record().value(0);
   }
@@ -113,7 +131,8 @@ void Query::insertObject(QSharedPointer<QObject> &object) {
   connectToAllProperties(object);
 }
 
-void Query::updateObject(QSharedPointer<QObject> &object) {
+void Query::updateObject(QSharedPointer<QObject>& object)
+{
   saveAllOneToOne(object);
 
   QSharedPointer<ClassMapBase> classBase = ConfigurationMap::getMappedClass(object);
@@ -127,7 +146,8 @@ void Query::updateObject(QSharedPointer<QObject> &object) {
   saveAllOneToMany(object);
 }
 
-void Query::deleteObject(QSharedPointer<QObject> &object) {
+void Query::deleteObject(QSharedPointer<QObject>& object)
+{
   deleteAllOneToMany(object);
 
   QSharedPointer<ClassMapBase> classBase = ConfigurationMap::getMappedClass(object);
@@ -141,7 +161,8 @@ void Query::deleteObject(QSharedPointer<QObject> &object) {
   removeObjectFromRegistry(object);
 }
 
-void Query::refresh(QSharedPointer<QObject> &object) {
+void Query::refresh(QSharedPointer<QObject>& object)
+{
   QSharedPointer<ClassMapBase> classBase = ConfigurationMap::getMappedClass(object);
 
   GroupConditions group;
@@ -160,19 +181,25 @@ void Query::refresh(QSharedPointer<QObject> &object) {
   query.next();
   QSqlRecord record = query.record();
   QString idColumn = getQueryColumn(sqlBuilder.getQueryModel()->getMainTableModel(), property);
-  if (!record.value(idColumn).isNull()) {
+  if (!record.value(idColumn).isNull())
+  {
     refreshObjectData(object, sqlBuilder.getQueryModel()->getMainTableModel(), record);
   }
 }
 
-void Query::saveOneField(QSharedPointer<QObject> &object, const QString &propertyName) {
+void Query::saveOneField(QSharedPointer<QObject>& object, const QString& propertyName)
+{
   QSharedPointer<ClassMapBase> classBase = ConfigurationMap::getMappedClass(object);
   QSharedPointer<OneToMany> oneToMany = classBase->findOneToManyByPropertyName(propertyName);
-  if (oneToMany) {
+  if (oneToMany)
+  {
     saveOneToMany(object, oneToMany);
-  } else {
+  }
+  else
+  {
     QSharedPointer<OneToOne> oneToOne = classBase->findOneToOneByPropertyName(propertyName);
-    if (oneToOne && isIdOneToOneDefault(object, oneToOne)) {
+    if (oneToOne && isIdOneToOneDefault(object, oneToOne))
+    {
       saveOneToOne(object, oneToOne);
     }
 
@@ -184,21 +211,26 @@ void Query::saveOneField(QSharedPointer<QObject> &object, const QString &propert
   }
 }
 
-QSqlDatabase Query::getDatabase() const {
+QSqlDatabase Query::getDatabase() const
+{
   return database;
 }
 
-void Query::setDatabase(const QSqlDatabase &value) {
+void Query::setDatabase(const QSqlDatabase& value)
+{
   database = value;
 }
 
-void Query::executeQuery(QSqlQuery &query) {
-  if (tryReopenDatabaseConnectionIfNeed()) {
+void Query::executeQuery(QSqlQuery& query)
+{
+  if (tryReopenDatabaseConnectionIfNeed())
+  {
     throw DatabaseConnectionClosedException("Database connection closed");
   }
 
   QString executedQuery = getSqlTextWithBindParams(query);
-  if (!query.exec()) {
+  if (!query.exec())
+  {
     emit executedSql(executedQuery);
     QString errorMsg = QString("Query: %1 \nError: %2").arg(executedQuery).arg(query.lastError().text());
     throw SqlException(errorMsg);
@@ -206,11 +238,13 @@ void Query::executeQuery(QSqlQuery &query) {
   emit executedSql(executedQuery);
 }
 
-QList<QSharedPointer<QObject>> Query::getList(QSqlQuery &query, const QSharedPointer<QueryModel> &queryModel) {
+QList<QSharedPointer<QObject>> Query::getList(QSqlQuery& query, const QSharedPointer<QueryModel>& queryModel)
+{
   QList<QSharedPointer<QObject>> objects;
   QSharedPointer<ClassMapBase> classBase = queryModel->getClassBase();
   QString mainTableAlias = queryModel->getMainTableModel()->getAlias();
-  while (query.next()) {
+  while (query.next())
+  {
     QSharedPointer<QObject> newObject =
         getObject(query.record(), classBase, mainTableAlias, queryModel->getMainTableModel());
     objects.append(newObject);
@@ -219,11 +253,14 @@ QList<QSharedPointer<QObject>> Query::getList(QSqlQuery &query, const QSharedPoi
   return objects;
 }
 
-void Query::fillObject(QSharedPointer<QObject> &object, QSharedPointer<QueryTableModel> &queryTableModel,
-                       const QSqlRecord &record) {
+void Query::fillObject(QSharedPointer<QObject>& object,
+                       QSharedPointer<QueryTableModel>& queryTableModel,
+                       const QSqlRecord& record)
+{
   QSharedPointer<ClassMapBase> classBase = ConfigurationMap::getMappedClass(object);
   auto properties = classBase->getProperties();
-  for (auto prop : properties) {
+  for (auto prop : properties)
+  {
     QString queryColumn = getQueryColumn(queryTableModel, prop);
     QVariant value = record.value(queryColumn);
     if (value.isValid())
@@ -231,9 +268,12 @@ void Query::fillObject(QSharedPointer<QObject> &object, QSharedPointer<QueryTabl
   }
 }
 
-void Query::fillOneToMany(const QList<QSharedPointer<OneToMany>> &relations, const QString &idProperty,
-                          QSharedPointer<QObject> object) {
-  for (QSharedPointer<OneToMany> oneToMany : relations) {
+void Query::fillOneToMany(QSharedPointer<QObject> object,
+                          const QList<QSharedPointer<OneToMany>>& relations,
+                          const QString& idProperty)
+{
+  for (QSharedPointer<OneToMany> oneToMany : relations)
+  {
     QString refClass = oneToMany->getRefClass();
     QString property = oneToMany->getProperty();
     QString column = oneToMany->getColumn();
@@ -252,10 +292,13 @@ void Query::fillOneToMany(const QList<QSharedPointer<OneToMany>> &relations, con
   }
 }
 
-void Query::fillOneToOne(QSharedPointer<QObject> object, QSharedPointer<QueryTableModel> queryTableModel,
-                         const QSqlRecord &record) {
+void Query::fillOneToOne(QSharedPointer<QObject> object,
+                         QSharedPointer<QueryTableModel> queryTableModel,
+                         const QSqlRecord& record)
+{
   QSharedPointer<ClassMapBase> classBase = ConfigurationMap::getMappedClass(object);
-  for (QSharedPointer<OneToOne> oneToOne : classBase->getOneToOneRelations()) {
+  for (QSharedPointer<OneToOne> oneToOne : classBase->getOneToOneRelations())
+  {
     QString property = oneToOne->getProperty();
     QString refClass = Mapping::ClassMapBase::getTypeNameOfProperty(object, property);
 
@@ -265,12 +308,16 @@ void Query::fillOneToOne(QSharedPointer<QObject> object, QSharedPointer<QueryTab
     QString tableAlias = join->getQueryTableModel()->getAlias();
     QString idColumn = getQueryColumn(join->getQueryTableModel(), refClassBase->getIdProperty());
     QVariant idValue = record.value(idColumn);
-    if (!idValue.isNull()){
+    if (!idValue.isNull())
+    {
       bool isBase = ConfigurationMap::isBaseClass(refClass);
       QSharedPointer<QObject> newObject;
-      if (isBase){
+      if (isBase)
+      {
         newObject = getById(refClass, idValue);
-      } else {
+      }
+      else
+      {
         newObject = getObject(record, refClassBase, tableAlias, join->getQueryTableModel());
       }
       QVariant var = refClassBase->getVariantByObject(newObject);
@@ -279,19 +326,25 @@ void Query::fillOneToOne(QSharedPointer<QObject> object, QSharedPointer<QueryTab
   }
 }
 
-QSharedPointer<QObject> Query::getObject(const QSqlRecord &record, const QSharedPointer<ClassMapBase> &classBase,
-                                         const QString &tableAlias, QSharedPointer<QueryTableModel> queryTableModel) {
+QSharedPointer<QObject> Query::getObject(const QSqlRecord& record,
+                                         const QSharedPointer<ClassMapBase>& classBase,
+                                         const QString& tableAlias,
+                                         QSharedPointer<QueryTableModel> queryTableModel)
+{
   QSharedPointer<QObject> object;
 
-  if (registryContainsObject(classBase, record, tableAlias)) {
+  if (registryContainsObject(classBase, record, tableAlias))
+  {
     object = getObjectFromRegistry(classBase, record, tableAlias);
-  } else {
+  }
+  else
+  {
     object = createNewInstance(classBase, record, queryTableModel);
     insertObjectIntoRegistry(classBase, record, object, tableAlias);
 
     fillObject(object, queryTableModel, record);
     fillOneToOne(object, queryTableModel, record);
-    fillOneToMany(classBase->getOneToManyRelations(), classBase->getIdProperty()->getName(), object);
+    fillOneToMany(object, classBase->getOneToManyRelations(), classBase->getIdProperty()->getName());
 
     connectToAllProperties(object);
   }
@@ -299,13 +352,16 @@ QSharedPointer<QObject> Query::getObject(const QSqlRecord &record, const QShared
   return object;
 }
 
-void Query::setObjectProperty(QSharedPointer<QObject> object, const QString &propertyName, QVariant &value) {
+void Query::setObjectProperty(QSharedPointer<QObject> object, const QString& propertyName, QVariant& value)
+{
   const QMetaObject* metaObject = object->metaObject();
   int propertyIndex = metaObject->indexOfProperty(propertyName.toStdString().data());
-  if (metaObject->property(propertyIndex).isEnumType()) {
+  if (metaObject->property(propertyIndex).isEnumType())
+  {
     value = value.value<int>();
   }
-  if (!object->setProperty(propertyName.toStdString().data(), value)) {
+  if (!object->setProperty(propertyName.toStdString().data(), value))
+  {
     QString textError = QString::fromUtf8("Unable to place value %3 in %1.%2")
                             .arg(object->metaObject()->className())
                             .arg(propertyName)
@@ -315,64 +371,84 @@ void Query::setObjectProperty(QSharedPointer<QObject> object, const QString &pro
   }
 }
 
-QSharedPointer<QObject> Query::createNewInstance(QSharedPointer<ClassMapBase> classBase, const QSqlRecord &record,
-                                                 const QSharedPointer<QueryTableModel> &model) {
+QSharedPointer<QObject> Query::createNewInstance(QSharedPointer<ClassMapBase> classBase,
+                                                 const QSqlRecord& record,
+                                                 const QSharedPointer<QueryTableModel>& model)
+{
   QSharedPointer<QObject> newObject;
   auto derrivedClasses = ConfigurationMap::getDerrivedClasses(classBase->getClassName());
-  if(derrivedClasses.isEmpty()) {
+  if (derrivedClasses.isEmpty())
+  {
     newObject = QSharedPointer<QObject>(classBase->getMetaObject().newInstance());
-  } else {
+  }
+  else
+  {
     QString discrimanatorColumn = getQueryColumn(model, classBase->getDiscriminatorProperty());
     QVariant recordValue = record.value(discrimanatorColumn);
-    for(auto dc : derrivedClasses) {
+    for (auto dc : derrivedClasses)
+    {
       QVariant discrimanatorValue = dc->getDiscrimanatorValue();
-      if(recordValue == discrimanatorValue) {
+      if (recordValue == discrimanatorValue)
+      {
         newObject = QSharedPointer<QObject>(dc->getMetaObject().newInstance());
         break;
       }
     }
   }
 
-  if (!newObject) {
-    QString message = QString("Object(%1) instance did not created(Missed Q_INVOKABLE in constructor?)").arg(classBase->getClassName());
+  if (!newObject)
+  {
+    QString message = QString("Object(%1) instance did not created(Missed Q_INVOKABLE in constructor?)")
+                          .arg(classBase->getClassName());
     throw InstanceNotCreatedException(message);
   }
 
   return newObject;
 }
 
-bool Query::registryContainsObject(QSharedPointer<ClassMapBase> classBase, const QSqlRecord &record,
-                                   const QString &tableAlias) {
+bool Query::registryContainsObject(QSharedPointer<ClassMapBase> classBase,
+                                   const QSqlRecord& record,
+                                   const QString& tableAlias)
+{
   QString tableName = classBase->getTable();
   QVariant idValue = getIdFromRecord(classBase, record, tableAlias);
   return registry->contains(tableName, idValue.toString());
 }
 
-QSharedPointer<QObject> Query::getObjectFromRegistry(QSharedPointer<ClassMapBase> classBase, const QSqlRecord &record,
-                                                     const QString &tableAlias) {
+QSharedPointer<QObject> Query::getObjectFromRegistry(QSharedPointer<ClassMapBase> classBase,
+                                                     const QSqlRecord& record,
+                                                     const QString& tableAlias)
+{
   QString tableName = classBase->getTable();
   QVariant idValue = getIdFromRecord(classBase, record, tableAlias);
   return registry->value(tableName, idValue.toString());
 }
 
-void Query::insertObjectIntoRegistry(QSharedPointer<ClassMapBase> classBase, const QSqlRecord &record,
-                                     QSharedPointer<QObject> object, const QString &tableAlias) {
+void Query::insertObjectIntoRegistry(QSharedPointer<ClassMapBase> classBase,
+                                     const QSqlRecord& record,
+                                     QSharedPointer<QObject> object,
+                                     const QString& tableAlias)
+{
   QVariant idValue = getIdFromRecord(classBase, record, tableAlias);
   insertObjectIntoRegistry(classBase, object, idValue);
 }
 
-void Query::insertObjectIntoRegistry(QSharedPointer<ClassMapBase> classBase, QSharedPointer<QObject> object,
-                                     QVariant idValue) {
+void Query::insertObjectIntoRegistry(QSharedPointer<ClassMapBase> classBase,
+                                     QSharedPointer<QObject> object,
+                                     QVariant idValue)
+{
   QString tableName = classBase->getTable();
   registry->insert(tableName, idValue.toString(), object);
 }
 
-void Query::removeObjectFromRegistry(QSharedPointer<QObject> object) {
+void Query::removeObjectFromRegistry(QSharedPointer<QObject> object)
+{
   registry->remove(object);
 }
 
-QVariant Query::getIdFromRecord(QSharedPointer<ClassMapBase> classBase, const QSqlRecord &record,
-                                const QString &tableAlias) {
+QVariant
+Query::getIdFromRecord(QSharedPointer<ClassMapBase> classBase, const QSqlRecord& record, const QString& tableAlias)
+{
   QString idColumn = classBase->getIdColumn();
   if (!tableAlias.isEmpty())
     idColumn = tableAlias + "_" + idColumn;
@@ -380,19 +456,23 @@ QVariant Query::getIdFromRecord(QSharedPointer<ClassMapBase> classBase, const QS
   return record.value(idColumn);
 }
 
-void Query::refreshObjectData(QSharedPointer<QObject> object, QSharedPointer<QueryTableModel> queryTableModel,
-                              const QSqlRecord &record) {
+void Query::refreshObjectData(QSharedPointer<QObject> object,
+                              QSharedPointer<QueryTableModel> queryTableModel,
+                              const QSqlRecord& record)
+{
   QSharedPointer<ClassMapBase> classBase = ConfigurationMap::getMappedClass(object);
   fillObject(object, queryTableModel, record);
 
   refreshedObject.append(object);
 
-  for (QSharedPointer<OneToOne> oneToOne : classBase->getOneToOneRelations()) {
+  for (QSharedPointer<OneToOne> oneToOne : classBase->getOneToOneRelations())
+  {
     QString oneToOnePropertyTypeName = Mapping::ClassMapBase::getTypeNameOfProperty(object, oneToOne->getProperty());
     QSharedPointer<ClassMapBase> refClassBase = ConfigurationMap::getMappedClass(oneToOnePropertyTypeName);
     QVariant propertyValue = object->property(oneToOne->getProperty().toStdString().data());
     QSharedPointer<QObject> oneToOneObj = refClassBase->getObjectByVariant(propertyValue);
-    if (!refreshedObject.contains(oneToOneObj)) {
+    if (!refreshedObject.contains(oneToOneObj))
+    {
       QSharedPointer<QueryJoin> join = queryTableModel->findJoinByColumnName(oneToOne->getTableColumn());
       refreshObjectData(oneToOneObj, join->getQueryTableModel(), record);
     }
@@ -400,15 +480,18 @@ void Query::refreshObjectData(QSharedPointer<QObject> object, QSharedPointer<Que
 
   QVariant idValue = object->property(classBase->getIdProperty()->getName().toStdString().data());
 
-  for (QSharedPointer<OneToMany> oneToMany : classBase->getOneToManyRelations()) {
+  for (QSharedPointer<OneToMany> oneToMany : classBase->getOneToManyRelations())
+  {
     QSharedPointer<ClassMapBase> refClassBase = ConfigurationMap::getMappedClass(oneToMany->getRefClass());
     QString refColumn = oneToMany->getColumn();
     QList<QSharedPointer<QObject>> newChildren = getListObject(refClassBase->getClassName(), refColumn, idValue);
 
     QVariant propertyValue = object->property(oneToMany->getProperty().toStdString().data());
     QList<QSharedPointer<QObject>> currentChildren = refClassBase->getObjectListByVariant(propertyValue);
-    for (QSharedPointer<QObject> child : newChildren) {
-      if (currentChildren.contains(child) && !refreshedObject.contains(child)) {
+    for (QSharedPointer<QObject> child : newChildren)
+    {
+      if (currentChildren.contains(child) && !refreshedObject.contains(child))
+      {
         refresh(child);
       }
     }
@@ -418,16 +501,21 @@ void Query::refreshObjectData(QSharedPointer<QObject> object, QSharedPointer<Que
   }
 }
 
-QString Query::getSqlTextWithBindParams(QSqlQuery &query) {
+QString Query::getSqlTextWithBindParams(QSqlQuery& query)
+{
   QString text;
   text = query.lastQuery() + "\n";
 
   auto boundValues = query.boundValues();
-  for (auto it = boundValues.begin(); it != boundValues.end(); ++it) {
+  for (auto it = boundValues.begin(); it != boundValues.end(); ++it)
+  {
     QString value;
-    if (!it.value().isNull() || it.value().isValid()) {
+    if (!it.value().isNull() || it.value().isValid())
+    {
       value = it.value().toString();
-    } else {
+    }
+    else
+    {
       value = "null";
     }
     text += QString("%1 = %2\n").arg(it.key()).arg(value);
@@ -436,43 +524,52 @@ QString Query::getSqlTextWithBindParams(QSqlQuery &query) {
   return text;
 }
 
-void Query::saveAllOneToOne(QSharedPointer<QObject> object) {
+void Query::saveAllOneToOne(QSharedPointer<QObject> object)
+{
   QSharedPointer<ClassMapBase> classBase = ConfigurationMap::getMappedClass(object);
   ;
-  for (QSharedPointer<OneToOne> oneToOne : classBase->getOneToOneRelations()) {
-    if (oneToOne->getSaveCascade()) {
+  for (QSharedPointer<OneToOne> oneToOne : classBase->getOneToOneRelations())
+  {
+    if (oneToOne->getSaveCascade())
+    {
       saveOneToOne(object, oneToOne);
     }
   }
 }
 
-void Query::saveOneToOne(QSharedPointer<QObject> object, QSharedPointer<OneToOne> oneToOne) {
+void Query::saveOneToOne(QSharedPointer<QObject> object, QSharedPointer<OneToOne> oneToOne)
+{
   QString className = Mapping::ClassMapBase::getTypeNameOfProperty(object, oneToOne->getProperty());
   QSharedPointer<ClassMapBase> refClassBase = ConfigurationMap::getMappedClass(className);
 
   QVariant propertyVariant = object->property(oneToOne->getProperty().toStdString().data());
   QSharedPointer<QObject> propertyObject = refClassBase->getObjectByVariant(propertyVariant);
 
-  if (propertyObject) {
+  if (propertyObject)
+  {
     Query subQuery(*this);
     connect(&subQuery, &Query::executedSql, this, &Query::executedSql);
     subQuery.saveObjectWoStartTransaction(propertyObject);
   }
 }
 
-void Query::saveAllOneToMany(QSharedPointer<QObject> object) {
+void Query::saveAllOneToMany(QSharedPointer<QObject> object)
+{
   QSharedPointer<ClassMapBase> classBase = ConfigurationMap::getMappedClass(object);
-  for (QSharedPointer<OneToMany> oneToMany : classBase->getOneToManyRelations()) {
+  for (QSharedPointer<OneToMany> oneToMany : classBase->getOneToManyRelations())
+  {
     if (oneToMany->getSaveCascade())
       saveOneToMany(object, oneToMany);
   }
 }
 
-void Query::saveOneToMany(QSharedPointer<QObject> object, QSharedPointer<OneToMany> oneToMany) {
+void Query::saveOneToMany(QSharedPointer<QObject> object, QSharedPointer<OneToMany> oneToMany)
+{
   QSharedPointer<ClassMapBase> refClassBase = ConfigurationMap::getMappedClass(oneToMany->getRefClass());
   QVariant val = object->property(oneToMany->getProperty().toStdString().data());
   QList<QSharedPointer<QObject>> lst = refClassBase->getObjectListByVariant(val);
-  for (QSharedPointer<QObject> obj : lst) {
+  for (QSharedPointer<QObject> obj : lst)
+  {
     Query subQuery(*this);
     connect(&subQuery, &Query::executedSql, this, &Query::executedSql);
     subQuery.saveObjectWoStartTransaction(obj);
@@ -491,7 +588,7 @@ void Query::deleteAllOneToMany(QSharedPointer<QObject> object)
   }
 }
 
-void Query::deleteOneToMany(QSharedPointer<QObject> object, const QSharedPointer<OneToMany>&oneToMany)
+void Query::deleteOneToMany(QSharedPointer<QObject> object, const QSharedPointer<OneToMany>& oneToMany)
 {
   QSharedPointer<ClassMapBase> refClassBase = ConfigurationMap::getMappedClass(oneToMany->getRefClass());
   QVariant val = object->property(oneToMany->getProperty().toStdString().data());
@@ -504,15 +601,18 @@ void Query::deleteOneToMany(QSharedPointer<QObject> object, const QSharedPointer
   }
 }
 
-QSharedPointer<Registry> Query::getRegistry() const {
+QSharedPointer<Registry> Query::getRegistry() const
+{
   return registry;
 }
 
-void Query::setRegistry(QSharedPointer<Registry> value) {
+void Query::setRegistry(QSharedPointer<Registry> value)
+{
   registry = value;
 }
 
-Query &Query::operator=(const Query &other) {
+Query& Query::operator=(const Query& other)
+{
   updater = other.getUpdater();
   registry = other.getRegistry();
   database = other.getDatabase();
@@ -521,35 +621,45 @@ Query &Query::operator=(const Query &other) {
   return *this;
 }
 
-void Query::saveObjectWoStartTransaction(QSharedPointer<QObject> object) {
-  if (isIdObjectDefault(object)) {
+void Query::saveObjectWoStartTransaction(QSharedPointer<QObject> object)
+{
+  if (isIdObjectDefault(object))
+  {
     insertObject(object);
-  } else {
+  }
+  else
+  {
     updateObject(object);
   }
 }
 
-void Query::startTransaction() {
-  if (database.driver()->hasFeature(QSqlDriver::Transactions)) {
+void Query::startTransaction()
+{
+  if (database.driver()->hasFeature(QSqlDriver::Transactions))
+  {
     database.transaction();
   }
 }
 
-void Query::commit() {
+void Query::commit()
+{
   database.commit();
 }
 
-void Query::rollback() {
+void Query::rollback()
+{
   database.rollback();
 }
 
-bool Query::isIdObjectDefault(QSharedPointer<QObject> object) {
+bool Query::isIdObjectDefault(QSharedPointer<QObject> object)
+{
   QSharedPointer<ClassMapBase> classBase = ConfigurationMap::getMappedClass(object);
   QVariant idVal = object->property(classBase->getIdProperty()->getName().toStdString().data());
   return idVal.value<ulong>() == 0;
 }
 
-bool Query::isIdOneToOneDefault(QSharedPointer<QObject> object, QSharedPointer<OneToOne> oneToOne) {
+bool Query::isIdOneToOneDefault(QSharedPointer<QObject> object, QSharedPointer<OneToOne> oneToOne)
+{
   QString className = Mapping::ClassMapBase::getTypeNameOfProperty(object, oneToOne->getProperty());
   QSharedPointer<ClassMapBase> refClassBase = ConfigurationMap::getMappedClass(className);
 
@@ -559,15 +669,18 @@ bool Query::isIdOneToOneDefault(QSharedPointer<QObject> object, QSharedPointer<O
   return isIdObjectDefault(propertyObject);
 }
 
-QString Query::getQueryColumn(QSharedPointer<QueryTableModel> queryTableModel, QSharedPointer<PropertyMap> property) {
+QString Query::getQueryColumn(QSharedPointer<QueryTableModel> queryTableModel, QSharedPointer<PropertyMap> property)
+{
   return QString("%1_%2").arg(queryTableModel->getAlias()).arg(property->getColumn());
 }
 
-bool Query::tryReopenDatabaseConnectionIfNeed() {
+bool Query::tryReopenDatabaseConnectionIfNeed()
+{
   return !database.isOpen() && !database.open();
 }
 
-SimpleSqlBuilder Query::createSimpleSqlBuilder(QSharedPointer<ClassMapBase> &classBase) {
+SimpleSqlBuilder Query::createSimpleSqlBuilder(QSharedPointer<ClassMapBase>& classBase)
+{
   SimpleSqlBuilder sqlBuilder;
   sqlBuilder.setDatabase(database);
   sqlBuilder.setQueryCache(queryCache);
@@ -576,8 +689,9 @@ SimpleSqlBuilder Query::createSimpleSqlBuilder(QSharedPointer<ClassMapBase> &cla
   return sqlBuilder;
 }
 
-GroupConditions Query::replacePropertyToColumn(QSharedPointer<ClassMapBase> &classBase,
-                                               const GroupConditions &conditions) {
+GroupConditions Query::replacePropertyToColumn(QSharedPointer<ClassMapBase>& classBase,
+                                               const GroupConditions& conditions)
+{
   GroupConditions result;
 
   if (conditions.isEmpty())
@@ -585,63 +699,76 @@ GroupConditions Query::replacePropertyToColumn(QSharedPointer<ClassMapBase> &cla
 
   result.setOperation(conditions.getOperation());
 
-  for (QSharedPointer<Condition> &condition : conditions.getConditions()) {
+  for (QSharedPointer<Condition>& condition : conditions.getConditions())
+  {
     QSharedPointer<Condition> newCondition = QSharedPointer<Condition>::create(*condition.data());
     newCondition->setProperty(getColumn(classBase, newCondition->getProperty()));
     result.addCondition(newCondition);
   }
 
-  for (QSharedPointer<GroupConditions> &group : conditions.getGroups()) {
+  for (QSharedPointer<GroupConditions>& group : conditions.getGroups())
+  {
     result.addGroup(replacePropertyToColumn(classBase, *group.data()));
   }
 
   return result;
 }
 
-QList<OrderColumn> Query::replacePropertyToColumn(QSharedPointer<ClassMapBase> &classBase,
-                                                  const QList<OrderColumn> &orderColumns) {
+QList<OrderColumn> Query::replacePropertyToColumn(QSharedPointer<ClassMapBase>& classBase,
+                                                  const QList<OrderColumn>& orderColumns)
+{
   if (orderColumns.isEmpty())
     return orderColumns;
 
   QList<OrderColumn> result = orderColumns;
-  for (auto orderColumn : result) {
+  for (auto orderColumn : result)
+  {
     orderColumn.orderProperty = getColumn(classBase, orderColumn.orderProperty);
   }
 
   return result;
 }
 
-QString Query::getColumn(QSharedPointer<ClassMapBase> &classBase, const QString &property) {
-  if (classBase->containsProperty(property)) {
+QString Query::getColumn(QSharedPointer<ClassMapBase>& classBase, const QString& property)
+{
+  if (classBase->containsProperty(property))
+  {
     return classBase->getPropertyColumn(property);
   }
 
   return property;
 }
 
-void Query::connectToAllProperties(QSharedPointer<QObject> &object) {
-  if (updater) {
+void Query::connectToAllProperties(QSharedPointer<QObject>& object)
+{
+  if (updater)
+  {
     updater->connectToAllProperties(object);
   }
 }
 
-QSharedPointer<AutoUpdater> Query::getUpdater() const {
+QSharedPointer<AutoUpdater> Query::getUpdater() const
+{
   return updater;
 }
 
-void Query::setUpdater(const QSharedPointer<AutoUpdater> &value) {
+void Query::setUpdater(const QSharedPointer<AutoUpdater>& value)
+{
   updater = value;
 }
 
-QSharedPointer<QueryCache> Query::getQueryCache() const {
+QSharedPointer<QueryCache> Query::getQueryCache() const
+{
   return queryCache;
 }
 
-void Query::setQueryCache(QSharedPointer<QueryCache> value) {
+void Query::setQueryCache(QSharedPointer<QueryCache> value)
+{
   queryCache = value;
 }
 
-void Query::clearRefreshedObject() {
+void Query::clearRefreshedObject()
+{
   refreshedObject.clear();
 }
 }
