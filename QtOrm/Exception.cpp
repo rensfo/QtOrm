@@ -8,7 +8,7 @@ Exception::Exception(const Exception &other) : Exception(other.getMessage()) {
 }
 
 void Exception::raise() const {
-  throw *this;
+  throw * this;
 }
 
 QException *Exception::clone() const {
@@ -17,5 +17,9 @@ QException *Exception::clone() const {
 
 QString Exception::getMessage() const {
   return message;
+}
+
+const char *Exception::what() const noexcept {
+  return message.toStdString().data();
 }
 }

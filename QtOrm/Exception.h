@@ -15,6 +15,7 @@ public:
   virtual QException *clone() const override;
 
   QString getMessage() const;
+  virtual const char*what() const noexcept override;
 
 protected:
   QString message;
