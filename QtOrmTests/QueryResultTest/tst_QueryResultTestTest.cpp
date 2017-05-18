@@ -161,11 +161,7 @@ void QueryResultTestTest::insertObject() {
 
     session.clearRegistry();
 
-    //    a->deleteLater();
-
     a = session.get<A>("code_1", "code10");
-
-    //    a->deleteLater();
 
     QVERIFY(a);
   } catch (QtOrm::Exception &e) {

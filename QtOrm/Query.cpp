@@ -247,7 +247,8 @@ void Query::fillOneToMany(QSharedPointer<QObject> object, const QList<QSharedPoi
     QList<QSharedPointer<QObject>> qobjectList = getListObject(refClass, where, oneToMany->getOrderBy());
 
     QSharedPointer<ClassMapBase> refClassBase = ConfigurationMap::getMappedClass(oneToMany->getRefClass());
-    QVariant var = refClassBase->castToConcreteSharedPointerList(qobjectList);
+    auto kind = Mapping::ClassMapBase::getTypeKindOfProperty(object, property);
+    QVariant var = refClassBase->castToList(kind, qobjectList);
     setObjectProperty(object, property, var);
   }
 }
@@ -391,10 +392,9 @@ void Query::refreshObjectData(QSharedPointer<QObject> object, QSharedPointer<Que
   refreshedObject.append(object);
 
   for (QSharedPointer<OneToOne> oneToOne : classBase->getOneToOneRelations()) {
-    QString oneToOnePropertyTypeName = Mapping::ClassMapBase::getTypeNameOfProperty(object, oneToOne->getProperty());
-    QSharedPointer<ClassMapBase> refClassBase = ConfigurationMap::getMappedClass(oneToOnePropertyTypeName);
     QVariant propertyValue = object->property(oneToOne->getProperty().toStdString().data());
-    QSharedPointer<QObject> oneToOneObj = refClassBase->castToQObjectSharedPointer(propertyValue);
+    QObject* qobjectPropertyValue = propertyValue.value<QObject*>();
+    QSharedPointer<QObject> oneToOneObj = registry->value(qobjectPropertyValue);
     if (!refreshedObject.contains(oneToOneObj)) {
       QSharedPointer<QueryJoin> join = queryTableModel->findJoinByColumnName(oneToOne->getTableColumn());
       refreshObjectData(oneToOneObj, join->getQueryTableModel(), record);
@@ -408,15 +408,20 @@ void Query::refreshObjectData(QSharedPointer<QObject> object, QSharedPointer<Que
     QString refColumn = oneToMany->getColumn();
     QList<QSharedPointer<QObject>> newChildren = getListObject(refClassBase->getClassName(), refColumn, idValue);
 
+    auto kind = Mapping::ClassMapBase::getTypeKindOfProperty(object, oneToMany->getProperty());
+    QVariant newChildrenVariant = refClassBase->castToList(kind, newChildren);
+
     QVariant propertyValue = object->property(oneToMany->getProperty().toStdString().data());
-    QList<QSharedPointer<QObject>> currentChildren = refClassBase->castToQObjectSharedPointerList(propertyValue);
-    for (QSharedPointer<QObject> child : newChildren) {
-      if (currentChildren.contains(child) && !refreshedObject.contains(child)) {
-        refresh(child);
+    QVariantList currentChildren = propertyValue.value<QVariantList>();
+
+    for (QVariant& child : newChildrenVariant.value<QVariantList>()) {
+      auto childShared = registry->value(child.value<QObject*>());
+      if (currentChildren.contains(child) && !refreshedObject.contains(childShared)) {
+        refresh(childShared);
       }
     }
 
-    QVariant newChildrenValue = refClassBase->castToConcreteSharedPointerList(newChildren);
+    QVariant newChildrenValue = refClassBase->castToList(kind, newChildren);
     object->setProperty(oneToMany->getProperty().toStdString().data(), newChildrenValue);
   }
 }
@@ -449,11 +454,9 @@ void Query::saveAllOneToOne(QSharedPointer<QObject> object) {
 }
 
 void Query::saveOneToOne(QSharedPointer<QObject> object, QSharedPointer<OneToOne> oneToOne) {
-  QString className = Mapping::ClassMapBase::getTypeNameOfProperty(object, oneToOne->getProperty());
-  QSharedPointer<ClassMapBase> refClassBase = ConfigurationMap::getMappedClass(className);
-
   QVariant propertyVariant = object->property(oneToOne->getProperty().toStdString().data());
-  QSharedPointer<QObject> propertyObject = refClassBase->castToQObjectSharedPointer(propertyVariant);
+  QObject* qobjectPropertyValue = propertyVariant.value<QObject*>();
+  QSharedPointer<QObject> propertyObject = registry->value(qobjectPropertyValue);
 
   if (propertyObject) {
     Query subQuery(*this);
@@ -471,13 +474,15 @@ void Query::saveAllOneToMany(QSharedPointer<QObject> object) {
 }
 
 void Query::saveOneToMany(QSharedPointer<QObject> object, QSharedPointer<OneToMany> oneToMany) {
-  QSharedPointer<ClassMapBase> refClassBase = ConfigurationMap::getMappedClass(oneToMany->getRefClass());
   QVariant val = object->property(oneToMany->getProperty().toStdString().data());
-  QList<QSharedPointer<QObject>> lst = refClassBase->castToQObjectSharedPointerList(val);
-  for (QSharedPointer<QObject> obj : lst) {
+  QSequentialIterable iterable = val.value<QSequentialIterable>();
+
+  for (const QVariant &variantItem : iterable) {
     Query subQuery(*this);
     connect(&subQuery, &Query::executedSql, this, &Query::executedSql);
-    subQuery.saveObjectWoStartTransaction(obj);
+    auto qobject = variantItem.value<QObject*>();
+    auto sharedObject = registry->value(qobject);
+    subQuery.saveObjectWoStartTransaction(sharedObject);
   }
 }
 
@@ -491,13 +496,15 @@ void Query::deleteAllOneToMany(QSharedPointer<QObject> object) {
 }
 
 void Query::deleteOneToMany(QSharedPointer<QObject> object, const QSharedPointer<OneToMany> &oneToMany) {
-  QSharedPointer<ClassMapBase> refClassBase = ConfigurationMap::getMappedClass(oneToMany->getRefClass());
   QVariant val = object->property(oneToMany->getProperty().toStdString().data());
-  auto lst = refClassBase->castToQObjectSharedPointerList(val);
-  for (auto obj : lst) {
+
+  QSequentialIterable iterable = val.value<QSequentialIterable>();
+  for (const QVariant &variantItem : iterable) {
     Query subQuery(*this);
-    connect(&subQuery, SIGNAL(executedSql(QString)), this, SIGNAL(executedSql(QString)));
-    subQuery.deleteObject(obj);
+    connect(&subQuery, &Query::executedSql, this, &Query::executedSql);
+    auto qobject = variantItem.value<QObject*>();
+    auto sharedObject = registry->value(qobject);
+    subQuery.deleteObject(sharedObject);
   }
 }
 
@@ -543,15 +550,13 @@ void Query::rollback() {
 bool Query::isIdObjectDefault(QSharedPointer<QObject> object) {
   QSharedPointer<ClassMapBase> classBase = ConfigurationMap::getMappedClass(object);
   QVariant idVal = object->property(classBase->getIdProperty()->getName().toStdString().data());
-  return idVal.value<ulong>() == 0;
+  return idVal == classBase->getIdProperty()->getNull();
 }
 
 bool Query::isIdOneToOneDefault(QSharedPointer<QObject> object, QSharedPointer<OneToOne> oneToOne) {
-  QString className = Mapping::ClassMapBase::getTypeNameOfProperty(object, oneToOne->getProperty());
-  QSharedPointer<ClassMapBase> refClassBase = ConfigurationMap::getMappedClass(className);
-
   QVariant propertyVariant = object->property(oneToOne->getProperty().toStdString().data());
-  QSharedPointer<QObject> propertyObject = refClassBase->castToQObjectSharedPointer(propertyVariant);
+  QObject* objectPropertyValue = propertyVariant.value<QObject*>();
+  QSharedPointer<QObject> propertyObject = registry->value(objectPropertyValue);
 
   return isIdObjectDefault(propertyObject);
 }

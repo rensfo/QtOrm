@@ -28,8 +28,9 @@ public:
   QVariant castToConcreteWeakPointer(QSharedPointer<QObject> value) override;
   QVariant castToConcretePointer(QSharedPointer<QObject> value) override;
 
-  QList<QSharedPointer<QObject>> castToQObjectSharedPointerList(QVariant &value) override;
-  QSharedPointer<QObject> castToQObjectSharedPointer(QVariant &value) override;
+protected:
+  virtual void checkProperty(const QString &propertyName) override;
+  virtual void checkRelationProperty(const QString &propertyName) override;
 };
 
 template <typename T>
@@ -45,9 +46,9 @@ ClassMap<T>::~ClassMap() {
 
 template <typename T>
 QVariant ClassMap<T>::castToList(TypeKind kind, QList<QSharedPointer<QObject>> value) {
-  if(kind == TypeKind::Pointer){
+  if (kind == TypeKind::Pointer) {
     return castToConcretePointerList(value);
-  } else if(kind == TypeKind::SharedPointer){
+  } else if (kind == TypeKind::SharedPointer) {
     return castToConcreteSharedPointerList(value);
   }
 
@@ -86,9 +87,9 @@ QVariant ClassMap<T>::castToConcretePointerList(QList<QSharedPointer<QObject>> v
 
 template <typename T>
 QVariant ClassMap<T>::castTo(TypeKind kind, QSharedPointer<QObject> value) {
-  if(kind == TypeKind::Pointer){
+  if (kind == TypeKind::Pointer) {
     return castToConcretePointer(value);
-  } else if(kind == TypeKind::SharedPointer){
+  } else if (kind == TypeKind::SharedPointer) {
     return castToConcreteSharedPointer(value);
   }
 
@@ -111,18 +112,25 @@ QVariant ClassMap<T>::castToConcretePointer(QSharedPointer<QObject> value) {
 }
 
 template <typename T>
-QSharedPointer<QObject> ClassMap<T>::castToQObjectSharedPointer(QVariant &value) {
-  QSharedPointer<T> sharedData = value.value<QSharedPointer<T>>();
-  return sharedData.template objectCast<QObject>();
+void ClassMap<T>::checkProperty(const QString &propertyName) {
+  int propertyIndex = T::staticMetaObject.indexOfProperty(propertyName.toStdString().data());
+  Q_ASSERT_X(propertyIndex != -1, "checkProperty", QString("Property %2 in class %1 did not found")
+                                                       .arg(T::staticMetaObject.className())
+                                                       .arg(propertyName)
+                                                       .toStdString()
+                                                       .data());
 }
 
 template <typename T>
-QList<QSharedPointer<QObject>> ClassMap<T>::castToQObjectSharedPointerList(QVariant &value) {
-  QList<QSharedPointer<QObject>> ret;
+void ClassMap<T>::checkRelationProperty(const QString &propertyName) {
+  checkProperty(propertyName);
 
-  for (QSharedPointer<T> item : value.value<QList<QSharedPointer<T>>>())
-    ret.append(item);
-  return ret;
+  TypeKind kind = getTypeKindOfProperty(T::staticMetaObject, propertyName);
+  Q_ASSERT_X(kind != TypeKind::Other, "checkRelationProperty", QString("Class %1 property %2 has not registred type")
+                                                                   .arg(T::staticMetaObject.className())
+                                                                   .arg(propertyName)
+                                                                   .toStdString()
+                                                                   .data());
 }
 }
 }

@@ -17,7 +17,7 @@
 namespace QtOrm {
 namespace Mapping {
 
-enum class TypeKind { Pointer, SharedPointer, WeakPointer };
+enum class TypeKind { Pointer, SharedPointer, WeakPointer, Other };
 
 class ClassMapBase : public QObject {
   Q_OBJECT
@@ -64,16 +64,14 @@ public:
   virtual QVariant castToConcreteWeakPointer(QSharedPointer<QObject> value) = 0;
   virtual QVariant castToConcretePointer(QSharedPointer<QObject> value) = 0;
 
-  virtual QList<QSharedPointer<QObject>> castToQObjectSharedPointerList(QVariant &value) = 0;
-  virtual QSharedPointer<QObject> castToQObjectSharedPointer(QVariant &value) = 0;
-
   virtual QSharedPointer<OneToOne> findOneToOneByPropertyName(const QString &propertyName);
   virtual QSharedPointer<OneToMany> findOneToManyByPropertyName(const QString &propertyName);
 
   static QString getTypeNameOfProperty(QSharedPointer<QObject> obj, const QString &prop);
   static QString getTypeNameOfProperty(const QMetaObject &meta, const QString &prop);
 
-  static TypeKind getTypeKindOfProperty(QSharedPointer<QObject>&obj, const QString &prop);
+  static TypeKind getTypeKindOfProperty(QSharedPointer<QObject> &obj, const QString &prop);
+  static TypeKind getTypeKindOfProperty(const QMetaObject &meta, const QString &prop);
 
   virtual bool containsProperty(const QString &propertyName) const;
   bool isSubclass() const;
@@ -94,10 +92,11 @@ public:
 protected:
   void setSuperClass(const QSharedPointer<ClassMapBase> &value);
   static QString getPropertyType(const QMetaObject &meta, const QString &prop);
+  virtual void checkProperty(const QString &propertyName) = 0;
+  virtual void checkRelationProperty(const QString &propertyName) = 0;
 
 private:
   PropertyMap &createProperty(QString propertyName);
-  void checkToExistProperty(const QString &property);
 
 protected:
   QVariant discrimanatorValue;

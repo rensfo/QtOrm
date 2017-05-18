@@ -36,7 +36,7 @@ private:
   QString column;
   bool isId = false;
   bool isDiscriminator = false;
-  QVariant null;
+  QVariant null = QVariant(0);
 };
 }
 }

@@ -31,11 +31,11 @@ void A::setChild(const QList<QSharedPointer<B> > &value) {
   child = value;
 }
 
-QSharedPointer<KindA> A::getKindA() const {
+KindA* A::getKindA() const {
     return kindA;
 }
 
-void A::setKindA(QSharedPointer<KindA> value) {
+void A::setKindA(KindA* value) {
   kindA = value;
   emit kindAChanged();
 }

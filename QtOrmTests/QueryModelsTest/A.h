@@ -11,7 +11,7 @@ class A : public QObject {
   Q_OBJECT
   Q_PROPERTY(long id READ getId WRITE setId)
   Q_PROPERTY(QString code_1 READ getCode WRITE setCode NOTIFY codeChanged)
-  Q_PROPERTY(QSharedPointer<KindA> kindA READ getKindA WRITE setKindA NOTIFY kindAChanged)
+  Q_PROPERTY(KindA* kindA READ getKindA WRITE setKindA NOTIFY kindAChanged)
   Q_PROPERTY(QList<QSharedPointer<B>> child READ getChild WRITE setChild)
 public:
   Q_INVOKABLE explicit A(QObject *parent = nullptr);
@@ -23,8 +23,8 @@ public:
   QString getCode() const;
   void setCode(const QString &value);
 
-  QSharedPointer<KindA> getKindA() const;
-  void setKindA(QSharedPointer<KindA> value);
+  KindA* getKindA() const;
+  void setKindA(KindA* value);
 
   QList<QSharedPointer<B>> getChild() const;
   void setChild(const QList<QSharedPointer<B>> &value);
@@ -36,7 +36,7 @@ signals:
 protected:
   long id = 0;
   QString code_1;
-  QSharedPointer<KindA> kindA;
+  KindA* kindA = nullptr;
   QList<QSharedPointer<B>> child;
 };
 

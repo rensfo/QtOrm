@@ -61,7 +61,7 @@ PropertyMap &ClassMapBase::map(QString propertyName, QString columnName) {
 }
 
 PropertyMap &ClassMapBase::createProperty(QString propertyName) {
-  checkToExistProperty(propertyName);
+  checkProperty(propertyName);
 
   QSharedPointer<PropertyMap> propertyMap = QSharedPointer<PropertyMap>::create(propertyName);
   properties.insert(propertyName, propertyMap);
@@ -101,7 +101,7 @@ QString ClassMapBase::getPropertyColumn(const QString &property) {
 }
 
 OneToMany &ClassMapBase::oneToMany(const QString &property) {
-  checkToExistProperty(property);
+  checkRelationProperty(property);
 
   QSharedPointer<OneToMany> relation = QSharedPointer<OneToMany>::create();
   relation->setProperty(property);
@@ -111,22 +111,13 @@ OneToMany &ClassMapBase::oneToMany(const QString &property) {
 }
 
 OneToOne &ClassMapBase::oneToOne(const QString &property) {
-  checkToExistProperty(property);
+  checkRelationProperty(property);
 
   QSharedPointer<OneToOne> relation = QSharedPointer<OneToOne>::create();
   relation->setProperty(property);
   oneToOneRelations.append(relation);
 
   return *relation;
-}
-
-void ClassMapBase::checkToExistProperty(const QString &property) {
-  int propertyIndex = classMetaObject.indexOfProperty(property.toStdString().data());
-  if (propertyIndex == -1) {
-    QString message =
-        QString::fromUtf8("Property %2 in class %1 did not found").arg(classMetaObject.className()).arg(property);
-    throw PropertyNotFoundException(message);
-  }
 }
 
 QSharedPointer<OneToOne> ClassMapBase::findOneToOneByPropertyName(const QString &propertyName) {
@@ -156,18 +147,20 @@ QString ClassMapBase::getTypeNameOfProperty(const QMetaObject &meta, const QStri
 
   QRegExp rx("(\\w+<)*(\\w+)[*]*>*");
   int pos = rx.indexIn(propertyType);
-  QString result;
+  QString result = propertyType;
   if (pos > -1) {
     result = rx.cap(2);
-  } else {
-    result = propertyType;
   }
 
   return result;
 }
 
 TypeKind ClassMapBase::getTypeKindOfProperty(QSharedPointer<QObject> &obj, const QString &prop) {
-  QString propertyType = getPropertyType(*obj->metaObject(), prop);
+  return getTypeKindOfProperty(*obj->metaObject(), prop);
+}
+
+TypeKind ClassMapBase::getTypeKindOfProperty(const QMetaObject &meta, const QString &prop) {
+  QString propertyType = getPropertyType(meta, prop);
 
   auto checker = [propertyType](const QString &pattern) -> bool {
     QRegExp rx(pattern);
@@ -175,19 +168,17 @@ TypeKind ClassMapBase::getTypeKindOfProperty(QSharedPointer<QObject> &obj, const
     return pos > -1;
   };
 
-  std::map<QString, TypeKind> checkPatterns{
-    {"^(QList<)*(.+)[*]>*$", TypeKind::Pointer},
-    {"^(QList<)*QSharedPointer<.+>(>)*$", TypeKind::SharedPointer},
-    {"^(QList<)*QWeakPointer<.+>(>)*$", TypeKind::WeakPointer}
-  };
+  std::map<QString, TypeKind> checkPatterns{{"^(QList<)*(.+)[*]>*$", TypeKind::Pointer},
+                                            {"^(QList<)*QSharedPointer<.+>(>)*$", TypeKind::SharedPointer},
+                                            {"^(QList<)*QWeakPointer<.+>(>)*$", TypeKind::WeakPointer}};
 
-  for(auto pair : checkPatterns){
-    if(checker(pair.first)){
+  for (auto pair : checkPatterns) {
+    if (checker(pair.first)) {
       return pair.second;
     }
   }
 
-
+  return TypeKind::Other;
 }
 
 bool ClassMapBase::containsProperty(const QString &propertyName) const {
