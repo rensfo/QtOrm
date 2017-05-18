@@ -13,7 +13,6 @@ class OneToOne : public Relation {
 public:
   explicit OneToOne(QObject *parent = nullptr);
 
-  QString getProperty() const;
   OneToOne &setProperty(const QString &property);
 
   QString getTableColumn() const;
@@ -22,7 +21,6 @@ public:
   OneToOne &setSaveCascade(bool value);
 
 private:
-  QString property;
   QString tableColumn;
 };
 }

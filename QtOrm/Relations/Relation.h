@@ -14,7 +14,10 @@ public:
   bool getSaveCascade() const;
   bool getDeleteCascade() const;
 
+  QString getProperty() const;
+
 protected:
+  QString property;
   bool saveCascade = false;
   bool deleteCascade = false;
 };

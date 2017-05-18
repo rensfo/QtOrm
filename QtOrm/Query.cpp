@@ -234,8 +234,8 @@ void Query::fillObject(QSharedPointer<QObject> &object, QSharedPointer<QueryTabl
 void Query::fillOneToMany(QSharedPointer<QObject> object, const QList<QSharedPointer<OneToMany>> &relations,
                           const QString &idProperty) {
   for (QSharedPointer<OneToMany> oneToMany : relations) {
-    QString refClass = oneToMany->getRefClass();
     QString property = oneToMany->getProperty();
+    QString refClass = Mapping::ClassMapBase::getTypeNameOfProperty(object, property);
     QString column = oneToMany->getColumn();
     QVariant value = object->property(idProperty.toStdString().data());
 
@@ -246,7 +246,7 @@ void Query::fillOneToMany(QSharedPointer<QObject> object, const QList<QSharedPoi
 
     QList<QSharedPointer<QObject>> qobjectList = getListObject(refClass, where, oneToMany->getOrderBy());
 
-    QSharedPointer<ClassMapBase> refClassBase = ConfigurationMap::getMappedClass(oneToMany->getRefClass());
+    QSharedPointer<ClassMapBase> refClassBase = ConfigurationMap::getMappedClass(refClass);
     auto kind = Mapping::ClassMapBase::getTypeKindOfProperty(object, property);
     QVariant var = refClassBase->castToList(kind, qobjectList);
     setObjectProperty(object, property, var);
@@ -404,7 +404,8 @@ void Query::refreshObjectData(QSharedPointer<QObject> object, QSharedPointer<Que
   QVariant idValue = object->property(classBase->getIdProperty()->getName().toStdString().data());
 
   for (QSharedPointer<OneToMany> oneToMany : classBase->getOneToManyRelations()) {
-    QSharedPointer<ClassMapBase> refClassBase = ConfigurationMap::getMappedClass(oneToMany->getRefClass());
+    QString oneToManyPropertyTypeName = Mapping::ClassMapBase::getTypeNameOfProperty(object, oneToMany->getProperty());
+    QSharedPointer<ClassMapBase> refClassBase = ConfigurationMap::getMappedClass(oneToManyPropertyTypeName);
     QString refColumn = oneToMany->getColumn();
     QList<QSharedPointer<QObject>> newChildren = getListObject(refClassBase->getClassName(), refColumn, idValue);
 

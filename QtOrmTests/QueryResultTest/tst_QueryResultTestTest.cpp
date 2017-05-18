@@ -300,7 +300,7 @@ void QueryResultTestTest::childrenOneToOneParent() {
   try {
     QSharedPointer<A> a = session.get<A>("code_1", "code2");
 
-    QCOMPARE(a, a->getChild().first()->getA());
+    QCOMPARE(a, a->getChild().first()->getA().toStrongRef());
     return;
   } catch (QtOrm::Exception &e) {
     qDebug() << e.getMessage();

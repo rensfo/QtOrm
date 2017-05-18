@@ -10,9 +10,12 @@ bool Relation::getSaveCascade() const {
   return saveCascade;
 }
 
-bool Relation::getDeleteCascade() const
-{
+bool Relation::getDeleteCascade() const {
   return deleteCascade;
+}
+
+QString Relation::getProperty() const {
+  return property;
 }
 }
 }

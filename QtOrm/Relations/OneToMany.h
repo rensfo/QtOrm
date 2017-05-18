@@ -16,13 +16,7 @@ class OneToMany : public Relation {
 public:
   explicit OneToMany(QObject *parent = nullptr);
 
-  QString getProperty() const;
   OneToMany &setProperty(const QString &property);
-
-  QString getRefClass() const;
-  OneToMany &setRefClass(const QString &refClass);
-  template <typename T>
-  OneToMany &setRefClass();
 
   QString getColumn() const;
   OneToMany &setColumn(const QString &column);
@@ -37,17 +31,11 @@ public:
   Sql::GroupConditions &getCondition();
 
 private:
-  QString property;
   QString refClass;
   QString column;
   QList<OrderColumn> orderBy;
   Sql::GroupConditions group;
 };
-
-template <typename T>
-OneToMany &OneToMany::setRefClass() {
-  return setRefClass(T::staticMetaObject.className());
-}
 }
 }
 #endif // ONETOMANY_H

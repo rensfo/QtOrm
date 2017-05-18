@@ -24,11 +24,11 @@ void B::setCode(const QString &value) {
   code = value;
 }
 
-QSharedPointer<A> B::getA() const{
+QWeakPointer<A> B::getA() const {
   return a;
 }
 
-void B::setA(const QSharedPointer<A> &value){
+void B::setA(const QWeakPointer<A> &value) {
   a = value;
   emit aChanged();
 }
