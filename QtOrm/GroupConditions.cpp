@@ -1,16 +1,28 @@
 #include "GroupConditions.h"
 
+#include "Conditions/Condition.h"
+
 namespace QtOrm {
 namespace Sql {
 
 GroupConditions::GroupConditions(QObject *parent) : QObject(parent) {
 }
 
-GroupConditions::GroupConditions(const GroupConditions &group) : GroupConditions(nullptr) {
-  setParent(group.parent());
-  operation = group.getOperation();
-  conditions = group.getConditions();
-  groups = group.getGroups();
+GroupConditions::GroupConditions() : GroupConditions(nullptr) {
+}
+
+GroupConditions::GroupConditions(const GroupConditions &other) : GroupConditions() {
+  setParent(other.parent());
+  operation = other.getOperation();
+  conditions = other.getConditions();
+  groups = other.getGroups();
+}
+
+GroupConditions::GroupConditions(GroupConditions &&other) : GroupConditions() {
+  operation = other.getOperation();
+  conditions = other.getConditions();
+  groups = other.getGroups();
+  other.clear();
 }
 GroupOperation GroupConditions::getOperation() const {
   return operation;
@@ -56,6 +68,54 @@ void GroupConditions::addCondition(const QString &property, const Operation &ope
   //  QSharedPointer<Condition> newFilter = ConditionFactory::create(property, operation, values);
 
   addCondition(QSharedPointer<Condition>::create(property, operation, values));
+}
+
+GroupConditions &GroupConditions::operator&&(const Condition &other) {
+  if (operation == GroupOperation::And) {
+    addCondition(other);
+  } else {
+    GroupConditions newGroup(std::move(*this));
+    operation = GroupOperation::And;
+    *this &&newGroup &&other;
+  }
+
+  return *this;
+}
+
+GroupConditions &GroupConditions::operator||(const Condition &other) {
+  if (operation == GroupOperation::Or) {
+    addCondition(other);
+  } else {
+    GroupConditions newGroup(std::move(*this));
+    operation = GroupOperation::Or;
+    *this || newGroup  || other;
+  }
+
+  return *this;
+}
+
+GroupConditions &GroupConditions::operator&&(const GroupConditions &other) {
+  if (operation == GroupOperation::And) {
+    addGroup(other);
+  } else {
+    GroupConditions newGroup(std::move(*this));
+    operation = GroupOperation::And;
+    *this &&newGroup &&other;
+  }
+
+  return *this;
+}
+
+GroupConditions &GroupConditions::operator||(const GroupConditions &other) {
+  if (operation == GroupOperation::Or) {
+    addGroup(other);
+  } else {
+    GroupConditions newGroup(std::move(*this));
+    operation = GroupOperation::Or;
+    *this || newGroup  || other;
+  }
+
+  return *this;
 }
 
 void GroupConditions::addEqual(const QString &fieldName, const QVariant &value) {

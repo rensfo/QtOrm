@@ -6,6 +6,9 @@ namespace Sql {
 Condition::Condition() {
 }
 
+Condition::Condition(const QString &property, const QVariant &value) : Condition(property, Operation::Equal, value) {
+}
+
 Condition::Condition(const QString &property, Operation operation, const QVariant &value)
     : property(property), operation(operation), values({value}) {
 }
@@ -53,6 +56,22 @@ Operation Condition::getOperation() const {
 
 void Condition::setOperation(const Operation &value) {
   operation = value;
+}
+
+GroupConditions Condition::operator&&(const Condition &other) {
+  return GroupConditions() && *this && other;
+}
+
+GroupConditions Condition::operator||(const Condition &other) {
+  return GroupConditions() || *this || other;
+}
+
+GroupConditions Condition::operator&&(const GroupConditions &other) {
+  return GroupConditions(other) && *this;
+}
+
+GroupConditions Condition::operator||(const GroupConditions &other) {
+  return GroupConditions(other) || *this;
 }
 }
 }

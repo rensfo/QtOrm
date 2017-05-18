@@ -1,6 +1,7 @@
 #include "SelectQueryModel.h"
 
 #include "ConfigurationMap.h"
+#include "Conditions/Condition.h"
 
 namespace QtOrm {
 namespace Sql {

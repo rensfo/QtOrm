@@ -4,7 +4,7 @@
 #include <QSharedPointer>
 #include <QVariant>
 
-#include "Operation.h"
+#include "GroupConditions.h"
 
 namespace QtOrm {
 namespace Sql {
@@ -12,6 +12,7 @@ namespace Sql {
 class Condition {
 public:
   Condition();
+  Condition(const QString &property, const QVariant &value);
   Condition(const QString &property, Operation operation, const QVariant &value);
   Condition(const QString &property, Operation operation, const QVariantList &values);
   Condition(const Condition &other);
@@ -27,6 +28,13 @@ public:
 
   Operation getOperation() const;
   void setOperation(const Operation &value);
+
+
+  GroupConditions operator&&(const Condition& other);
+  GroupConditions operator||(const Condition& other);
+
+  GroupConditions operator&&(const GroupConditions& other);
+  GroupConditions operator||(const GroupConditions& other);
 
 protected:
   QString property;

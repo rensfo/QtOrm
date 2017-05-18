@@ -4,18 +4,22 @@
 #include <QObject>
 #include <QSharedPointer>
 
-#include "Conditions/Condition.h"
+#include "Conditions/Operation.h"
 
 namespace QtOrm {
 namespace Sql {
 
 enum class GroupOperation { And, Or };
 
+class Condition;
+
 class GroupConditions : public QObject {
   Q_OBJECT
 public:
-  explicit GroupConditions(QObject *parent = nullptr);
-  GroupConditions(const GroupConditions &group);
+  GroupConditions(QObject *parent);
+  GroupConditions();
+  GroupConditions(const GroupConditions &other);
+  GroupConditions(GroupConditions &&other);
 
   GroupOperation getOperation() const;
   void setOperation(const GroupOperation &value);
@@ -49,6 +53,12 @@ public:
 
   void addCondition(const QString &property, const Operation &operation, const QVariant &value);
   void addCondition(const QString &property, const Operation &operation, const QVariantList &values);
+
+  GroupConditions &operator&&(const Condition &other);
+  GroupConditions &operator||(const Condition &other);
+
+  GroupConditions &operator&&(const GroupConditions &other);
+  GroupConditions &operator||(const GroupConditions &other);
 
 protected:
   GroupOperation operation = GroupOperation::And;

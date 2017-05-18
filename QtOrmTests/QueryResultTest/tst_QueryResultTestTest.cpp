@@ -17,6 +17,7 @@
 #include "SuperClassSMap.h"
 #include "TypeAMap.h"
 #include "dml.h"
+#include "Conditions/Condition.h"
 
 using namespace QtOrm;
 using namespace Sql;
@@ -280,7 +281,6 @@ void QueryResultTestTest::refreshChildObject() {
 
 void QueryResultTestTest::deleteChildAndRefresh() {
   try {
-
     QSqlQuery query(db);
 
     QSharedPointer<A> a = session.get<A>("code_1", "code2");
@@ -460,15 +460,15 @@ void QueryResultTestTest::OneTablePerHierarchySelect() {
       bool result = true;
       QList<long> SubClassS1Ids{1, 2};
       QList<long> SubClassS2Ids{3, 4};
-      if (SubClassS1Ids.contains(s->getId())){
+      if (SubClassS1Ids.contains(s->getId())) {
         result = qobject_cast<SubClassS1 *>(s);
-      } else if(SubClassS2Ids.contains(s->getId())) {
+      } else if (SubClassS2Ids.contains(s->getId())) {
         result = qobject_cast<SubClassS2 *>(s);
       } else {
         result = qobject_cast<SubClassS3 *>(s);
       }
 
-      if (!result){
+      if (!result) {
         QVERIFY(false);
         return;
       }
@@ -501,11 +501,10 @@ void QueryResultTestTest::OneTablePerHierarchyInsert() {
   QVERIFY(true);
 }
 
-void QueryResultTestTest::TablePerHierarchySelectWithReference()
-{
+void QueryResultTestTest::TablePerHierarchySelectWithReference() {
   try {
     QSharedPointer<SubClassS3> subS3 = session.getById<SubClassS3>(5);
-    if(subS3->getRef() && subS3->getRef().objectCast<SubClassS1>()){
+    if (subS3->getRef() && subS3->getRef().objectCast<SubClassS1>()) {
       QVERIFY(true);
       return;
     }

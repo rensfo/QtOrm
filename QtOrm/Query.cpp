@@ -12,6 +12,8 @@
 #include "ConfigurationMap.h"
 #include "SimpleSqlBuilder.h"
 
+#include "Conditions/Condition.h"
+
 namespace QtOrm {
 namespace Sql {
 

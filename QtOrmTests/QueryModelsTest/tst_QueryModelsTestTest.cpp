@@ -11,10 +11,12 @@
 
 #include "Sql.h"
 
-#include "QueryModels/SelectQueryModel.h"
 #include "QueryModels/DeleteQueryModel.h"
 #include "QueryModels/InsertQueryModel.h"
+#include "QueryModels/SelectQueryModel.h"
 #include "QueryModels/UpdateQueryModel.h"
+
+#include "Conditions/Condition.h"
 
 using namespace QtOrm;
 using namespace Sql;
@@ -36,6 +38,7 @@ private Q_SLOTS:
   void updateSql();
   void insertSql();
   void deleteSql();
+  void hardWhere();
 
 private:
   void registerClasses();
@@ -150,6 +153,21 @@ void QueryModelsTestTest::deleteSql() {
   query.buildModel();
 
   QCOMPARE(query.getSqlText(), expectedDeleteText);
+}
+
+void QueryModelsTestTest::hardWhere() {
+  QSharedPointer<ClassMapBase> classBase = ConfigurationMap::getMappedClass("A");
+  SelectQueryModel query;
+  query.setClassBase(classBase);
+  query.buildModel();
+
+  GroupConditions group =
+      (Condition("code_1", QVariant(1)) && Condition("code_1", Operation::Greater, QVariant(2))) ||
+      (Condition("code_1", Operation::Equal, QVariant(3)) &&
+       (Condition("code_1", Operation::LessOrEqual, QVariant(4)) || Condition("code_1", Operation::NotEqual, QVariant(5))));
+  query.setConditions(group);
+
+  QCOMPARE(query.getWhere(), expectedHardWhereClause);
 }
 
 void QueryModelsTestTest::registerClasses() {

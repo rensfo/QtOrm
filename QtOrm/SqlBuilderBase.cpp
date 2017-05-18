@@ -12,6 +12,7 @@
 #include "QueryModels/SelectQueryModel.h"
 #include "QueryModels/UpdateFieldQueryModel.h"
 #include "QueryModels/UpdateQueryModel.h"
+#include "Conditions/Condition.h"
 
 namespace QtOrm {
 namespace Sql {
