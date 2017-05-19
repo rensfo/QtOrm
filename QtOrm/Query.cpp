@@ -8,6 +8,7 @@
 #include <QSqlError>
 #include <QSqlField>
 #include <QSqlRecord>
+#include <QTime>
 
 #include "ConfigurationMap.h"
 #include "SimpleSqlBuilder.h"
@@ -200,12 +201,18 @@ void Query::executeQuery(QSqlQuery &query) {
   }
 
   QString executedQuery = getSqlTextWithBindParams(query);
+  QTime time;
+  QTime startTime = QTime::currentTime();
+  time.start();
   if (!query.exec()) {
     emit executedSql(executedQuery);
     QString errorMsg = QString("Query: %1 \nError: %2").arg(executedQuery).arg(query.lastError().text());
+    rollback();
     throw SqlException(errorMsg);
   }
-  emit executedSql(executedQuery);
+  int timeElapsed = time.elapsed();
+  QString fullExecutedMessage = QString("[%1](%2ms) %3").arg(startTime.toString("hh:mm:ss:zzzz")).arg(timeElapsed).arg(executedQuery);
+  emit executedSql(fullExecutedMessage);
 }
 
 QList<QSharedPointer<QObject>> Query::getList(QSqlQuery &query, const QSharedPointer<QueryModel> &queryModel) {

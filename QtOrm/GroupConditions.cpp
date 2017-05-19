@@ -59,14 +59,10 @@ void GroupConditions::addCondition(const QSharedPointer<Condition> &value) {
 }
 
 void GroupConditions::addCondition(const QString &property, const Operation &operation, const QVariant &value) {
-  //  QSharedPointer<Condition> newFilter = ConditionFactory::create(property, operation, value);
-
   addCondition(QSharedPointer<Condition>::create(property, operation, value));
 }
 
 void GroupConditions::addCondition(const QString &property, const Operation &operation, const QVariantList &values) {
-  //  QSharedPointer<Condition> newFilter = ConditionFactory::create(property, operation, values);
-
   addCondition(QSharedPointer<Condition>::create(property, operation, values));
 }
 
