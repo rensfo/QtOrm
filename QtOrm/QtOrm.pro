@@ -29,7 +29,6 @@ HEADERS += PropertyMap.h \
     AutoUpdater.h \
     QueryTableModel.h \
     QueryJoin.h \
-    QueryCache.h \
     Relations/Relation.h \
     Relations/OneToMany.h \
     Relations/OneToOne.h \
@@ -57,7 +56,6 @@ SOURCES += PropertyMap.cpp \
     AutoUpdater.cpp \
     QueryTableModel.cpp \
     QueryJoin.cpp \
-    QueryCache.cpp \
     Relations/Relation.cpp \
     Relations/OneToMany.cpp \
     Relations/OneToOne.cpp \

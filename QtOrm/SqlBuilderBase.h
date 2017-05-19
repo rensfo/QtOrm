@@ -11,7 +11,6 @@
 
 #include "ConfigurationMap.h"
 #include "GroupConditions.h"
-#include "QueryCache.h"
 #include "QueryModels/QueryModel.h"
 #include "Relations/OneToOne.h"
 
@@ -45,9 +44,6 @@ public:
 
   QSharedPointer<QueryModel> getQueryModel() const;
 
-  QSharedPointer<QueryCache> getQueryCache() const;
-  void setQueryCache(QSharedPointer<QueryCache> value);
-
   QList<OrderColumn> getOrderBy() const;
   void setOrderBy(const QList<OrderColumn> &value);
 
@@ -66,7 +62,6 @@ protected:
   GroupConditions conditions;
   QSharedPointer<QObject> object;
   QSharedPointer<QueryModel> queryModel;
-  QSharedPointer<QueryCache> queryCache;
   QString propertyName;
   QList<OrderColumn> orderBy;
 };

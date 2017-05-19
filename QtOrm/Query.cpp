@@ -530,7 +530,6 @@ Query &Query::operator=(const Query &other) {
   updater = other.getUpdater();
   registry = other.getRegistry();
   database = other.getDatabase();
-  queryCache = other.getQueryCache();
 
   return *this;
 }
@@ -582,7 +581,6 @@ bool Query::tryReopenDatabaseConnectionIfNeed() {
 SimpleSqlBuilder Query::createSimpleSqlBuilder(QSharedPointer<ClassMapBase> &classBase) {
   SimpleSqlBuilder sqlBuilder;
   sqlBuilder.setDatabase(database);
-  sqlBuilder.setQueryCache(queryCache);
   sqlBuilder.setClassBase(classBase);
 
   return sqlBuilder;
@@ -643,14 +641,6 @@ QSharedPointer<AutoUpdater> Query::getUpdater() const {
 
 void Query::setUpdater(const QSharedPointer<AutoUpdater> &value) {
   updater = value;
-}
-
-QSharedPointer<QueryCache> Query::getQueryCache() const {
-  return queryCache;
-}
-
-void Query::setQueryCache(QSharedPointer<QueryCache> value) {
-  queryCache = value;
 }
 
 void Query::clearRefreshedObject() {

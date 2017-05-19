@@ -11,7 +11,6 @@
 #include "AutoUpdater.h"
 #include "ClassMapBase.h"
 #include "GroupConditions.h"
-#include "QueryCache.h"
 #include "QueryModels/QueryModel.h"
 #include "Registry.h"
 #include "Relations/OneToOne.h"
@@ -43,9 +42,6 @@ public:
 
   QSharedPointer<Registry> getRegistry() const;
   void setRegistry(QSharedPointer<Registry> value);
-
-  QSharedPointer<QueryCache> getQueryCache() const;
-  void setQueryCache(QSharedPointer<QueryCache> value);
 
   void clearRefreshedObject();
 
@@ -118,7 +114,6 @@ protected:
 protected:
   QSharedPointer<Registry> registry;
   QSqlDatabase database;
-  QSharedPointer<QueryCache> queryCache;
   QList<QSharedPointer<QObject>> refreshedObject;
   QSharedPointer<AutoUpdater> updater;
 };

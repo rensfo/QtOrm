@@ -61,7 +61,6 @@ SimpleSqlBuilder &SimpleSqlBuilder::operator=(const SimpleSqlBuilder &other) {
   database = other.getDatabase();
   classBase = other.getClassBase();
   queryModel = other.getQueryModel();
-  queryCache = other.getQueryCache();
 
   return *this;
 }

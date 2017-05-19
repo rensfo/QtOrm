@@ -311,7 +311,6 @@ void QueryResultTestTest::childrenOneToOneParent() {
 void QueryResultTestTest::autoUpdate() {
   try {
     session.clearRegistry();
-    session.clearQueryCache();
     session.setAutoUpdate(true);
 
     QString newCode = "code2.2";

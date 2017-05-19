@@ -63,7 +63,6 @@ void AutoUpdater::onObjectPropertyChanged() {
     Query query;
     query.setDatabase(database);
     query.setRegistry(registry);
-    query.setQueryCache(queryCache);
 
     connect(&query, &Query::executedSql, this, &AutoUpdater::executedSql);
     query.saveOneField(sharedSender, senderPropertyName);
@@ -80,14 +79,6 @@ QMetaMethod AutoUpdater::findOnObjectPropertyChangedMethod() {
   }
 
   return result;
-}
-
-QSharedPointer<QueryCache> AutoUpdater::getQueryCache() const {
-  return queryCache;
-}
-
-void AutoUpdater::setQueryCache(const QSharedPointer<QueryCache> &value) {
-  queryCache = value;
 }
 
 QSqlDatabase AutoUpdater::getDatabase() const {

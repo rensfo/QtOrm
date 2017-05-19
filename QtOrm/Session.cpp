@@ -6,11 +6,9 @@
 namespace QtOrm {
 Session::Session(QObject *parent) : QObject(parent) {
   registry = QSharedPointer<Registry>::create();
-  queryCache = QSharedPointer<QueryCache>::create();
 
   updater = QSharedPointer<AutoUpdater>::create();
   updater->setRegistry(registry);
-  updater->setQueryCache(queryCache);
   connect(updater.data(), &AutoUpdater::executedSql, this, &Session::executedSql);
 }
 
@@ -37,10 +35,6 @@ void Session::clearRegistry() {
   registry->clear();
 }
 
-void Session::clearQueryCache() {
-  queryCache->clear();
-}
-
 void Session::removeFromCache(QSharedPointer<QObject> object) {
   if (registry) {
     registry->remove(object);
@@ -51,7 +45,6 @@ Query Session::createQuery() {
   Query query;
   query.setDatabase(database);
   query.setRegistry(registry);
-  query.setQueryCache(queryCache);
   if (autoUpdate) {
     query.setUpdater(updater);
   }

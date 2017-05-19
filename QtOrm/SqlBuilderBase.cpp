@@ -70,29 +70,11 @@ void SqlBuilderBase::bindValues(QSqlQuery &query, const QSharedPointer<GroupCond
 }
 
 QSharedPointer<QueryModel> SqlBuilderBase::getQueryModel(QueryModelType queryType) {
-  QString className = classBase->getClassName();
-  if (queryCache) {
-    if (QSharedPointer<QueryModel> model = queryCache->getModel(queryType, className, propertyName)) {
-      if (queryType == QueryModelType::Select) {
-        QSharedPointer<SelectQueryModel> selectModel = model.dynamicCast<SelectQueryModel>();
-        selectModel->setConditions(conditions);
-        selectModel->setOrderColumns(orderBy);
-      }
-      model->buildModel();
-      return model;
-    }
-  }
-
   return createModelAndAddToCache(queryType);
 }
 
 QSharedPointer<QueryModel> SqlBuilderBase::createModelAndAddToCache(QueryModelType queryType) {
-  QString className = classBase->getClassName();
   QSharedPointer<QueryModel> newModel = createModel(queryType);
-  if (queryCache) {
-    queryCache->addModel(queryType, newModel, className, propertyName);
-  }
-
   return newModel;
 }
 
@@ -155,14 +137,6 @@ QList<OrderColumn> SqlBuilderBase::getOrderBy() const {
 
 void SqlBuilderBase::setOrderBy(const QList<OrderColumn> &value) {
   orderBy = value;
-}
-
-QSharedPointer<QueryCache> SqlBuilderBase::getQueryCache() const {
-  return queryCache;
-}
-
-void SqlBuilderBase::setQueryCache(QSharedPointer<QueryCache> value) {
-  queryCache = value;
 }
 
 QSharedPointer<QueryModel> SqlBuilderBase::getQueryModel() const {
