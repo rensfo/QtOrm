@@ -6,6 +6,7 @@
 #include "AMap.h"
 #include "BMap.h"
 #include "CMap.h"
+#include "Conditions/Condition.h"
 #include "DMap.h"
 #include "EMap.h"
 #include "Exception.h"
@@ -17,7 +18,6 @@
 #include "SuperClassSMap.h"
 #include "TypeAMap.h"
 #include "dml.h"
-#include "Conditions/Condition.h"
 
 using namespace QtOrm;
 using namespace Sql;
@@ -38,6 +38,7 @@ private Q_SLOTS:
   void oneColumnTwoTimesInWhere();
   void insertObject();
   void deleteObject();
+  void deleteCascade();
   void updateObject();
   void where();
   void orderBy();
@@ -172,6 +173,22 @@ void QueryResultTestTest::insertObject() {
 }
 
 void QueryResultTestTest::deleteObject() {
+  try {
+    QSharedPointer<A> a = session.getById<A>(1);
+    session.deleteObject<A>(a);
+
+    a.clear();
+    a = session.getById<A>(1);
+
+    QVERIFY(!a);
+    return;
+  } catch (QtOrm::Exception &e) {
+    qDebug() << e.getMessage();
+  }
+  QVERIFY(false);
+}
+
+void QueryResultTestTest::deleteCascade() {
   try {
     QSharedPointer<A> a = session.getById<A>(1);
     session.deleteObject<A>(a);
