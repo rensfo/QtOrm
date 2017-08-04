@@ -145,7 +145,7 @@ QString ClassMapBase::getTypeNameOfProperty(QSharedPointer<QObject> obj, const Q
 QString ClassMapBase::getTypeNameOfProperty(const QMetaObject &meta, const QString &prop) {
   QString propertyType = getPropertyType(meta, prop);
 
-  QRegExp rx("(\\w+<)*(\\w+)[*]*>*");
+  QRegExp rx("(\\w+<)*([\\w|:]+)[*]*>*");
   int pos = rx.indexIn(propertyType);
   QString result = propertyType;
   if (pos > -1) {
