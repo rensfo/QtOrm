@@ -13,7 +13,7 @@ public:
 
   oneToOne("kindA").setTableColumn("idKindA");
 
-  oneToMany("child").setColumn("idA").setOrderBy("code", Sort::DESC);
+  oneToMany("child").setColumn("idA").setSaveCascade(true).setOrderBy("code", Sort::DESC);
   }
 };
 

@@ -408,10 +408,12 @@ void Query::refreshObjectData(QSharedPointer<QObject> object, QSharedPointer<Que
   for (QSharedPointer<OneToOne> oneToOne : classBase->getOneToOneRelations()) {
     QVariant propertyValue = object->property(oneToOne->getProperty().toStdString().data());
     QObject* qobjectPropertyValue = propertyValue.value<QObject*>();
-    QSharedPointer<QObject> oneToOneObj = registry->value(qobjectPropertyValue);
-    if (!refreshedObject.contains(oneToOneObj)) {
-      QSharedPointer<QueryJoin> join = queryTableModel->findJoinByColumnName(oneToOne->getTableColumn());
-      refreshObjectData(oneToOneObj, join->getQueryTableModel(), record);
+    if(qobjectPropertyValue) {
+      QSharedPointer<QObject> oneToOneObj = registry->value(qobjectPropertyValue);
+      if (!refreshedObject.contains(oneToOneObj)) {
+        QSharedPointer<QueryJoin> join = queryTableModel->findJoinByColumnName(oneToOne->getTableColumn());
+        refreshObjectData(oneToOneObj, join->getQueryTableModel(), record);
+      }
     }
   }
 
@@ -489,15 +491,17 @@ void Query::saveAllOneToMany(QSharedPointer<QObject> object) {
 }
 
 void Query::saveOneToMany(QSharedPointer<QObject> object, QSharedPointer<OneToMany> oneToMany) {
-  QVariant val = object->property(oneToMany->getProperty().toStdString().data());
-  QSequentialIterable iterable = val.value<QSequentialIterable>();
+  QString property = oneToMany->getProperty();
+  QVariant val = object->property(property.toStdString().data());
+  TypeKind type = ClassMapBase::getTypeKindOfProperty(object, property);
+  QString propertyTypeName = ClassMapBase::getTypeNameOfProperty(object, property);
+  QSharedPointer<ClassMapBase> refClassBase = ConfigurationMap::getMappedClass(propertyTypeName);
+  QList<QSharedPointer<QObject>> list = refClassBase->castFromList(type, val);
 
-  for (const QVariant &variantItem : iterable) {
+  for (auto item : list) {
     Query subQuery(*this);
     connect(&subQuery, &Query::executedSql, this, &Query::executedSql);
-    auto qobject = variantItem.value<QObject*>();
-    auto sharedObject = registry->value(qobject);
-    subQuery.saveObjectWoStartTransaction(sharedObject);
+    subQuery.saveObjectWoStartTransaction(item);
   }
 }
 

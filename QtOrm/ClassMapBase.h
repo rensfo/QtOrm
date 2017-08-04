@@ -64,6 +64,16 @@ public:
   virtual QVariant castToConcreteWeakPointer(QSharedPointer<QObject> value) = 0;
   virtual QVariant castToConcretePointer(QSharedPointer<QObject> value) = 0;
 
+  virtual QList<QSharedPointer<QObject>> castFromList(TypeKind kind, const QVariant& value) = 0;
+  virtual QList<QSharedPointer<QObject>> castFromConcreteSharedPointerList(const QVariant& value) = 0;
+  virtual QList<QSharedPointer<QObject>> castFromConcreteWeakPointerList(const QVariant& value) = 0;
+  virtual QList<QSharedPointer<QObject>> castFromConcretePointerList(const QVariant& value) = 0;
+
+  virtual QSharedPointer<QObject> castFrom(TypeKind kind, const QVariant& value) = 0;
+  virtual QSharedPointer<QObject> castFromConcreteSharedPointer(const QVariant& value) = 0;
+  virtual QSharedPointer<QObject> castFromConcreteWeakPointer(const QVariant& value) = 0;
+  virtual QSharedPointer<QObject> castFromConcretePointer(const QVariant& value) = 0;
+
   virtual QSharedPointer<OneToOne> findOneToOneByPropertyName(const QString &propertyName);
   virtual QSharedPointer<OneToMany> findOneToManyByPropertyName(const QString &propertyName);
 

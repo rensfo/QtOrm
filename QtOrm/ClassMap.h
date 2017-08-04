@@ -28,6 +28,16 @@ public:
   QVariant castToConcreteWeakPointer(QSharedPointer<QObject> value) override;
   QVariant castToConcretePointer(QSharedPointer<QObject> value) override;
 
+  virtual QList<QSharedPointer<QObject> > castFromList(TypeKind kind, const QVariant&value) override;
+  virtual QList<QSharedPointer<QObject> > castFromConcreteSharedPointerList(const QVariant&value) override;
+  virtual QList<QSharedPointer<QObject> > castFromConcreteWeakPointerList(const QVariant&value) override;
+  virtual QList<QSharedPointer<QObject> > castFromConcretePointerList(const QVariant&value) override;
+
+  virtual QSharedPointer<QObject> castFrom(TypeKind kind, const QVariant&value) override;
+  virtual QSharedPointer<QObject> castFromConcreteSharedPointer(const QVariant&value) override;
+  virtual QSharedPointer<QObject> castFromConcreteWeakPointer(const QVariant&value) override;
+  virtual QSharedPointer<QObject> castFromConcretePointer(const QVariant&value) override;
+
 protected:
   virtual void checkProperty(const QString &propertyName) override;
   virtual void checkRelationProperty(const QString &propertyName) override;
@@ -109,6 +119,87 @@ QVariant ClassMap<T>::castToConcreteWeakPointer(QSharedPointer<QObject> value) {
 template <typename T>
 QVariant ClassMap<T>::castToConcretePointer(QSharedPointer<QObject> value) {
   return QVariant::fromValue(value.objectCast<T>().data());
+}
+
+template<typename T>
+QList<QSharedPointer<QObject> > ClassMap<T>::castFromList(TypeKind kind, const QVariant&value)
+{
+  if (kind == TypeKind::Pointer) {
+    return castFromConcretePointerList(value);
+  } else if (kind == TypeKind::SharedPointer) {
+    return castFromConcreteSharedPointerList(value);
+  }
+
+  return castFromConcreteWeakPointerList(value);
+}
+
+template<typename T>
+QList<QSharedPointer<QObject> > ClassMap<T>::castFromConcreteSharedPointerList(const QVariant&value)
+{
+  QList<QSharedPointer<T>> list = value.value<QList<QSharedPointer<T>>>();
+  QList<QSharedPointer<QObject>> result;
+  for(QSharedPointer<T> item : list) {
+    result << item.template objectCast<QObject>();
+  }
+
+  return result;
+}
+
+template<typename T>
+QList<QSharedPointer<QObject> > ClassMap<T>::castFromConcreteWeakPointerList(const QVariant&value)
+{
+  QList<QWeakPointer<T>> list = value.value<QList<QWeakPointer<T>>>();
+  QList<QSharedPointer<QObject>> result;
+  for(auto item : list) {
+    result << item.toStrongRef().template objectCast<QObject>();
+  }
+
+  return result;
+}
+
+template<typename T>
+QList<QSharedPointer<QObject>> ClassMap<T>::castFromConcretePointerList(const QVariant&value)
+{
+  QList<T*> list = value.value<QList<T*>>();
+  QList<QSharedPointer<QObject>> result;
+  for(auto item : list) {
+    result << QSharedPointer<QObject>(item);
+  }
+
+  return result;
+}
+
+template<typename T>
+QSharedPointer<QObject> ClassMap<T>::castFrom(TypeKind kind, const QVariant&value)
+{
+  if (kind == TypeKind::Pointer) {
+    return castFromConcretePointer(value);
+  } else if (kind == TypeKind::SharedPointer) {
+    return castFromConcreteSharedPointer(value);
+  }
+
+  return castFromConcreteWeakPointer(value);
+}
+
+template<typename T>
+QSharedPointer<QObject> ClassMap<T>::castFromConcreteSharedPointer(const QVariant&value)
+{
+  QSharedPointer<T> sharedPointer = value.value<QSharedPointer<T>>();
+  return sharedPointer.template objectCast<QObject>();
+}
+
+template<typename T>
+QSharedPointer<QObject> ClassMap<T>::castFromConcreteWeakPointer(const QVariant&value)
+{
+  QWeakPointer<T> weakPointer = value.value<QWeakPointer<T>>();
+  return weakPointer.toStrongRef().template objectCast<QObject>();
+}
+
+template<typename T>
+QSharedPointer<QObject> ClassMap<T>::castFromConcretePointer(const QVariant&value)
+{
+  T* pointer = value.value<T*>();
+  return QSharedPointer<QObject>(pointer);
 }
 
 template <typename T>

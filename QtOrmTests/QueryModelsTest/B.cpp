@@ -5,7 +5,8 @@
 B::B(QObject *parent) : QObject(parent) {
 }
 
-B::~B() {
+B::~B()
+{
 }
 
 long B::getId() const {
