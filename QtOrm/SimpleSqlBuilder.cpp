@@ -110,7 +110,8 @@ void SimpleSqlBuilder::bindQueryParams(QSqlQuery &query, QSharedPointer<Property
   QString placeHolder = getPlaceHolder(property->getColumn());
   QVariant propertyValue = object->property(property->getName().toStdString().c_str());
   QVariant resultValue;
-  if (propertyValue != property->getNull()) {
+  QVariant nullValue = property->getNull();
+  if (propertyValue != nullValue) {
     resultValue = propertyValue;
   }
   query.bindValue(placeHolder, resultValue);

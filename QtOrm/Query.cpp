@@ -235,8 +235,13 @@ void Query::fillObject(QSharedPointer<QObject> &object, QSharedPointer<QueryTabl
   for (auto prop : properties) {
     QString queryColumn = getQueryColumn(queryTableModel, prop);
     QVariant value = record.value(queryColumn);
-    if (value.isValid())
+    QVariant nullValue = prop->getNull();
+    if(value.isNull() && nullValue.isValid()) {
+      value = nullValue;
+    }
+    if (value.isValid()) {
       setObjectProperty(object, prop->getName(), value);
+    }
   }
 }
 

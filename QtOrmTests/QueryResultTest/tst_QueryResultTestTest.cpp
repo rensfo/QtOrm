@@ -38,7 +38,6 @@ private Q_SLOTS:
   void oneColumnTwoTimesInWhere();
   void insertObject();
   void deleteObject();
-  void deleteCascade();
   void updateObject();
   void where();
   void orderBy();
@@ -188,22 +187,6 @@ void QueryResultTestTest::deleteObject() {
   QVERIFY(false);
 }
 
-void QueryResultTestTest::deleteCascade() {
-  try {
-    QSharedPointer<A> a = session.getById<A>(1);
-    session.deleteObject<A>(a);
-
-    a.clear();
-    a = session.getById<A>(1);
-
-    QVERIFY(!a);
-    return;
-  } catch (QtOrm::Exception &e) {
-    qDebug() << e.getMessage();
-  }
-  QVERIFY(false);
-}
-
 void QueryResultTestTest::updateObject() {
   try {
     session.clearRegistry();
@@ -256,7 +239,7 @@ void QueryResultTestTest::refreshObject() {
 
     QSharedPointer<A> a = session.get<A>("code_1", "code2");
     if (query.exec("update A set code = null where code = 'code2'")) {
-      session.refresh<A>(a);
+      session.refresh(a);
       QCOMPARE(a->getCode(), QString(""));
 
       a->setCode("code2");

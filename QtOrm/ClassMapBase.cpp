@@ -31,7 +31,7 @@ PropertyMap &ClassMapBase::id(QString propertyName) {
   }
 
   idProperty = propertyName;
-  return createProperty(propertyName).setColumn(propertyName).setIsId(true);
+  return createProperty(propertyName).setColumn(propertyName).setIsId(true).setNull(0);
 }
 
 PropertyMap &ClassMapBase::id(const QString &propertyName, const QString &columnName) {
