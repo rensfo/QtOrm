@@ -34,9 +34,14 @@ public:
 private Q_SLOTS:
   void initTestCase();
   void cleanupTestCase();
-  void unregisteredClass();
+
+  void objectFromRegistry_data();
   void objectFromRegistry();
+
+  void oneTableTwoTimesInQuery_data();
   void oneTableTwoTimesInQuery();
+
+  void oneColumnTwoTimesInWhere_data();
   void oneColumnTwoTimesInWhere();
 
   void insertObject_data();
@@ -60,36 +65,55 @@ private Q_SLOTS:
   void refreshChildObject_data();
   void refreshChildObject();
 
+  void deleteChildAndRefresh_data();
   void deleteChildAndRefresh();
+
+  void childrenOneToOneParent_data();
   void childrenOneToOneParent();
+
+  void autoUpdate_data();
   void autoUpdate();
+
+  void operationBetween_data();
   void operationBetween();
+
+  void operationIn_data();
   void operationIn();
+
+  void operationGreater_data();
   void operationGreater();
+
+  void operationGreaterOrEqual_data();
   void operationGreaterOrEqual();
+
+  void operationLess_data();
   void operationLess();
+
+  void operationLessOrEqual_data();
   void operationLessOrEqual();
+
+  void operationLike_data();
   void operationLike();
+
+  void nullValueUpdate_data();
   void nullValueUpdate();
+
+  void OneTablePerHierarchySelect_data();
   void OneTablePerHierarchySelect();
+
+  void OneTablePerHierarchyConcreteSelect_data();
   void OneTablePerHierarchyConcreteSelect();
+
+  void OneTablePerHierarchyInsert_data();
   void OneTablePerHierarchyInsert();
+
+  void TablePerHierarchySelectWithReference_data();
   void TablePerHierarchySelectWithReference();
 
 private:
   void enableLogSql();
-  bool openConnection();
   QSqlDatabase openConnection(const QString& name);
   void initDataBase(const QString& dbName, const QStringList& dml);
-  void configurateSession();
-  void registerClasses();
-  bool createTables();
-  bool fillData();
-  bool executeListCommand(const QStringList& commands);
-
-  bool dropDatabase(const QString& dbName);
-  void closeConnection();
-
   template <typename T>
   T find(QList<T> container, std::function<bool(T)> func);
 
@@ -97,7 +121,6 @@ private:
   QtOrm::Session session;
   QSqlQuery query;
   QSqlDatabase db;
-  QString dbName = "UnitTests.sqlite";
 };
 
 QueryResultTestTest::QueryResultTestTest()
@@ -106,40 +129,28 @@ QueryResultTestTest::QueryResultTestTest()
 
 void QueryResultTestTest::initTestCase()
 {
-  QVERIFY(openConnection());
-  QVERIFY(createTables());
-  QVERIFY(fillData());
-
-  configurateSession();
 }
 
 void QueryResultTestTest::cleanupTestCase()
 {
-  closeConnection();
-  QVERIFY(dropDatabase(dbName));
 }
 
-void QueryResultTestTest::unregisteredClass()
+void QueryResultTestTest::objectFromRegistry_data()
 {
-  try
-  {
-    auto res = session.getList<A>();
-    Q_UNUSED(res)
-  }
-  catch (NotRegistredClassException& e)
-  {
-    Q_UNUSED(e)
-    QVERIFY(true);
-    return;
-  }
-  QVERIFY(false);
+  initDataBase("objectFromRegistry", { "create table A(id integer primary key autoincrement, code text, idKindA integer)" });
+  session.clearRegistry();
+  ConfigurationMap::removeAllMappings();
+  ConfigurationMap::addMapping<AOnlyMap>();
+  QSharedPointer<A> a = QSharedPointer<A>::create();
+  a->setCode("code1");
+  session.saveObject(a);
+  session.clearRegistry();
 }
 
 void QueryResultTestTest::objectFromRegistry()
 {
   try
   {
-    registerClasses();
     QSharedPointer<A> a = session.getById<A>(1);
     QSharedPointer<A> aFromRegistry = session.getById<A>(1);
 
@@ -151,6 +162,47 @@ void QueryResultTestTest::objectFromRegistry()
 
     QVERIFY(false);
   }
+}
+
+void QueryResultTestTest::oneTableTwoTimesInQuery_data()
+{
+  initDataBase("oneTableTwoTimesInQuery", { "create table E(id integer primary key autoincrement, idC integer, idD integer, foreign key (idC)  references  C(id), foreign key (idD)  references D(id))",
+                                            "create table C(id integer primary key autoincrement, idKindA integer, foreign key (idKindA)  references KindA(id))",
+                                            "create table D(id integer primary key autoincrement, idKindA integer, foreign key (idKindA)  references KindA(id))",
+                                            "create table KindA(id integer primary key autoincrement, code text, name text, idTypeA integer, foreign key (idTypeA) references TypeA(id))",
+                                            "create table TypeA(id integer primary key autoincrement, code text, name text)"});
+  session.clearRegistry();
+  ConfigurationMap::removeAllMappings();
+  ConfigurationMap::addMappings<EMap, CMap, DMap, TypeAMap, KindAMap>();
+
+  QSharedPointer<TypeA> typeA = QSharedPointer<TypeA>::create();
+  typeA->setCode("code1");
+  typeA->setName("value1");
+  session.saveObject(typeA);
+
+  QSharedPointer<KindA> kindA = QSharedPointer<KindA>::create();
+  kindA->setCode("code1");
+  kindA->setName("value1");
+  session.saveObject(kindA);
+
+  QSharedPointer<KindA> kindA2 = QSharedPointer<KindA>::create();
+  kindA2->setCode("code2");
+  kindA2->setName("value2");
+  session.saveObject(kindA2);
+
+  QSharedPointer<C> c = QSharedPointer<C>::create();
+  c->setKindA(kindA);
+  session.saveObject(c);
+
+  QSharedPointer<D> d = QSharedPointer<D>::create();
+  d->setKindA(kindA2);
+  session.saveObject(d);
+
+  QSharedPointer<E> e = QSharedPointer<E>::create();
+  e->setC(c);
+  e->setD(d);
+  session.saveObject(e);
+  session.clearRegistry();
 }
 
 void QueryResultTestTest::oneTableTwoTimesInQuery()
@@ -170,11 +222,25 @@ void QueryResultTestTest::oneTableTwoTimesInQuery()
   }
 }
 
+void QueryResultTestTest::oneColumnTwoTimesInWhere_data()
+{
+  initDataBase("oneColumnTwoTimesInWhere", { "create table A(id integer primary key autoincrement, code text, idKindA integer)" });
+  session.clearRegistry();
+  session.setAutoUpdate(false);
+  ConfigurationMap::removeAllMappings();
+  ConfigurationMap::addMapping<AOnlyMap>();
+  for(auto c : QStringList{"code1", "code2", "code3", "code11", "code22"}) {
+    QSharedPointer<A> a = QSharedPointer<A>::create();
+    a->setCode(c);
+    session.saveObject(a);
+  }
+  session.clearRegistry();
+}
+
 void QueryResultTestTest::oneColumnTwoTimesInWhere()
 {
   try
   {
-
     GroupConditions gc;
     gc.setOperation(GroupOperation::Or);
     gc.addEqual("code_1", "code1");
@@ -342,12 +408,16 @@ void QueryResultTestTest::orderBy()
 {
   try
   {
-    //            connect(&session, &Session::executedSql, [](QString sql){ qDebug() << sql; });
     QSharedPointer<A> a = session.getById<A>(1);
 
-    QCOMPARE(a->getChild()[0]->getCode(), QString("code2.3"));
-    QCOMPARE(a->getChild()[1]->getCode(), QString("code2.2"));
-    QCOMPARE(a->getChild()[2]->getCode(), QString("code2.1"));
+    auto child = a->getChild();
+    if(child.count()){
+      QCOMPARE(child[0]->getCode(), QString("code2.3"));
+      QCOMPARE(child[1]->getCode(), QString("code2.2"));
+      QCOMPARE(child[2]->getCode(), QString("code2.1"));
+    } else {
+      QVERIFY(false);
+    }
   }
   catch (QtOrm::Exception& e)
   {
@@ -380,9 +450,6 @@ void QueryResultTestTest::refreshObject()
     {
       session.refresh(a);
       QCOMPARE(a->getCode(), QString(""));
-
-      a->setCode("code2");
-      session.saveObject(a);
       return;
     }
     QVERIFY(false);
@@ -412,6 +479,7 @@ void QueryResultTestTest::refreshChildObject_data()
   for(auto c : QStringList{"code2.3", "code2.2", "code2.1"}) {
     QSharedPointer<B> b = QSharedPointer<B>::create();
     b->setCode(c);
+    b->setA(a);
     child << b;
   }
   a->setChild(child);
@@ -435,11 +503,6 @@ void QueryResultTestTest::refreshChildObject()
       };
       QSharedPointer<B> updatedB = this->find<QSharedPointer<B>>(a->getChild(), func);
       QVERIFY(updatedB != nullptr);
-      if (updatedB)
-      {
-        updatedB->setCode("code2.2");
-        session.saveObject(updatedB);
-      }
       return;
     }
   }
@@ -449,6 +512,32 @@ void QueryResultTestTest::refreshChildObject()
   }
 
   QVERIFY(false);
+}
+
+void QueryResultTestTest::deleteChildAndRefresh_data()
+{
+  initDataBase("deleteChildAndRefresh", { "create table TypeA(id integer primary key autoincrement, code text, name text)",
+                                  "create table KindA(id integer primary key autoincrement, code text, name text, idTypeA integer, foreign key (idTypeA) references TypeA(id))",
+                                  "create table A(id integer primary key autoincrement, code text, idKindA integer, foreign key (idKindA) references KindA(id))",
+                                  "create table B(id integer primary key autoincrement, idA integer, code text, foreign key (idA)  references A(id))"});
+  session.clearRegistry();
+  session.setAutoUpdate(false);
+  ConfigurationMap::removeAllMappings();
+  ConfigurationMap::addMappings<AMap, BMap, KindAMap, TypeAMap>();
+
+  QSharedPointer<A> a = QSharedPointer<A>::create();
+  a->setCode("code2");
+
+  QList<QSharedPointer<B>> child;
+  for(auto c : QStringList{"code2.3", "code2.2", "code2.1"}) {
+    QSharedPointer<B> b = QSharedPointer<B>::create();
+    b->setCode(c);
+    b->setA(a);
+    child << b;
+  }
+  a->setChild(child);
+  session.saveObject(a);
+  session.clearRegistry();
 }
 
 void QueryResultTestTest::deleteChildAndRefresh()
@@ -473,13 +562,44 @@ void QueryResultTestTest::deleteChildAndRefresh()
   QVERIFY(false);
 }
 
+void QueryResultTestTest::childrenOneToOneParent_data()
+{
+  initDataBase("childrenOneToOneParent", { "create table TypeA(id integer primary key autoincrement, code text, name text)",
+                                  "create table KindA(id integer primary key autoincrement, code text, name text, idTypeA integer, foreign key (idTypeA) references TypeA(id))",
+                                  "create table A(id integer primary key autoincrement, code text, idKindA integer, foreign key (idKindA) references KindA(id))",
+                                  "create table B(id integer primary key autoincrement, idA integer, code text, foreign key (idA)  references A(id))"});
+  session.clearRegistry();
+  session.setAutoUpdate(false);
+  ConfigurationMap::removeAllMappings();
+  ConfigurationMap::addMappings<AMap, BMap, KindAMap, TypeAMap>();
+
+  QSharedPointer<A> a = QSharedPointer<A>::create();
+  a->setCode("code2");
+
+  QList<QSharedPointer<B>> child;
+  for(auto c : QStringList{"code2.3", "code2.2", "code2.1"}) {
+    QSharedPointer<B> b = QSharedPointer<B>::create();
+    b->setCode(c);
+    b->setA(a);
+    child << b;
+  }
+  a->setChild(child);
+  session.saveObject(a);
+  session.clearRegistry();
+}
+
 void QueryResultTestTest::childrenOneToOneParent()
 {
   try
   {
     QSharedPointer<A> a = session.get<A>("code_1", "code2");
 
-    QCOMPARE(a, a->getChild().first()->getA().toStrongRef());
+    auto child = a->getChild() ;
+    if(child.count()){
+      QCOMPARE(a, child.first()->getA().toStrongRef());
+    } else {
+      QVERIFY(false);
+    }
     return;
   }
   catch (QtOrm::Exception& e)
@@ -489,13 +609,25 @@ void QueryResultTestTest::childrenOneToOneParent()
   QVERIFY(false);
 }
 
+void QueryResultTestTest::autoUpdate_data()
+{
+  initDataBase("autoUpdate", { "create table A(id integer primary key autoincrement, code text, idKindA integer)" });
+  session.clearRegistry();
+  session.setAutoUpdate(true);
+  ConfigurationMap::removeAllMappings();
+  ConfigurationMap::addMapping<AOnlyMap>();
+  for(auto c : QStringList{"code1", "code2", "code3", "code11", "code22"}) {
+    QSharedPointer<A> a = QSharedPointer<A>::create();
+    a->setCode(c);
+    session.saveObject(a);
+  }
+  session.clearRegistry();
+}
+
 void QueryResultTestTest::autoUpdate()
 {
   try
   {
-    session.clearRegistry();
-    session.setAutoUpdate(true);
-
     QString newCode = "code2.2";
     QString oldCode = "code2";
 
@@ -505,10 +637,6 @@ void QueryResultTestTest::autoUpdate()
     session.clearRegistry();
     a = session.get<A>("code_1", newCode);
     QCOMPARE(a->getCode(), newCode);
-
-    a->setCode(oldCode);
-    session.setAutoUpdate(false);
-    session.clearRegistry();
     return;
   }
   catch (QtOrm::Exception& e)
@@ -516,6 +644,21 @@ void QueryResultTestTest::autoUpdate()
     qDebug() << e.getMessage();
   }
   QVERIFY(false);
+}
+
+void QueryResultTestTest::operationBetween_data()
+{
+  initDataBase("operationBetween", { "create table A(id integer primary key autoincrement, code text, idKindA integer)" });
+  session.clearRegistry();
+  session.setAutoUpdate(false);
+  ConfigurationMap::removeAllMappings();
+  ConfigurationMap::addMapping<AOnlyMap>();
+  for(auto c : QStringList{"code1", "code2", "code3", "code11", "code22"}) {
+    QSharedPointer<A> a = QSharedPointer<A>::create();
+    a->setCode(c);
+    session.saveObject(a);
+  }
+  session.clearRegistry();
 }
 
 void QueryResultTestTest::operationBetween()
@@ -536,6 +679,21 @@ void QueryResultTestTest::operationBetween()
   QVERIFY(false);
 }
 
+void QueryResultTestTest::operationIn_data()
+{
+  initDataBase("operationIn", { "create table A(id integer primary key autoincrement, code text, idKindA integer)" });
+  session.clearRegistry();
+  session.setAutoUpdate(false);
+  ConfigurationMap::removeAllMappings();
+  ConfigurationMap::addMapping<AOnlyMap>();
+  for(auto c : QStringList{"code1", "code2", "code3", "code11", "code22"}) {
+    QSharedPointer<A> a = QSharedPointer<A>::create();
+    a->setCode(c);
+    session.saveObject(a);
+  }
+  session.clearRegistry();
+}
+
 void QueryResultTestTest::operationIn()
 {
   try
@@ -552,6 +710,21 @@ void QueryResultTestTest::operationIn()
     qDebug() << e.getMessage();
   }
   QVERIFY(false);
+}
+
+void QueryResultTestTest::operationGreater_data()
+{
+  initDataBase("operationGreater", { "create table A(id integer primary key autoincrement, code text, idKindA integer)" });
+  session.clearRegistry();
+  session.setAutoUpdate(false);
+  ConfigurationMap::removeAllMappings();
+  ConfigurationMap::addMapping<AOnlyMap>();
+  for(auto c : QStringList{"code1", "code2", "code3", "code11"}) {
+    QSharedPointer<A> a = QSharedPointer<A>::create();
+    a->setCode(c);
+    session.saveObject(a);
+  }
+  session.clearRegistry();
 }
 
 void QueryResultTestTest::operationGreater()
@@ -572,6 +745,21 @@ void QueryResultTestTest::operationGreater()
   QVERIFY(false);
 }
 
+void QueryResultTestTest::operationGreaterOrEqual_data()
+{
+  initDataBase("operationGreaterOrEqual", { "create table A(id integer primary key autoincrement, code text, idKindA integer)" });
+  session.clearRegistry();
+  session.setAutoUpdate(false);
+  ConfigurationMap::removeAllMappings();
+  ConfigurationMap::addMapping<AOnlyMap>();
+  for(auto c : QStringList{"code1", "code2", "code3", "code11"}) {
+    QSharedPointer<A> a = QSharedPointer<A>::create();
+    a->setCode(c);
+    session.saveObject(a);
+  }
+  session.clearRegistry();
+}
+
 void QueryResultTestTest::operationGreaterOrEqual()
 {
   try
@@ -590,30 +778,27 @@ void QueryResultTestTest::operationGreaterOrEqual()
   QVERIFY(false);
 }
 
+void QueryResultTestTest::operationLess_data()
+{
+  initDataBase("operationLess", { "create table A(id integer primary key autoincrement, code text, idKindA integer)" });
+  session.clearRegistry();
+  session.setAutoUpdate(false);
+  ConfigurationMap::removeAllMappings();
+  ConfigurationMap::addMapping<AOnlyMap>();
+  for(auto c : QStringList{"code1", "code2", "code3", "code11"}) {
+    QSharedPointer<A> a = QSharedPointer<A>::create();
+    a->setCode(c);
+    session.saveObject(a);
+  }
+  session.clearRegistry();
+}
+
 void QueryResultTestTest::operationLess()
 {
   try
   {
     GroupConditions where;
     where.addLess("id", 3);
-    auto listA = session.getList<A>(where);
-
-    QCOMPARE(listA.count(), 1);
-    return;
-  }
-  catch (QtOrm::Exception& e)
-  {
-    qDebug() << e.getMessage();
-  }
-  QVERIFY(false);
-}
-
-void QueryResultTestTest::operationLessOrEqual()
-{
-  try
-  {
-    GroupConditions where;
-    where.addLessOrEqual("id", 3);
     auto listA = session.getList<A>(where);
 
     QCOMPARE(listA.count(), 2);
@@ -624,6 +809,54 @@ void QueryResultTestTest::operationLessOrEqual()
     qDebug() << e.getMessage();
   }
   QVERIFY(false);
+}
+
+void QueryResultTestTest::operationLessOrEqual_data()
+{
+  initDataBase("operationLessOrEqual", { "create table A(id integer primary key autoincrement, code text, idKindA integer)" });
+  session.clearRegistry();
+  session.setAutoUpdate(false);
+  ConfigurationMap::removeAllMappings();
+  ConfigurationMap::addMapping<AOnlyMap>();
+  for(auto c : QStringList{"code1", "code2", "code3", "code11"}) {
+    QSharedPointer<A> a = QSharedPointer<A>::create();
+    a->setCode(c);
+    session.saveObject(a);
+  }
+  session.clearRegistry();
+}
+
+void QueryResultTestTest::operationLessOrEqual()
+{
+  try
+  {
+    GroupConditions where;
+    where.addLessOrEqual("id", 3);
+    auto listA = session.getList<A>(where);
+
+    QCOMPARE(listA.count(), 3);
+    return;
+  }
+  catch (QtOrm::Exception& e)
+  {
+    qDebug() << e.getMessage();
+  }
+  QVERIFY(false);
+}
+
+void QueryResultTestTest::operationLike_data()
+{
+  initDataBase("operationLike", { "create table A(id integer primary key autoincrement, code text, idKindA integer)" });
+  session.clearRegistry();
+  session.setAutoUpdate(false);
+  ConfigurationMap::removeAllMappings();
+  ConfigurationMap::addMapping<AOnlyMap>();
+  for(auto c : QStringList{"code1", "code2", "co1de", "co2de"}) {
+    QSharedPointer<A> a = QSharedPointer<A>::create();
+    a->setCode(c);
+    session.saveObject(a);
+  }
+  session.clearRegistry();
 }
 
 void QueryResultTestTest::operationLike()
@@ -644,6 +877,19 @@ void QueryResultTestTest::operationLike()
   QVERIFY(false);
 }
 
+void QueryResultTestTest::nullValueUpdate_data()
+{
+  initDataBase("nullValueUpdate", { "create table super_class_s(id integer primary key autoincrement, type integer not null, code text, int_val integer, str_val text, id_ref integer, foreign key (id_ref)  references super_class_s(id))" });
+  session.clearRegistry();
+  session.setAutoUpdate(false);
+  ConfigurationMap::removeAllMappings();
+  ConfigurationMap::addMappings<SuperClassSMap, SubClassS1Map>();
+  QSharedPointer<SubClassS1> sub = QSharedPointer<SubClassS1>::create();
+  sub->setIntVal(1);
+  session.saveObject(sub);
+  session.clearRegistry();
+}
+
 void QueryResultTestTest::nullValueUpdate()
 {
   try
@@ -651,6 +897,7 @@ void QueryResultTestTest::nullValueUpdate()
     auto sub = session.getById<SubClassS1>(1);
     sub->setIntVal(0);
     session.saveObject(sub);
+    QSqlQuery query(db);
     if (!query.exec("select int_val from super_class_s where id = 1"))
     {
       qDebug() << query.lastError().text();
@@ -667,6 +914,36 @@ void QueryResultTestTest::nullValueUpdate()
     qDebug() << e.getMessage();
   }
   QVERIFY(false);
+}
+
+void QueryResultTestTest::OneTablePerHierarchySelect_data()
+{
+  initDataBase("OneTablePerHierarchySelect", { "create table super_class_s(id integer primary key autoincrement, type integer not null, code text, int_val integer, str_val text, id_ref integer, foreign key (id_ref)  references super_class_s(id))" });
+  session.clearRegistry();
+  session.setAutoUpdate(false);
+  ConfigurationMap::removeAllMappings();
+  ConfigurationMap::addMappings<SuperClassSMap, SubClassS1Map, SubClassS2Map>();
+  QSharedPointer<SubClassS1> sub1 = QSharedPointer<SubClassS1>::create();
+  sub1->setCode("one");
+  sub1->setIntVal(1);
+  session.saveObject(sub1);
+
+  QSharedPointer<SubClassS1> sub2 = QSharedPointer<SubClassS1>::create();
+  sub2->setCode("three");
+  sub2->setIntVal(3);
+  session.saveObject(sub2);
+
+  QSharedPointer<SubClassS2> sub3 = QSharedPointer<SubClassS2>::create();
+  sub3->setCode("two");
+  sub3->setStrVal("Два");
+  session.saveObject(sub3);
+
+  QSharedPointer<SubClassS2> sub4 = QSharedPointer<SubClassS2>::create();
+  sub4->setCode("four");
+  sub4->setStrVal("Четыре");
+  session.saveObject(sub4);
+
+  session.clearRegistry();
 }
 
 void QueryResultTestTest::OneTablePerHierarchySelect()
@@ -709,6 +986,26 @@ void QueryResultTestTest::OneTablePerHierarchySelect()
   QVERIFY(false);
 }
 
+void QueryResultTestTest::OneTablePerHierarchyConcreteSelect_data()
+{
+  initDataBase("OneTablePerHierarchyConcreteSelect", { "create table super_class_s(id integer primary key autoincrement, type integer not null, code text, int_val integer, str_val text, id_ref integer, foreign key (id_ref)  references super_class_s(id))" });
+  session.clearRegistry();
+  session.setAutoUpdate(false);
+  ConfigurationMap::removeAllMappings();
+  ConfigurationMap::addMappings<SuperClassSMap, SubClassS1Map>();
+  QSharedPointer<SubClassS1> sub1 = QSharedPointer<SubClassS1>::create();
+  sub1->setCode("one");
+  sub1->setIntVal(1);
+  session.saveObject(sub1);
+
+  QSharedPointer<SubClassS1> sub2 = QSharedPointer<SubClassS1>::create();
+  sub2->setCode("three");
+  sub2->setIntVal(3);
+  session.saveObject(sub2);
+
+  session.clearRegistry();
+}
+
 void QueryResultTestTest::OneTablePerHierarchyConcreteSelect()
 {
   try
@@ -724,6 +1021,10 @@ void QueryResultTestTest::OneTablePerHierarchyConcreteSelect()
   QVERIFY(false);
 }
 
+void QueryResultTestTest::OneTablePerHierarchyInsert_data()
+{
+}
+
 void QueryResultTestTest::OneTablePerHierarchyInsert()
 {
   try
@@ -736,11 +1037,31 @@ void QueryResultTestTest::OneTablePerHierarchyInsert()
   QVERIFY(true);
 }
 
+void QueryResultTestTest::TablePerHierarchySelectWithReference_data()
+{
+  initDataBase("TablePerHierarchySelectWithReference", { "create table super_class_s(id integer primary key autoincrement, type integer not null, code text, int_val integer, str_val text, id_ref integer, foreign key (id_ref)  references super_class_s(id))" });
+  session.clearRegistry();
+  session.setAutoUpdate(false);
+  ConfigurationMap::removeAllMappings();
+  ConfigurationMap::addMappings<SuperClassSMap, SubClassS1Map, SubClassS3Map>();
+  QSharedPointer<SubClassS1> sub1 = QSharedPointer<SubClassS1>::create();
+  sub1->setCode("one");
+  sub1->setIntVal(1);
+  session.saveObject(sub1);
+
+  QSharedPointer<SubClassS3> sub3 = QSharedPointer<SubClassS3>::create();
+  sub3->setCode("three");
+  sub3->setRef(sub1);
+  session.saveObject(sub3);
+
+  session.clearRegistry();
+}
+
 void QueryResultTestTest::TablePerHierarchySelectWithReference()
 {
   try
   {
-    QSharedPointer<SubClassS3> subS3 = session.getById<SubClassS3>(5);
+    QSharedPointer<SubClassS3> subS3 = session.getById<SubClassS3>(2);
     if (subS3->getRef() && subS3->getRef().objectCast<SubClassS1>())
     {
       QVERIFY(true);
@@ -757,19 +1078,6 @@ void QueryResultTestTest::TablePerHierarchySelectWithReference()
 void QueryResultTestTest::enableLogSql()
 {
   connect(&session, &Session::executedSql, [](QString sql) { qDebug() << sql; });
-}
-
-bool QueryResultTestTest::openConnection()
-{
-  dropDatabase(dbName);
-
-  db = QSqlDatabase::addDatabase("QSQLITE");
-  db.setDatabaseName(dbName);
-
-  bool openResult = db.open();
-  query = QSqlQuery(db);
-
-  return openResult;
 }
 
 QSqlDatabase QueryResultTestTest::openConnection(const QString& name)
@@ -796,51 +1104,6 @@ void QueryResultTestTest::initDataBase(const QString& dbName, const QStringList&
       QFAIL(query.lastError().text().toStdString().c_str());
     }
   }
-}
-
-void QueryResultTestTest::configurateSession()
-{
-  session.setDatabase(db);
-}
-
-void QueryResultTestTest::registerClasses()
-{
-  ConfigurationMap::addMappings<AMap, KindAMap, TypeAMap, BMap, CMap, DMap, EMap, SuperClassSMap, SubClassS1Map,
-                                SubClassS2Map, SubClassS3Map>();
-}
-
-bool QueryResultTestTest::createTables()
-{
-  return executeListCommand(sqlCreateSqlite);
-}
-
-bool QueryResultTestTest::fillData()
-{
-  return executeListCommand(sqlFill);
-}
-
-bool QueryResultTestTest::executeListCommand(const QStringList& commands)
-{
-  for (QString command : commands)
-  {
-    if (!query.exec(command))
-    {
-      qDebug() << query.lastError().text();
-      return false;
-    }
-  }
-
-  return true;
-}
-
-bool QueryResultTestTest::dropDatabase(const QString& dbName)
-{
-  return QFile::remove(dbName);
-}
-
-void QueryResultTestTest::closeConnection()
-{
-  db.close();
 }
 
 template <typename T>

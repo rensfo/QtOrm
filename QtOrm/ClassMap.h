@@ -47,6 +47,7 @@ template <typename T>
 ClassMap<T>::ClassMap() : ClassMapBase() {
   (void)static_cast<QObject *>((T *)0);
   qRegisterMetaType<QSharedPointer<T>>();
+  qRegisterMetaType<QWeakPointer<T>>();
   setMetaObject(T::staticMetaObject);
 }
 

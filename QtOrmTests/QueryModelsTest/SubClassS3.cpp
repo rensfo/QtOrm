@@ -2,6 +2,7 @@
 
 SubClassS3::SubClassS3(QObject* parent) : SuperClassS(parent)
 {
+  setDiscriminator(3);
 }
 
 QSharedPointer<SuperClassS> SubClassS3::getRef() const

@@ -13,7 +13,7 @@ public:
     setDiscrimanatorValue(1);
   }
 };
-// Q_DECLARE_METATYPE(QList<A*>)
-// Q_DECLARE_METATYPE(A*)
+//Q_DECLARE_METATYPE(QList<A*>)
+//Q_DECLARE_METATYPE(A*)
 
 #endif // SUBCLASSS1MAP_H
