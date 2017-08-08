@@ -43,6 +43,22 @@ QMap<QString, QSharedPointer<PropertyMap>> SubClassMap::getAllProperties() {
   return allProperties;
 }
 
+QString SubClassMap::getClassNameByProperty(const QString&property){
+  if(getProperties().keys().contains(property)) {
+    return getClassName();
+  }
+
+  if(superClass->isSubclass()) {
+    return superClass->toSubclass()->getClassNameByProperty(property);
+  } else {
+    if(superClass->getProperties().keys().contains(property)){
+      return superClass->getClassName();
+    }
+  }
+
+  return QString::null;
+}
+
 void SubClassMap::setInheritanceType(const InheritanceType&value) {
     inheritanceType = value;
 }

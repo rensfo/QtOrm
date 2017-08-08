@@ -30,6 +30,8 @@ public:
 
   QMap<QString, QSharedPointer<PropertyMap>> getAllProperties();
 
+  QString getClassNameByProperty(const QString &property);
+
 protected:
   void setInheritanceType(const InheritanceType&value);
 

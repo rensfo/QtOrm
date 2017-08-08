@@ -1235,17 +1235,31 @@ void QueryResultTestTest::ClassTableInheritanceAutoUpdate_data() {
 
 void QueryResultTestTest::ClassTableInheritanceAutoUpdate() {
   try {
+//    enableLogSql();
     auto s1 = session.getById<SubClassS1>(1);
+    s1->setCode("new_code");
     s1->setIntVal(999);
     QSqlQuery query(db);
-    if(!query.exec("select int_val from sub_class_s1")){
-      QVERIFY2(false, query.lastError().text().toStdString().c_str());
-      return;
+    {
+      if(!query.exec("select int_val from sub_class_s1")){
+        QVERIFY2(false, query.lastError().text().toStdString().c_str());
+        return;
+      }
+      query.next();
+      auto variantValue = query.record().value("int_val");
+      int cnt = variantValue.toInt();
+      QVERIFY(cnt == 999);
     }
-    query.next();
-    auto variantValue = query.record().value("int_val");
-    int cnt = variantValue.toInt();
-    QVERIFY(cnt == 999);
+    {
+      if(!query.exec("select code from super_class_s")){
+        QVERIFY2(false, query.lastError().text().toStdString().c_str());
+        return;
+      }
+      query.next();
+      auto variantValue = query.record().value("code");
+      QString cnt = variantValue.toString();
+      QVERIFY(cnt == "new_code");
+    }
     return;
   } catch (QtOrm::Exception& e) {
     qDebug() << e.getMessage();

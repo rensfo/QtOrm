@@ -247,6 +247,10 @@ void Query::refresh(QSharedPointer<QObject> &object) {
 
 void Query::saveOneField(QSharedPointer<QObject> &object, const QString &propertyName) {
   QSharedPointer<ClassMapBase> classBase = ConfigurationMap::getMappedClass(object);
+  if(SubClassMap::isClassTableInheritance(classBase)){
+    QString propertyOwnerClassName = classBase->toSubclass()->getClassNameByProperty(propertyName);
+    classBase = ConfigurationMap::getMappedClass(propertyOwnerClassName);
+  }
   QSharedPointer<OneToMany> oneToMany = classBase->findOneToManyByPropertyName(propertyName);
   if (oneToMany) {
     saveOneToMany(object, oneToMany);
