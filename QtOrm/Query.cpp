@@ -325,6 +325,29 @@ void Query::fillObject(QSharedPointer<QObject> &object, const QSharedPointer<Cla
   }
 }
 
+void Query::ctiFillObject(QSharedPointer<QObject> &object, const QSharedPointer<ClassMapBase>& baseMap, const QSharedPointer<ClassMapBase>& subMap) {
+  QVariant idValue = object->property(baseMap->getIdPropertyName().toStdString().c_str());
+  auto currentMap = subMap;
+  while (currentMap->isSubclass()) {
+    SimpleSqlBuilder sqlBuilder = createSimpleSqlBuilder(currentMap);
+    GroupConditions where;
+    where.addEqual(currentMap->getIdColumn(), idValue);
+    sqlBuilder.setConditions(where);
+    QSqlQuery query = sqlBuilder.selectQuery();
+    executeQuery(query);
+    query.next();
+    auto subRecord = query.record();
+    auto subQueryModel = sqlBuilder.getQueryModel();
+    auto subMainTableModel = subQueryModel->getMainTableModel();
+
+    fillObject(object, currentMap, subMainTableModel, subRecord);
+    fillOneToOne(object, subMainTableModel, subRecord);
+    fillOneToMany(object, currentMap->getOneToManyRelations(), currentMap->getIdPropertyName());
+
+    currentMap = currentMap->toSubclass()->getSuperClass();
+  }
+}
+
 void Query::fillOneToMany(QSharedPointer<QObject> object, const QList<QSharedPointer<OneToMany>> &relations,
                           const QString &idProperty) {
   for (QSharedPointer<OneToMany> oneToMany : relations) {
@@ -392,26 +415,7 @@ QSharedPointer<QObject> Query::getObject(const QSqlRecord &record, const QShared
 
     auto currentClassBase = ConfigurationMap::getMappedClass(object->metaObject()->className());
     if(SubClassMap::isClassTableInheritance(currentClassBase)) {
-      auto subClassBase = currentClassBase;
-      QVariant idValue = object->property(classBase->getIdPropertyName().toStdString().c_str());
-      while (subClassBase->isSubclass()) {
-        SimpleSqlBuilder sqlBuilder = createSimpleSqlBuilder(subClassBase);
-        GroupConditions where;
-        where.addEqual(subClassBase->getIdColumn(), idValue);
-        sqlBuilder.setConditions(where);
-        QSqlQuery query = sqlBuilder.selectQuery();
-        executeQuery(query);
-        query.next();
-        auto subRecord = query.record();
-        auto subQueryModel = sqlBuilder.getQueryModel();
-        auto subMainTableModel = subQueryModel->getMainTableModel();
-
-        fillObject(object, subClassBase, subMainTableModel, subRecord);
-        fillOneToOne(object, subMainTableModel, subRecord);
-        fillOneToMany(object, subClassBase->getOneToManyRelations(), subClassBase->getIdPropertyName());
-
-        subClassBase = subClassBase->toSubclass()->getSuperClass();
-      }
+      ctiFillObject(object, classBase, currentClassBase);
     }
 
     connectToAllProperties(object);
