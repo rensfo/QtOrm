@@ -25,6 +25,11 @@ public:
   InheritanceType getInheritanceType() const;
 
   QSharedPointer<ClassMapBase> getBaseClass() const;
+
+  static bool isClassTableInheritance(const QSharedPointer<ClassMapBase>&classBase);
+
+  QMap<QString, QSharedPointer<PropertyMap>> getAllProperties();
+
 protected:
   void setInheritanceType(const InheritanceType&value);
 

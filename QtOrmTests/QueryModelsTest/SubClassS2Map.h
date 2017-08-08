@@ -10,7 +10,7 @@ public:
   SubClassS2Map()
   {
     map("strVal", "str_val");
-    setDiscrimanatorValue(2);
+    setDiscrimanitorValue(2);
   }
 };
 

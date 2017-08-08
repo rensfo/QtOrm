@@ -207,7 +207,7 @@ QString ClassMapBase::getDiscriminatorPropertyName() const {
   return discriminatorProperty;
 }
 
-QString ClassMapBase::getDiscrimanatorColumn() const {
+QString ClassMapBase::getDiscriminatorColumn() const {
   return properties.value(discriminatorProperty)->getColumn();
 }
 
@@ -227,11 +227,11 @@ QStringList ClassMapBase::getColumns() {
   return columns;
 }
 
-QVariant ClassMapBase::getDiscrimanatorValue() const {
+QVariant ClassMapBase::getDiscriminatorValue() const {
   return discrimanatorValue;
 }
 
-void ClassMapBase::setDiscrimanatorValue(const QVariant &value) {
+void ClassMapBase::setDiscrimanitorValue(const QVariant &value) {
   discrimanatorValue = value;
 }
 

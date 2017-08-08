@@ -1,6 +1,8 @@
 #include "Registry.h"
 
 #include <QMetaObject>
+#include "ConfigurationMap.h"
+#include "SubClassMap.h"
 
 namespace QtOrm {
 
@@ -55,8 +57,15 @@ QSharedPointer<QObject> Registry::value(const QString &table, const QString &id)
 
 QSharedPointer<QObject> Registry::value(QObject *object) {
   QString className = object->metaObject()->className();
-  if (data.contains(className)) {
-    for (QSharedPointer<QObject> &registryObject : data[className]) {
+  QString tableName;
+  auto classBase = Config::ConfigurationMap::getMappedClass(className);
+  if(Mapping::SubClassMap::isClassTableInheritance(classBase)){
+    classBase = classBase->toSubclass()->getBaseClass();
+  }
+  tableName = classBase->getTable();
+
+  if (data.contains(tableName)) {
+    for (QSharedPointer<QObject> &registryObject : data[tableName]) {
       if (registryObject.data() == object) {
         return registryObject;
       }

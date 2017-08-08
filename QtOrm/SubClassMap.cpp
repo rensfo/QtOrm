@@ -30,6 +30,19 @@ QSharedPointer<ClassMapBase> SubClassMap::getBaseClass() const {
   return superClass;
 }
 
+bool SubClassMap::isClassTableInheritance(const QSharedPointer<ClassMapBase>&classBase) {
+  return classBase->isSubclass() && classBase->toSubclass()->getInheritanceType() == InheritanceType::ClassTable;
+}
+
+QMap<QString, QSharedPointer<PropertyMap>> SubClassMap::getAllProperties() {
+  QMap<QString, QSharedPointer<PropertyMap>> allProperties = superClass->getProperties();
+  for(auto prop : getProperties().toStdMap()){
+    allProperties.insert(prop.first, prop.second);
+  }
+
+  return allProperties;
+}
+
 void SubClassMap::setInheritanceType(const InheritanceType&value) {
     inheritanceType = value;
 }

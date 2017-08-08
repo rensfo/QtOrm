@@ -9,7 +9,7 @@ class SubClassS1CtiMap : public QtOrm::Mapping::ClassTableInheritanceMap<SuperCl
 public:
   SubClassS1CtiMap()
   {
-    setDiscrimanatorValue(1);
+    setDiscrimanitorValue(1);
     setTable("sub_class_s1");
     id("id", "idS1").setAutoincrement(false);
     map("intVal", "int_val").setNull(0);

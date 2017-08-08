@@ -60,6 +60,13 @@ QList<QSharedPointer<QObject>> Query::getListObject(const QString &className, co
 QList<QSharedPointer<QObject>> Query::getListObject(const QString &className, const GroupConditions &conditions,
                                                     const QList<OrderColumn> &orderBy) {
   QSharedPointer<ClassMapBase> classBase = ConfigurationMap::getMappedClass(className);
+  QVariant discriminatorValue;
+  if(SubClassMap::isClassTableInheritance(classBase)){
+    discriminatorValue = classBase->getDiscriminatorValue();
+    classBase = classBase->toSubclass()->getBaseClass();
+  } else {
+    discriminatorValue = classBase->getDiscriminatorValue();
+  }
 
   SimpleSqlBuilder sqlBuilder = createSimpleSqlBuilder(classBase);
 
@@ -68,7 +75,7 @@ QList<QSharedPointer<QObject>> Query::getListObject(const QString &className, co
 
   GroupConditions resultWhere;
   if (classBase->isSubclass()) {
-    resultWhere.addEqual(classBase->getDiscrimanatorColumn(), classBase->getDiscrimanatorValue());
+    resultWhere.addEqual(classBase->getDiscriminatorColumn(), discriminatorValue);
   }
 
   GroupConditions replacedConditions = replacePropertyToColumn(classBase, conditions);
@@ -92,7 +99,7 @@ void Query::saveObject(QSharedPointer<QObject> &object) {
 
 void Query::insertObject(QSharedPointer<QObject> &object) {
   QSharedPointer<ClassMapBase> classBase = ConfigurationMap::getMappedClass(object);
-  if(isClassTableInheritance(classBase)){
+  if(SubClassMap::isClassTableInheritance(classBase)){
     insertObjectCti(object, classBase);
   } else {
     insertObjectMain(object, classBase);
@@ -145,9 +152,16 @@ void Query::insertObjectCti(QSharedPointer<QObject>&object, QSharedPointer<Class
 }
 
 void Query::updateObject(QSharedPointer<QObject> &object) {
-  saveAllOneToOne(object);
-
   QSharedPointer<ClassMapBase> classBase = ConfigurationMap::getMappedClass(object);
+  if(SubClassMap::isClassTableInheritance(classBase)){
+    updateObjectCti(object, classBase);
+  } else {
+    updateObjectMain(object, classBase);
+  }
+}
+
+void Query::updateObjectMain(QSharedPointer<QObject>&object, QSharedPointer<ClassMapBase>&classBase) {
+  saveAllOneToOne(object);
 
   SimpleSqlBuilder sqlBuilder = createSimpleSqlBuilder(classBase);
   sqlBuilder.setObject(object);
@@ -158,9 +172,20 @@ void Query::updateObject(QSharedPointer<QObject> &object) {
   saveAllOneToMany(object);
 }
 
+void Query::updateObjectCti(QSharedPointer<QObject>&object, QSharedPointer<ClassMapBase>&classBase) {
+  auto superClass = classBase->toSubclass()->getSuperClass();
+  if(superClass->isSubclass()){
+    updateObjectCti(object, superClass);
+  } else {
+    updateObjectMain(object, superClass);
+  }
+
+  updateObjectMain(object, classBase);
+}
+
 void Query::deleteObject(QSharedPointer<QObject> &object) {
   QSharedPointer<ClassMapBase> classBase = ConfigurationMap::getMappedClass(object);
-  if(isClassTableInheritance(classBase)){
+  if(SubClassMap::isClassTableInheritance(classBase)){
     deleteObjectCti(object, classBase);
   } else {
     deleteObjectMain(object, classBase);
@@ -362,7 +387,7 @@ QSharedPointer<QObject> Query::getObject(const QSqlRecord &record, const QShared
     fillOneToMany(object, classBase->getOneToManyRelations(), classBase->getIdProperty()->getName());
 
     auto currentClassBase = ConfigurationMap::getMappedClass(object->metaObject()->className());
-    if(isClassTableInheritance(currentClassBase)) {
+    if(SubClassMap::isClassTableInheritance(currentClassBase)) {
       auto subClassBase = currentClassBase;
       QVariant idValue = object->property(classBase->getIdPropertyName().toStdString().c_str());
       while (subClassBase->isSubclass()) {
@@ -417,7 +442,7 @@ QSharedPointer<QObject> Query::createNewInstance(QSharedPointer<ClassMapBase> cl
     QString discrimanatorColumn = getQueryColumn(model, classBase->getDiscriminatorProperty());
     QVariant recordValue = record.value(discrimanatorColumn);
     for (auto dc : derrivedClasses) {
-      QVariant discrimanatorValue = dc->getDiscrimanatorValue();
+      QVariant discrimanatorValue = dc->getDiscriminatorValue();
       if (recordValue == discrimanatorValue) {
         newObject = QSharedPointer<QObject>(dc->getMetaObject().newInstance());
         break;
@@ -717,10 +742,6 @@ void Query::connectToAllProperties(QSharedPointer<QObject> &object) {
   if (updater) {
     updater->connectToAllProperties(object);
   }
-}
-
-bool Query::isClassTableInheritance(const QSharedPointer<ClassMapBase>& classBase){
-  return classBase->isSubclass() && classBase->toSubclass()->getInheritanceType() == InheritanceType::ClassTable;
 }
 
 QSharedPointer<AutoUpdater> Query::getUpdater() const {

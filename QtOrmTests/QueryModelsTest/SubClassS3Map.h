@@ -9,7 +9,7 @@ class SubClassS3Map : public QtOrm::Mapping::SingleTableInheritanceMap<SuperClas
 public:
   SubClassS3Map()
   {
-    setDiscrimanatorValue(3);
+    setDiscrimanitorValue(3);
     oneToOne("ref").setTableColumn("id_ref");
   }
 };

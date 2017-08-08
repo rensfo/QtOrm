@@ -90,14 +90,14 @@ public:
   SubClassMap* toSubclass();
 
   virtual QString getDiscriminatorPropertyName() const;
-  virtual QString getDiscrimanatorColumn() const;
+  virtual QString getDiscriminatorColumn() const;
   void setDiscriminatorProperty(const QString &value);
   virtual QSharedPointer<PropertyMap> getDiscriminatorProperty() const;
 
   QStringList getColumns();
 
-  QVariant getDiscrimanatorValue() const;
-  void setDiscrimanatorValue(const QVariant &value);
+  QVariant getDiscriminatorValue() const;
+  void setDiscrimanitorValue(const QVariant &value);
 
   QMetaObject getClassMetaObject() const;
   void setClassMetaObject(const QMetaObject&value);

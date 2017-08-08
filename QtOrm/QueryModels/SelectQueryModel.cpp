@@ -416,7 +416,7 @@ QSharedPointer<QueryTableModel> SelectQueryModel::buildQueryTableModelOneToOne(Q
   {
     QSharedPointer<QueryTableModel> queryTableModel = QSharedPointer<QueryTableModel>::create();
     queryTableModel->setName(classBase->getTable());
-    queryTableModel->addColumns({classBase->getIdColumn(), classBase->getDiscrimanatorColumn()});
+    queryTableModel->addColumns({classBase->getIdColumn(), classBase->getDiscriminatorColumn()});
     return queryTableModel;
   }
 

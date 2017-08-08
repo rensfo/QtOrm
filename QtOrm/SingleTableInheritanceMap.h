@@ -28,7 +28,7 @@ public:
   virtual QString getPropertyColumn(const QString &property) override;
 
   virtual QString getDiscriminatorPropertyName() const;
-  virtual QString getDiscrimanatorColumn() const;
+  virtual QString getDiscriminatorColumn() const;
 
   virtual QList<QSharedPointer<OneToMany>> getOneToManyRelations() const override;
   virtual QList<QSharedPointer<OneToOne>> getOneToOneRelations() const override;
@@ -96,8 +96,8 @@ QString SingleTableInheritanceMap<SUPER, T>::getDiscriminatorPropertyName() cons
 }
 
 template <typename SUPER, typename T>
-QString SingleTableInheritanceMap<SUPER, T>::getDiscrimanatorColumn() const {
-  return this->getSuperClass()->getDiscrimanatorColumn();
+QString SingleTableInheritanceMap<SUPER, T>::getDiscriminatorColumn() const {
+  return this->getSuperClass()->getDiscriminatorColumn();
 }
 
 template <typename SUPER, typename T>

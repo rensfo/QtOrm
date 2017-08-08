@@ -61,6 +61,9 @@ protected:
   void insertObjectCti(QSharedPointer<QObject>&object, QSharedPointer<ClassMapBase>&classBase);
 
   void updateObject(QSharedPointer<QObject> &object);
+  void updateObjectMain(QSharedPointer<QObject> &object, QSharedPointer<ClassMapBase>&classBase);
+  void updateObjectCti(QSharedPointer<QObject> &object, QSharedPointer<ClassMapBase>&classBase);
+
   virtual void executeQuery(QSqlQuery &query);
   QList<QSharedPointer<QObject>> getList(QSqlQuery &query, const QSharedPointer<QueryModel> &queryModel);
 
@@ -115,8 +118,6 @@ protected:
                                              const QList<OrderColumn> &orderColumns);
   QString getColumn(QSharedPointer<ClassMapBase> &classBase, const QString &property);
   void connectToAllProperties(QSharedPointer<QObject> &object);
-
-  bool isClassTableInheritance(const QSharedPointer<ClassMapBase>&classBase);
 
 protected:
   QSharedPointer<Registry> registry;

@@ -37,7 +37,12 @@ void AutoUpdater::connectToAllProperties(QSharedPointer<QObject> object) {
     properties.append(oneToOne->getProperty());
   }
 
-  properties.append(classBase->getProperties().keys());
+  if(SubClassMap::isClassTableInheritance(classBase)){
+    auto allProperties = classBase->toSubclass()->getAllProperties();
+    properties.append(allProperties.keys());
+  } else {
+    properties.append(classBase->getProperties().keys());
+  }
 
   for (QString propertyName : properties) {
     int propertyIndex = object->metaObject()->indexOfProperty(propertyName.toStdString().data());

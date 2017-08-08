@@ -10,7 +10,7 @@ public:
   SubClassS1Map()
   {
     map("intVal", "int_val").setNull(0);
-    setDiscrimanatorValue(1);
+    setDiscrimanitorValue(1);
   }
 };
 
