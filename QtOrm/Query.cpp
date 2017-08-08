@@ -92,15 +92,11 @@ void Query::saveObject(QSharedPointer<QObject> &object) {
 
 void Query::insertObject(QSharedPointer<QObject> &object) {
   QSharedPointer<ClassMapBase> classBase = ConfigurationMap::getMappedClass(object);
-  if(classBase->isSubclass()){
-    SubClassMap* subclass = classBase->toSubclass();
-    if(subclass->getInheritanceType() == InheritanceType::ClassTable){
-      insertObjectCti(object, classBase);
-      return;
-    }
+  if(isClassTableInheritance(classBase)){
+    insertObjectCti(object, classBase);
+  } else {
+    insertObjectMain(object, classBase);
   }
-
-  insertObjectMain(object, classBase);
 }
 
 void Query::insertObjectMain(QSharedPointer<QObject>&object, QSharedPointer<ClassMapBase> classBase)
@@ -130,14 +126,11 @@ void Query::insertObjectMain(QSharedPointer<QObject>&object, QSharedPointer<Clas
 
 void Query::insertObjectCti(QSharedPointer<QObject>&object, QSharedPointer<ClassMapBase> &classBase)
 {
-  if(classBase->isSubclass()){
-    auto superClass = classBase->toSubclass()->getSuperClass();
-    if(superClass){
-        insertObjectCti(object, superClass);
-    }
+  auto superClass = classBase->toSubclass()->getSuperClass();
+  if(superClass->isSubclass()){
+    insertObjectCti(object, superClass);
   } else {
-    insertObjectMain(object, classBase);
-    return;
+    insertObjectMain(object, superClass);
   }
 
   saveAllOneToOne(object);
@@ -166,9 +159,16 @@ void Query::updateObject(QSharedPointer<QObject> &object) {
 }
 
 void Query::deleteObject(QSharedPointer<QObject> &object) {
-  deleteAllOneToMany(object);
-
   QSharedPointer<ClassMapBase> classBase = ConfigurationMap::getMappedClass(object);
+  if(isClassTableInheritance(classBase)){
+    deleteObjectCti(object, classBase);
+  } else {
+    deleteObjectMain(object, classBase);
+  }
+}
+
+void Query::deleteObjectMain(QSharedPointer<QObject>&object, QSharedPointer<ClassMapBase> &classBase) {
+  deleteAllOneToMany(object);
 
   SimpleSqlBuilder sqlBuilder = createSimpleSqlBuilder(classBase);
   sqlBuilder.setObject(object);
@@ -177,6 +177,23 @@ void Query::deleteObject(QSharedPointer<QObject> &object) {
   executeQuery(query);
 
   removeObjectFromRegistry(object);
+}
+
+void Query::deleteObjectCti(QSharedPointer<QObject>&object, QSharedPointer<ClassMapBase> &classBase) {
+  deleteAllOneToMany(object);
+
+  SimpleSqlBuilder sqlBuilder = createSimpleSqlBuilder(classBase);
+  sqlBuilder.setObject(object);
+
+  QSqlQuery query = sqlBuilder.deleteQuery();
+  executeQuery(query);
+
+  auto superClass = classBase->toSubclass()->getSuperClass();
+  if(superClass->isSubclass()){
+    deleteObjectCti(object, superClass);
+  } else {
+    deleteObjectMain(object, superClass);
+  }
 }
 
 void Query::refresh(QSharedPointer<QObject> &object) {

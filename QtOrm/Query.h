@@ -34,6 +34,8 @@ public:
                                                        const QList<OrderColumn> &orderBy = QList<OrderColumn>());
   virtual void saveObject(QSharedPointer<QObject> &object);
   virtual void deleteObject(QSharedPointer<QObject> &object);
+  void deleteObjectMain(QSharedPointer<QObject> &object, QSharedPointer<ClassMapBase> &classBase);
+  void deleteObjectCti(QSharedPointer<QObject> &object, QSharedPointer<ClassMapBase> &classBase);
   virtual void refresh(QSharedPointer<QObject> &object);
   virtual void saveOneField(QSharedPointer<QObject> &object, const QString &propertyName);
 

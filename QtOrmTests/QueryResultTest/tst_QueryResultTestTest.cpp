@@ -115,6 +115,9 @@ private Q_SLOTS:
   void ClassTableInheritanceInsert_data();
   void ClassTableInheritanceInsert();
 
+  void ClassTableInheritanceDelete_data();
+  void ClassTableInheritanceDelete();
+
   void ClassTableInheritanceSelect_data();
   void ClassTableInheritanceSelect();
 
@@ -1114,6 +1117,61 @@ void QueryResultTestTest::ClassTableInheritanceInsert()
   QVERIFY(false);
 }
 
+void QueryResultTestTest::ClassTableInheritanceDelete_data()
+{
+  initDataBase("ClassTableInheritanceDelete", { "create table super_class_s(id integer primary key autoincrement, type integer not null, code text)",
+               "create table sub_class_s1(idS1 integer primary key, int_val integer)",
+               "create table sub_class_s2(idS2 integer primary key, str_val text)"});
+  session.clearRegistry();
+  session.setAutoUpdate(false);
+  ConfigurationMap::removeAllMappings();
+  ConfigurationMap::addMappings<SuperClassSMap, SubClassS1CtiMap, SubClassS2CtiMap>();
+  QSharedPointer<SubClassS1> sub1 = QSharedPointer<SubClassS1>::create();
+  sub1->setCode("one");
+  sub1->setIntVal(1);
+  session.saveObject(sub1);
+
+  QSharedPointer<SubClassS2> sub2 = QSharedPointer<SubClassS2>::create();
+  sub2->setCode("three");
+  sub2->setStrVal("3");
+  session.saveObject(sub2);
+  session.clearRegistry();
+}
+
+void QueryResultTestTest::ClassTableInheritanceDelete()
+{
+  try {
+    auto supers = session.getList<SuperClassS>();
+    if (supers.count() != 2) {
+      QVERIFY(false);
+      return;
+    }
+    for(auto item : supers){
+      session.deleteObject(item);
+    }
+    QSqlQuery query(db);
+    for(auto table : QStringList{"super_class_s" , "sub_class_s1"}){
+      if(!query.exec("select count() cnt from " + table)){
+        QVERIFY2(false, query.lastError().text().toStdString().c_str());
+        return;
+      }
+
+      query.next();
+      auto variantValue = query.record().value("cnt");
+      int cnt = variantValue.toInt();
+      if(cnt != 0) {
+        QVERIFY(false);
+        return;
+      }
+    }
+    QVERIFY(true);
+    return;
+  } catch (QtOrm::Exception& e) {
+    qDebug() << e.getMessage();
+  }
+  QVERIFY(false);
+}
+
 void QueryResultTestTest::ClassTableInheritanceSelect_data()
 {
   initDataBase("ClassTableInheritanceSelect", { "create table super_class_s(id integer primary key autoincrement, type integer not null, code text)",
@@ -1165,14 +1223,12 @@ QSqlDatabase QueryResultTestTest::openConnection(const QString& name)
 void QueryResultTestTest::initDataBase(const QString& dbName, const QStringList& dml)
 {
   db = openConnection(dbName);
-  if (!db.open())
-  {
+  if (!db.open()) {
     QFAIL("database do not open");
   }
   session.setDatabase(db);
   QSqlQuery query(db);
-  for (auto cmd : dml)
-  {
+  for (auto cmd : dml) {
     bool result = query.exec(cmd);
     if (!result){
       QFAIL(query.lastError().text().toStdString().c_str());
@@ -1183,10 +1239,8 @@ void QueryResultTestTest::initDataBase(const QString& dbName, const QStringList&
 template <typename T>
 T QueryResultTestTest::find(QList<T> container, std::function<bool(T)> func)
 {
-  for (T element : container)
-  {
-    if (func(element))
-    {
+  for (T element : container) {
+    if (func(element)) {
       return element;
     }
   }
