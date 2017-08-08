@@ -64,6 +64,7 @@ protected:
   QSharedPointer<QueryModel> queryModel;
   QString propertyName;
   QList<OrderColumn> orderBy;
+  bool idAutoincrement = true;
 };
 }
 }

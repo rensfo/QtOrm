@@ -55,11 +55,14 @@ signals:
 
 protected:
   void insertObject(QSharedPointer<QObject> &object);
+  void insertObjectMain(QSharedPointer<QObject>&object, QSharedPointer<ClassMapBase> classBase);
+  void insertObjectCti(QSharedPointer<QObject>&object, QSharedPointer<ClassMapBase>&classBase);
+
   void updateObject(QSharedPointer<QObject> &object);
   virtual void executeQuery(QSqlQuery &query);
   QList<QSharedPointer<QObject>> getList(QSqlQuery &query, const QSharedPointer<QueryModel> &queryModel);
 
-  void fillObject(QSharedPointer<QObject> &object, QSharedPointer<QueryTableModel> &queryTableModel,
+  void fillObject(QSharedPointer<QObject> &object, const QSharedPointer<ClassMapBase>&classBase, QSharedPointer<QueryTableModel> &queryTableModel,
                   const QSqlRecord &record);
   void fillOneToMany(QSharedPointer<QObject> object, const QList<QSharedPointer<OneToMany>> &relations,
                      const QString &idProperty);
@@ -104,12 +107,14 @@ protected:
   bool isIdOneToOneDefault(QSharedPointer<QObject> object, QSharedPointer<OneToOne> oneToOne);
   QString getQueryColumn(QSharedPointer<QueryTableModel> queryTableModel, QSharedPointer<PropertyMap> property);
   bool tryReopenDatabaseConnectionIfNeed();
-  SimpleSqlBuilder createSimpleSqlBuilder(QSharedPointer<ClassMapBase> &classBase);
+  SimpleSqlBuilder createSimpleSqlBuilder(QSharedPointer<ClassMapBase>&classBase);
   GroupConditions replacePropertyToColumn(QSharedPointer<ClassMapBase> &classBase, const GroupConditions &conditions);
   QList<OrderColumn> replacePropertyToColumn(QSharedPointer<ClassMapBase> &classBase,
                                              const QList<OrderColumn> &orderColumns);
   QString getColumn(QSharedPointer<ClassMapBase> &classBase, const QString &property);
   void connectToAllProperties(QSharedPointer<QObject> &object);
+
+  bool isClassTableInheritance(const QSharedPointer<ClassMapBase>&classBase);
 
 protected:
   QSharedPointer<Registry> registry;

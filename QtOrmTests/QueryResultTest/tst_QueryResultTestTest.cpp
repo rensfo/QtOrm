@@ -19,6 +19,8 @@
 #include "TypeAMap.h"
 #include "AOnlyMap.h"
 #include "dml.h"
+#include "SubClassS1CtiMap.h"
+#include "SubClassS2CtiMap.h"
 
 using namespace QtOrm;
 using namespace Sql;
@@ -98,17 +100,23 @@ private Q_SLOTS:
   void nullValueUpdate_data();
   void nullValueUpdate();
 
-  void OneTablePerHierarchySelect_data();
-  void OneTablePerHierarchySelect();
+  void SingleTableInheritanceSelect_data();
+  void SingleTableInheritanceSelect();
 
-  void OneTablePerHierarchyConcreteSelect_data();
-  void OneTablePerHierarchyConcreteSelect();
+  void SingleTableInheritanceConcreteSelect_data();
+  void SingleTableInheritanceConcreteSelect();
 
-  void OneTablePerHierarchyInsert_data();
-  void OneTablePerHierarchyInsert();
+  void SingleTableInheritanceInsert_data();
+  void SingleTableInheritanceInsert();
 
-  void TablePerHierarchySelectWithReference_data();
-  void TablePerHierarchySelectWithReference();
+  void SingleTableInheritanceSelectWithReference_data();
+  void SingleTableInheritanceSelectWithReference();
+
+  void ClassTableInheritanceInsert_data();
+  void ClassTableInheritanceInsert();
+
+  void ClassTableInheritanceSelect_data();
+  void ClassTableInheritanceSelect();
 
 private:
   void enableLogSql();
@@ -916,7 +924,7 @@ void QueryResultTestTest::nullValueUpdate()
   QVERIFY(false);
 }
 
-void QueryResultTestTest::OneTablePerHierarchySelect_data()
+void QueryResultTestTest::SingleTableInheritanceSelect_data()
 {
   initDataBase("OneTablePerHierarchySelect", { "create table super_class_s(id integer primary key autoincrement, type integer not null, code text, int_val integer, str_val text, id_ref integer, foreign key (id_ref)  references super_class_s(id))" });
   session.clearRegistry();
@@ -946,7 +954,7 @@ void QueryResultTestTest::OneTablePerHierarchySelect_data()
   session.clearRegistry();
 }
 
-void QueryResultTestTest::OneTablePerHierarchySelect()
+void QueryResultTestTest::SingleTableInheritanceSelect()
 {
   try
   {
@@ -986,7 +994,7 @@ void QueryResultTestTest::OneTablePerHierarchySelect()
   QVERIFY(false);
 }
 
-void QueryResultTestTest::OneTablePerHierarchyConcreteSelect_data()
+void QueryResultTestTest::SingleTableInheritanceConcreteSelect_data()
 {
   initDataBase("OneTablePerHierarchyConcreteSelect", { "create table super_class_s(id integer primary key autoincrement, type integer not null, code text, int_val integer, str_val text, id_ref integer, foreign key (id_ref)  references super_class_s(id))" });
   session.clearRegistry();
@@ -1006,7 +1014,7 @@ void QueryResultTestTest::OneTablePerHierarchyConcreteSelect_data()
   session.clearRegistry();
 }
 
-void QueryResultTestTest::OneTablePerHierarchyConcreteSelect()
+void QueryResultTestTest::SingleTableInheritanceConcreteSelect()
 {
   try
   {
@@ -1021,11 +1029,11 @@ void QueryResultTestTest::OneTablePerHierarchyConcreteSelect()
   QVERIFY(false);
 }
 
-void QueryResultTestTest::OneTablePerHierarchyInsert_data()
+void QueryResultTestTest::SingleTableInheritanceInsert_data()
 {
 }
 
-void QueryResultTestTest::OneTablePerHierarchyInsert()
+void QueryResultTestTest::SingleTableInheritanceInsert()
 {
   try
   {
@@ -1037,7 +1045,7 @@ void QueryResultTestTest::OneTablePerHierarchyInsert()
   QVERIFY(true);
 }
 
-void QueryResultTestTest::TablePerHierarchySelectWithReference_data()
+void QueryResultTestTest::SingleTableInheritanceSelectWithReference_data()
 {
   initDataBase("TablePerHierarchySelectWithReference", { "create table super_class_s(id integer primary key autoincrement, type integer not null, code text, int_val integer, str_val text, id_ref integer, foreign key (id_ref)  references super_class_s(id))" });
   session.clearRegistry();
@@ -1053,11 +1061,10 @@ void QueryResultTestTest::TablePerHierarchySelectWithReference_data()
   sub3->setCode("three");
   sub3->setRef(sub1);
   session.saveObject(sub3);
-
   session.clearRegistry();
 }
 
-void QueryResultTestTest::TablePerHierarchySelectWithReference()
+void QueryResultTestTest::SingleTableInheritanceSelectWithReference()
 {
   try
   {
@@ -1070,6 +1077,73 @@ void QueryResultTestTest::TablePerHierarchySelectWithReference()
   }
   catch (QtOrm::Exception& e)
   {
+    qDebug() << e.getMessage();
+  }
+  QVERIFY(false);
+}
+
+void QueryResultTestTest::ClassTableInheritanceInsert_data()
+{
+  initDataBase("ClassTableInheritanceInsert", { "create table super_class_s(id integer primary key autoincrement, type integer not null, code text)",
+               "create table sub_class_s1(idS1 integer primary key, int_val integer)",
+               "create table sub_class_s2(idS2 integer primary key, str_val text)"});
+  session.clearRegistry();
+  session.setAutoUpdate(false);
+  ConfigurationMap::removeAllMappings();
+  ConfigurationMap::addMappings<SuperClassSMap, SubClassS1CtiMap, SubClassS2CtiMap>();
+}
+
+void QueryResultTestTest::ClassTableInheritanceInsert()
+{
+  try {
+    QSharedPointer<SubClassS1> sub1 = QSharedPointer<SubClassS1>::create();
+    sub1->setCode("one");
+    sub1->setIntVal(1);
+    session.saveObject(sub1);
+
+    QSharedPointer<SubClassS2> sub2 = QSharedPointer<SubClassS2>::create();
+    sub2->setCode("three");
+    sub2->setStrVal("3");
+    session.saveObject(sub2);
+
+    QVERIFY(true);
+    return;
+  } catch (QtOrm::Exception& e) {
+    qDebug() << e.getMessage();
+  }
+  QVERIFY(false);
+}
+
+void QueryResultTestTest::ClassTableInheritanceSelect_data()
+{
+  initDataBase("ClassTableInheritanceSelect", { "create table super_class_s(id integer primary key autoincrement, type integer not null, code text)",
+               "create table sub_class_s1(idS1 integer primary key, int_val integer)",
+               "create table sub_class_s2(idS2 integer primary key, str_val text)"});
+  session.clearRegistry();
+  session.setAutoUpdate(false);
+  ConfigurationMap::removeAllMappings();
+  ConfigurationMap::addMappings<SuperClassSMap, SubClassS1CtiMap, SubClassS2CtiMap>();
+  QSharedPointer<SubClassS1> sub1 = QSharedPointer<SubClassS1>::create();
+  sub1->setCode("one");
+  sub1->setIntVal(1);
+  session.saveObject(sub1);
+
+  QSharedPointer<SubClassS2> sub2 = QSharedPointer<SubClassS2>::create();
+  sub2->setCode("three");
+  sub2->setStrVal("3");
+  session.saveObject(sub2);
+  session.clearRegistry();
+}
+
+void QueryResultTestTest::ClassTableInheritanceSelect()
+{
+  try {
+    auto supers = session.getList<SuperClassS>();
+    if (supers.count() == 2) {
+      QVERIFY(true);
+      return;
+    }
+  } catch (QtOrm::Exception& e) {
     qDebug() << e.getMessage();
   }
   QVERIFY(false);

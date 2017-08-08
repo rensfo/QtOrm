@@ -67,35 +67,43 @@ SimpleSqlBuilder &SimpleSqlBuilder::operator=(const SimpleSqlBuilder &other) {
 
 void SimpleSqlBuilder::bindInsert(QSqlQuery &query) {
   for (auto &prop : classBase->getProperties()) {
-    if (prop->getIsId())
-      continue;
-
-    bindQueryParams(query, prop);
+    if (prop->getIsId()) {
+      if(!prop->getAutoincrement()) {
+        if(classBase->isSubclass()){
+          auto baseClass = classBase->toSubclass()->getBaseClass();
+          bindQueryIdParam(query, prop, baseClass->getIdProperty());
+        } else {
+          bindQueryParam(query, prop);
+        }
+      }
+    } else {
+      bindQueryParam(query, prop);
+    }
   }
 
   for (auto oneToOne : classBase->getOneToOneRelations()) {
-    bindQueryParams(query, oneToOne);
+    bindQueryParam(query, oneToOne);
   }
 }
 
 void SimpleSqlBuilder::bindUpdate(QSqlQuery &query) {
   for (auto &prop : classBase->getProperties()) {
-    bindQueryParams(query, prop);
+    bindQueryParam(query, prop);
   }
 
   for (auto &oneToOne : classBase->getOneToOneRelations()) {
-    bindQueryParams(query, oneToOne);
+    bindQueryParam(query, oneToOne);
   }
 }
 
 void SimpleSqlBuilder::bindOneColumnUpdate(QSqlQuery &query) {
   QSharedPointer<PropertyMap> idProperty = classBase->getIdProperty();
-  bindQueryParams(query, idProperty);
+  bindQueryParam(query, idProperty);
   if (classBase->containsProperty(propertyName)) {
-    bindQueryParams(query, classBase->getProperty(propertyName));
+    bindQueryParam(query, classBase->getProperty(propertyName));
   } else {
     QSharedPointer<OneToOne> oneToOne = classBase->findOneToOneByPropertyName(propertyName);
-    bindQueryParams(query, oneToOne);
+    bindQueryParam(query, oneToOne);
   }
 }
 
@@ -106,7 +114,7 @@ void SimpleSqlBuilder::bindDelete(QSqlQuery &query) {
   query.bindValue(idPlaceHolder, idPropertyValue);
 }
 
-void SimpleSqlBuilder::bindQueryParams(QSqlQuery &query, QSharedPointer<PropertyMap> property) {
+void SimpleSqlBuilder::bindQueryParam(QSqlQuery &query, QSharedPointer<PropertyMap> property) {
   QString placeHolder = getPlaceHolder(property->getColumn());
   QVariant propertyValue = object->property(property->getName().toStdString().c_str());
   QVariant resultValue;
@@ -117,7 +125,14 @@ void SimpleSqlBuilder::bindQueryParams(QSqlQuery &query, QSharedPointer<Property
   query.bindValue(placeHolder, resultValue);
 }
 
-void SimpleSqlBuilder::bindQueryParams(QSqlQuery &query, QSharedPointer<OneToOne> oneToOne) {
+void SimpleSqlBuilder::bindQueryIdParam(QSqlQuery&query, QSharedPointer<PropertyMap> idProperty, QSharedPointer<PropertyMap> baseIdProperty)
+{
+  QString placeHolder = getPlaceHolder(idProperty->getColumn());
+  QVariant resultValue = object->property(baseIdProperty->getName().toStdString().c_str());
+  query.bindValue(placeHolder, resultValue);
+}
+
+void SimpleSqlBuilder::bindQueryParam(QSqlQuery &query, QSharedPointer<OneToOne> oneToOne) {
   QVariant valFromProp = object->property(oneToOne->getProperty().toStdString().c_str());
   QString refClassName = Mapping::ClassMapBase::getTypeNameOfProperty(object, oneToOne->getProperty());
   QSharedPointer<ClassMapBase> refClassBase = ConfigurationMap::getMappedClass(refClassName);

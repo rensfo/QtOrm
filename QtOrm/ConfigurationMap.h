@@ -6,6 +6,7 @@
 #include <type_traits>
 
 #include "ClassMapBase.h"
+#include "SubClassMap.h"
 
 namespace QtOrm {
 namespace Config {
@@ -29,6 +30,8 @@ public:
   static void checkParent();
   static QList<QSharedPointer<ClassMapBase> > getDerrivedClasses(const QString& value);
   static bool isBaseClass(const QString& value);
+  static bool isBaseClass(const QSharedPointer<ClassMapBase>& value);
+  static InheritanceType getInheritanceType(const QSharedPointer<ClassMapBase>& value);
 
 protected:
   template <class ... Args>

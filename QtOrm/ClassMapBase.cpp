@@ -1,4 +1,5 @@
 #include "ClassMapBase.h"
+#include "SubClassMap.h"
 
 #include <QMetaProperty>
 
@@ -69,6 +70,14 @@ PropertyMap &ClassMapBase::createProperty(QString propertyName) {
   return *propertyMap;
 }
 
+QMetaObject ClassMapBase::getClassMetaObject() const {
+  return classMetaObject;
+}
+
+void ClassMapBase::setClassMetaObject(const QMetaObject&value) {
+  classMetaObject = value;
+}
+
 QMetaObject ClassMapBase::getMetaObject() const {
   return classMetaObject;
 }
@@ -82,11 +91,11 @@ QSharedPointer<PropertyMap> ClassMapBase::getIdProperty() const {
 }
 
 QString ClassMapBase::getIdColumn() const {
-  return properties.value(idProperty)->getColumn();
+  return getIdProperty()->getColumn();
 }
 
 QString ClassMapBase::getIdPropertyName() const {
-  return properties.value(idProperty)->getName();
+  return getIdProperty()->getName();
 }
 
 QSharedPointer<PropertyMap> ClassMapBase::getProperty(const QString &property) {
@@ -185,8 +194,13 @@ bool ClassMapBase::containsProperty(const QString &propertyName) const {
   return properties.contains(propertyName);
 }
 
-bool ClassMapBase::isSubclass() const {
-  return superClass.data();
+bool ClassMapBase::isSubclass() {
+  return false;
+}
+
+SubClassMap*ClassMapBase::toSubclass()
+{
+  return qobject_cast<SubClassMap*>(this);
 }
 
 QString ClassMapBase::getDiscriminatorPropertyName() const {
@@ -205,10 +219,6 @@ QSharedPointer<PropertyMap> ClassMapBase::getDiscriminatorProperty() const {
   return properties.value(discriminatorProperty);
 }
 
-QString ClassMapBase::getSuperClassName() const {
-  return superClass->getClassName();
-}
-
 QStringList ClassMapBase::getColumns() {
   QStringList columns;
   for (auto property : getProperties())
@@ -223,14 +233,6 @@ QVariant ClassMapBase::getDiscrimanatorValue() const {
 
 void ClassMapBase::setDiscrimanatorValue(const QVariant &value) {
   discrimanatorValue = value;
-}
-
-QSharedPointer<ClassMapBase> ClassMapBase::getSuperClass() const {
-  return superClass;
-}
-
-void ClassMapBase::setSuperClass(const QSharedPointer<ClassMapBase> &value) {
-  superClass = value;
 }
 
 QString ClassMapBase::getPropertyType(const QMetaObject &meta, const QString &prop) {

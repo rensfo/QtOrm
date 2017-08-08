@@ -22,11 +22,9 @@ QSharedPointer<QueryTableModel> InsertQueryModel::buildQueryTableModel() {
   queryTableModel->setName(classBase->getTable());
   idColumn = classBase->getIdColumn();
   for (auto property : classBase->getProperties()) {
-    if (property->getIsId()) {
-      continue;
+    if(!(property->getIsId() && property->getAutoincrement())) {
+      queryTableModel->addColumn(property->getColumn());
     }
-
-    queryTableModel->addColumn(property->getColumn());
   }
 
   for (QSharedPointer<OneToOne> oneToOne : classBase->getOneToOneRelations()) {
@@ -58,7 +56,7 @@ QString InsertQueryModel::buildSql() {
 }
 
 bool InsertQueryModel::getHasLastInsertedIdFeature() const {
-  return hasLastInsertedIdFeature;
+    return hasLastInsertedIdFeature;
 }
 
 void InsertQueryModel::setHasLastInsertedIdFeature(bool value) {

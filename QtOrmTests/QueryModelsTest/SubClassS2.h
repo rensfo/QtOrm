@@ -3,7 +3,6 @@
 
 #include "SuperClassS.h"
 
-
 class SubClassS2 : public SuperClassS
 {
   Q_OBJECT

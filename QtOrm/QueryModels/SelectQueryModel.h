@@ -4,6 +4,7 @@
 #include <QMap>
 
 #include "QueryModel.h"
+#include "SubClassMap.h"
 
 namespace QtOrm {
 namespace Sql {
@@ -48,6 +49,13 @@ protected:
   QString conditionToString(QSharedPointer<Condition> &condition);
   QString conditionToStringBase(QSharedPointer<Condition> &condition, const QString tableAlias, const QString &placeholder);
   short calculateCountUsedColumn(const QString &value);
+  QSharedPointer<QueryTableModel> buildQueryTableModelWoInheritance(QSharedPointer<ClassMapBase> classBase);
+  QSharedPointer<QueryTableModel> buildQueryTableModelWInheritance(QSharedPointer<ClassMapBase> classBase);
+  QSharedPointer<QueryTableModel> buildQueryTableModelBase(QSharedPointer<ClassMapBase> classBase);
+  QSharedPointer<QueryTableModel> buildQueryTableModelStiBase(QSharedPointer<ClassMapBase> classBase);
+  QSharedPointer<QueryTableModel> buildQueryTableModelCtiBase(QSharedPointer<ClassMapBase> classBase);
+  QSharedPointer<QueryTableModel> buildQueryTableModelSti(QtOrm::Mapping::SubClassMap* subClass);
+  QSharedPointer<QueryTableModel> buildQueryTableModelCti(QtOrm::Mapping::SubClassMap* subClass);
 
 protected:
   int tableNumber = 0;

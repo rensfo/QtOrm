@@ -4,6 +4,8 @@
 #include <QString>
 #include <QDebug>
 
+#include "SubClassMap.h"
+
 namespace QtOrm {
 namespace Config {
 
@@ -41,7 +43,7 @@ QList<QSharedPointer<ClassMapBase>> ConfigurationMap::getDerrivedClasses(const Q
   QList<QSharedPointer<ClassMapBase>> derrivedClasses;
   for(auto map : mappedClass.values())
   {
-    if(map->isSubclass() && map->getSuperClassName() == value)
+    if(map->isSubclass() && qobject_cast<SubClassMap*>(map)->getSuperClassName() == value)
       derrivedClasses << map;
   }
 
@@ -51,6 +53,18 @@ QList<QSharedPointer<ClassMapBase>> ConfigurationMap::getDerrivedClasses(const Q
 bool ConfigurationMap::isBaseClass(const QString&value)
 {
   return !getDerrivedClasses(value).isEmpty();
+}
+
+bool ConfigurationMap::isBaseClass(const QSharedPointer<ClassMapBase>&value)
+{
+  return isBaseClass(value->getClassName());
+}
+
+InheritanceType ConfigurationMap::getInheritanceType(const QSharedPointer<ClassMapBase>& value)
+{
+  QSharedPointer<ClassMapBase> firstDerrivedClass = getDerrivedClasses(value->getClassName()).first();
+  SubClassMap* subClass = qobject_cast<SubClassMap*>(firstDerrivedClass.data());
+  return subClass->getInheritanceType();
 }
 }
 }

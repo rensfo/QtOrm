@@ -2,9 +2,9 @@
 #define SUBCLASSS1MAP_H
 
 #include "SubClassS1.h"
-#include "SubclassMap.h"
+#include "SingleTableInheritanceMap.h"
 
-class SubClassS1Map : public QtOrm::Mapping::SubclassMap<SuperClassS, SubClassS1>
+class SubClassS1Map : public QtOrm::Mapping::SingleTableInheritanceMap<SuperClassS, SubClassS1>
 {
 public:
   SubClassS1Map()
@@ -13,7 +13,5 @@ public:
     setDiscrimanatorValue(1);
   }
 };
-//Q_DECLARE_METATYPE(QList<A*>)
-//Q_DECLARE_METATYPE(A*)
 
 #endif // SUBCLASSS1MAP_H

@@ -2,9 +2,9 @@
 #define SUBCLASS3MAP_H
 
 #include "SubClassS3.h"
-#include "SubclassMap.h"
+#include "SingleTableInheritanceMap.h"
 
-class SubClassS3Map : public QtOrm::Mapping::SubclassMap<SuperClassS, SubClassS3>
+class SubClassS3Map : public QtOrm::Mapping::SingleTableInheritanceMap<SuperClassS, SubClassS3>
 {
 public:
   SubClassS3Map()

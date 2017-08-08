@@ -42,7 +42,10 @@ HEADERS += PropertyMap.h \
     Conditions/Condition.h \
     Registry.h \
     QueryModels/OrderColumn.h \
-    SubclassMap.h
+    SingleTableInheritanceMap.h \
+    ClassTableInheritanceMap.h \
+    SubClassMap.h \
+    ClassMapBaseExt.h
 
 SOURCES += PropertyMap.cpp \
     ConfigurationMap.cpp \
@@ -66,7 +69,8 @@ SOURCES += PropertyMap.cpp \
     QueryModels/UpdateQueryModel.cpp \
     QueryModels/UpdateFieldQueryModel.cpp \
     Conditions/Condition.cpp \
-    Registry.cpp
+    Registry.cpp \
+    SubClassMap.cpp
 
 OTHER_FILES += QtOrmInclude.pri
 

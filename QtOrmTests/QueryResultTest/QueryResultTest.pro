@@ -41,7 +41,9 @@ HEADERS += \
     $$QUERY_MODELS_TEST_PATH/SubClassS1Map.h \
     $$QUERY_MODELS_TEST_PATH/SubClassS2Map.h \
     $$QUERY_MODELS_TEST_PATH/SubClassS3Map.h \
-    AOnlyMap.h
+    AOnlyMap.h \
+    SubClassS1CtiMap.h \
+    SubClassS2CtiMap.h
 
 SOURCES += tst_QueryResultTestTest.cpp \
     $$QUERY_MODELS_TEST_PATH/A.cpp \

@@ -15,7 +15,5 @@ public:
     discriminator("discriminator", "type");
   }
 };
-// Q_DECLARE_METATYPE(QList<A*>)
-// Q_DECLARE_METATYPE(A*)
 
 #endif // SUPERCLASSSMAP_H

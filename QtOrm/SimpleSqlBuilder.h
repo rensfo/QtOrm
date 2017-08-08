@@ -26,8 +26,9 @@ protected:
   virtual void bindUpdate(QSqlQuery &query);
   virtual void bindOneColumnUpdate(QSqlQuery &query);
   virtual void bindDelete(QSqlQuery &query);
-  void bindQueryParams(QSqlQuery &query, QSharedPointer<PropertyMap> property);
-  void bindQueryParams(QSqlQuery &query, QSharedPointer<OneToOne> oneToOne);
+  void bindQueryParam(QSqlQuery &query, QSharedPointer<PropertyMap> property);
+  void bindQueryIdParam(QSqlQuery &query, QSharedPointer<PropertyMap> idProperty, QSharedPointer<PropertyMap> baseIdProperty);
+  void bindQueryParam(QSqlQuery &query, QSharedPointer<OneToOne> oneToOne);
   QSqlQuery prepareSqlQuery(QueryModelType modelType, std::function<void(QSqlQuery &)> bindFunction);
 };
 }

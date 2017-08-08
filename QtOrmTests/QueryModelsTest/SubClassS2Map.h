@@ -2,9 +2,9 @@
 #define SUBCLASSS2MAP_H
 
 #include "SubClassS2.h"
-#include "SubclassMap.h"
+#include "SingleTableInheritanceMap.h"
 
-class SubClassS2Map : public QtOrm::Mapping::SubclassMap<SuperClassS, SubClassS2>
+class SubClassS2Map : public QtOrm::Mapping::SingleTableInheritanceMap<SuperClassS, SubClassS2>
 {
 public:
   SubClassS2Map()

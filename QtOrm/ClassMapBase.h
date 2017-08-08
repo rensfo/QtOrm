@@ -17,6 +17,8 @@
 namespace QtOrm {
 namespace Mapping {
 
+class SubClassMap;
+
 enum class TypeKind { Pointer, SharedPointer, WeakPointer, Other };
 
 class ClassMapBase : public QObject {
@@ -84,23 +86,23 @@ public:
   static TypeKind getTypeKindOfProperty(const QMetaObject &meta, const QString &prop);
 
   virtual bool containsProperty(const QString &propertyName) const;
-  bool isSubclass() const;
+  virtual bool isSubclass();
+  SubClassMap* toSubclass();
 
   virtual QString getDiscriminatorPropertyName() const;
   virtual QString getDiscrimanatorColumn() const;
   void setDiscriminatorProperty(const QString &value);
   virtual QSharedPointer<PropertyMap> getDiscriminatorProperty() const;
 
-  QString getSuperClassName() const;
   QStringList getColumns();
 
   QVariant getDiscrimanatorValue() const;
   void setDiscrimanatorValue(const QVariant &value);
 
-  QSharedPointer<ClassMapBase> getSuperClass() const;
+  QMetaObject getClassMetaObject() const;
+  void setClassMetaObject(const QMetaObject&value);
 
 protected:
-  void setSuperClass(const QSharedPointer<ClassMapBase> &value);
   static QString getPropertyType(const QMetaObject &meta, const QString &prop);
   virtual void checkProperty(const QString &propertyName) = 0;
   virtual void checkRelationProperty(const QString &propertyName) = 0;
@@ -121,7 +123,6 @@ private:
   QString discriminatorProperty;
 
   QMetaObject classMetaObject;
-  QSharedPointer<ClassMapBase> superClass;
 };
 }
 }

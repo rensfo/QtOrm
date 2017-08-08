@@ -46,7 +46,6 @@ void SqlBuilderBase::bindValues(QSqlQuery &query, const QSharedPointer<GroupCond
       QString placeHolder = placeHolders[condition];
 
       QList<Operation> operations{Operation::Between, Operation::In};
-      //      bool betweenOrIn = condition.dynamicCast<ConditionBetween>() || condition.dynamicCast<ConditionIn>();
 
       bool betweenOrIn = operations.contains(condition->getOperation());
 

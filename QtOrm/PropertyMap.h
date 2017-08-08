@@ -12,8 +12,8 @@ public:
   PropertyMap();
   PropertyMap(QString name);
   PropertyMap(QString name, QString column);
-  PropertyMap &setName(QString name);
 
+  PropertyMap &setName(QString name);
   QString getName() const;
 
   PropertyMap &setColumn(QString column);
@@ -22,14 +22,14 @@ public:
   PropertyMap &setIsId(bool isId);
   bool getIsId();
 
-  QString getUpdateFunction() const;
-  void setUpdateFunction(const QString &value);
-
   bool getIsDiscriminator() const;
   PropertyMap &setIsDiscriminator(bool value);
 
   QVariant getNull() const;
   PropertyMap &setNull(const QVariant &value);
+
+  bool getAutoincrement() const;
+  void setAutoincrement(bool value);
 
 private:
   QString name;
@@ -37,6 +37,7 @@ private:
   bool isId = false;
   bool isDiscriminator = false;
   QVariant null;
+  bool autoincrement = true;
 };
 }
 }
