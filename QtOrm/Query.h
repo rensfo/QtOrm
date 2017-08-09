@@ -36,6 +36,7 @@ public:
   virtual void deleteObject(QSharedPointer<QObject> &object);
 
   virtual void refresh(QSharedPointer<QObject> &object);
+
   virtual void saveOneField(QSharedPointer<QObject> &object, const QString &propertyName);
 
   QSqlDatabase getDatabase() const;
@@ -95,7 +96,7 @@ protected:
   void removeObjectFromRegistry(QSharedPointer<QObject> object);
   QVariant getIdFromRecord(QSharedPointer<ClassMapBase> classBase, const QSqlRecord &record, const QString &tableAlias);
 
-  void refreshObjectData(QSharedPointer<QObject> object, QSharedPointer<QueryTableModel> queryTableModel,
+  void refreshObjectData(QSharedPointer<QObject> object, QSharedPointer<ClassMapBase>& classBase, QSharedPointer<QueryTableModel> queryTableModel,
                          const QSqlRecord &record);
 
   QString getSqlTextWithBindParams(QSqlQuery &query);
@@ -113,6 +114,10 @@ protected:
   bool isIdOneToOneDefault(QSharedPointer<QObject> object, QSharedPointer<OneToOne> oneToOne);
   QString getQueryColumn(QSharedPointer<QueryTableModel> queryTableModel, QSharedPointer<PropertyMap> property);
   bool tryReopenDatabaseConnectionIfNeed();
+
+  SimpleSqlBuilder createSimpleSqlBuilder(QSharedPointer<ClassMapBase>&classBase, GroupConditions& conditions, QList<OrderColumn>& orderBy);
+  SimpleSqlBuilder createSimpleSqlBuilder(QSharedPointer<ClassMapBase>&classBase, GroupConditions& conditions);
+  SimpleSqlBuilder createSimpleSqlBuilder(QSharedPointer<ClassMapBase>&classBase, QSharedPointer<QObject>&object);
   SimpleSqlBuilder createSimpleSqlBuilder(QSharedPointer<ClassMapBase>&classBase);
   GroupConditions replacePropertyToColumn(QSharedPointer<ClassMapBase> &classBase, const GroupConditions &conditions);
   QList<OrderColumn> replacePropertyToColumn(QSharedPointer<ClassMapBase> &classBase,

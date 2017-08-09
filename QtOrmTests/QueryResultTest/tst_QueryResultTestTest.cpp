@@ -128,6 +128,9 @@ private Q_SLOTS:
   void ClassTableInheritanceSelect_data();
   void ClassTableInheritanceSelect();
 
+  void ClassTableInheritanceRefresh_data();
+  void ClassTableInheritanceRefresh();
+
 private:
   void enableLogSql();
   QSqlDatabase openConnection(const QString& name);
@@ -1240,6 +1243,44 @@ void QueryResultTestTest::ClassTableInheritanceSelect()
   try {
     auto supers = session.getList<SuperClassS>();
     QVERIFY(supers.count() == 3);
+    return;
+  } catch (QtOrm::Exception& e) {
+    qDebug() << e.getMessage();
+  }
+  QVERIFY(false);
+}
+
+void QueryResultTestTest::ClassTableInheritanceRefresh_data()
+{
+  initDataBase("ClassTableInheritanceRefresh", { "create table super_class_s(id integer primary key autoincrement, type integer not null, code text)",
+               "create table sub_class_s1(idS1 integer primary key, int_val integer)" });
+  session.clearRegistry();
+  session.setAutoUpdate(false);
+  ConfigurationMap::removeAllMappings();
+  ConfigurationMap::addMappings<SuperClassSMap, SubClassS1CtiMap>();
+  QSharedPointer<SubClassS1> sub1 = QSharedPointer<SubClassS1>::create();
+  sub1->setCode("one");
+  sub1->setIntVal(1);
+  session.saveObject(sub1);
+  session.clearRegistry();
+}
+
+void QueryResultTestTest::ClassTableInheritanceRefresh()
+{
+  try {
+    auto s1 = session.getById<SubClassS1>(1);
+    QSqlQuery query(db);
+    if(!query.exec("update sub_class_s1 set int_val = 999")){
+      QVERIFY2(false, query.lastError().text().toStdString().c_str());
+      return;
+    }
+    if(!query.exec("update super_class_s set code = 'new'")){
+      QVERIFY2(false, query.lastError().text().toStdString().c_str());
+      return;
+    }
+    session.refresh(s1);
+    QVERIFY(s1->getIntVal() == 999);
+    QVERIFY(s1->getCode() == "new");
     return;
   } catch (QtOrm::Exception& e) {
     qDebug() << e.getMessage();
