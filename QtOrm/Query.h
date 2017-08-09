@@ -78,7 +78,7 @@ protected:
   void fillOneToMany(QSharedPointer<QObject> object, const QList<QSharedPointer<OneToMany>> &relations,
                      const QString &idProperty);
   void fillOneToOne(QSharedPointer<QObject> object, QSharedPointer<QueryTableModel> queryTableModel,
-                    const QSqlRecord &record);
+                    const QSqlRecord &record, QList<QSharedPointer<OneToOne> > relations);
   QSharedPointer<QObject> getObject(const QSqlRecord &record, const QSharedPointer<ClassMapBase> &classBase,
                                     const QString &tableAlias, QSharedPointer<QueryTableModel> queryTableModel);
   void setObjectProperty(QSharedPointer<QObject> object, const QString &propertyName, QVariant &value);

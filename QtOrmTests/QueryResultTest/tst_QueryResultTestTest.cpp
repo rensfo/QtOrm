@@ -21,6 +21,7 @@
 #include "dml.h"
 #include "SubClassS1CtiMap.h"
 #include "SubClassS2CtiMap.h"
+#include "SubClassS3CtiMap.h"
 
 using namespace QtOrm;
 using namespace Sql;
@@ -1095,11 +1096,12 @@ void QueryResultTestTest::ClassTableInheritanceInsert_data()
 {
   initDataBase("ClassTableInheritanceInsert", { "create table super_class_s(id integer primary key autoincrement, type integer not null, code text)",
                "create table sub_class_s1(idS1 integer primary key, int_val integer)",
-               "create table sub_class_s2(idS2 integer primary key, str_val text)"});
+               "create table sub_class_s2(idS2 integer primary key, str_val text)",
+               "create table sub_class_s3(idS3 integer primary key, id_ref integer, foreign key (id_ref)  references super_class_s(id))"});
   session.clearRegistry();
   session.setAutoUpdate(false);
   ConfigurationMap::removeAllMappings();
-  ConfigurationMap::addMappings<SuperClassSMap, SubClassS1CtiMap, SubClassS2CtiMap>();
+  ConfigurationMap::addMappings<SuperClassSMap, SubClassS1CtiMap, SubClassS2CtiMap, SubClassS3CtiMap>();
 }
 
 void QueryResultTestTest::ClassTableInheritanceInsert()
@@ -1111,9 +1113,14 @@ void QueryResultTestTest::ClassTableInheritanceInsert()
     session.saveObject(sub1);
 
     QSharedPointer<SubClassS2> sub2 = QSharedPointer<SubClassS2>::create();
-    sub2->setCode("three");
+    sub2->setCode("two");
     sub2->setStrVal("3");
     session.saveObject(sub2);
+
+    QSharedPointer<SubClassS3> sub3 = QSharedPointer<SubClassS3>::create();
+    sub3->setCode("three");
+    sub3->setRef(sub1);
+    session.saveObject(sub3);
 
     QVERIFY(true);
     return;
@@ -1235,7 +1242,6 @@ void QueryResultTestTest::ClassTableInheritanceAutoUpdate_data() {
 
 void QueryResultTestTest::ClassTableInheritanceAutoUpdate() {
   try {
-//    enableLogSql();
     auto s1 = session.getById<SubClassS1>(1);
     s1->setCode("new_code");
     s1->setIntVal(999);
@@ -1271,20 +1277,26 @@ void QueryResultTestTest::ClassTableInheritanceSelect_data()
 {
   initDataBase("ClassTableInheritanceSelect", { "create table super_class_s(id integer primary key autoincrement, type integer not null, code text)",
                "create table sub_class_s1(idS1 integer primary key, int_val integer)",
-               "create table sub_class_s2(idS2 integer primary key, str_val text)"});
+               "create table sub_class_s2(idS2 integer primary key, str_val text)",
+               "create table sub_class_s3(idS3 integer primary key, id_ref integer, foreign key (id_ref)  references super_class_s(id))"});
   session.clearRegistry();
   session.setAutoUpdate(false);
   ConfigurationMap::removeAllMappings();
-  ConfigurationMap::addMappings<SuperClassSMap, SubClassS1CtiMap, SubClassS2CtiMap>();
+  ConfigurationMap::addMappings<SuperClassSMap, SubClassS1CtiMap, SubClassS2CtiMap, SubClassS3CtiMap>();
   QSharedPointer<SubClassS1> sub1 = QSharedPointer<SubClassS1>::create();
   sub1->setCode("one");
   sub1->setIntVal(1);
   session.saveObject(sub1);
 
   QSharedPointer<SubClassS2> sub2 = QSharedPointer<SubClassS2>::create();
-  sub2->setCode("three");
+  sub2->setCode("two");
   sub2->setStrVal("3");
   session.saveObject(sub2);
+
+  QSharedPointer<SubClassS3> sub3 = QSharedPointer<SubClassS3>::create();
+  sub3->setCode("three");
+  sub3->setRef(sub1);
+  session.saveObject(sub3);
   session.clearRegistry();
 }
 
@@ -1292,7 +1304,7 @@ void QueryResultTestTest::ClassTableInheritanceSelect()
 {
   try {
     auto supers = session.getList<SuperClassS>();
-    QVERIFY(supers.count() == 2);
+    QVERIFY(supers.count() == 3);
     return;
   } catch (QtOrm::Exception& e) {
     qDebug() << e.getMessage();
