@@ -167,15 +167,12 @@ void QueryResultTestTest::objectFromRegistry_data()
 
 void QueryResultTestTest::objectFromRegistry()
 {
-  try
-  {
+  try {
     QSharedPointer<A> a = session.getById<A>(1);
     QSharedPointer<A> aFromRegistry = session.getById<A>(1);
 
     QVERIFY(a == aFromRegistry);
-  }
-  catch (QtOrm::Exception& e)
-  {
+  } catch (QtOrm::Exception& e) {
     qDebug() << e.getMessage();
 
     QVERIFY(false);
@@ -225,15 +222,12 @@ void QueryResultTestTest::oneTableTwoTimesInQuery_data()
 
 void QueryResultTestTest::oneTableTwoTimesInQuery()
 {
-  try
-  {
+  try {
     QSharedPointer<E> e = session.getById<E>(1);
     Q_UNUSED(e)
 
     QVERIFY(true);
-  }
-  catch (QtOrm::Exception& e)
-  {
+  } catch (QtOrm::Exception& e) {
     Q_UNUSED(e)
 
     QVERIFY(false);
@@ -257,8 +251,7 @@ void QueryResultTestTest::oneColumnTwoTimesInWhere_data()
 
 void QueryResultTestTest::oneColumnTwoTimesInWhere()
 {
-  try
-  {
+  try {
     GroupConditions gc;
     gc.setOperation(GroupOperation::Or);
     gc.addEqual("code_1", "code1");
@@ -267,9 +260,7 @@ void QueryResultTestTest::oneColumnTwoTimesInWhere()
     QList<QSharedPointer<A>> listA = session.getList<A>(gc);
 
     QCOMPARE(listA.count(), 2);
-  }
-  catch (QtOrm::Exception& e)
-  {
+  } catch (QtOrm::Exception& e) {
     Q_UNUSED(e)
 
     QVERIFY(false);
@@ -319,8 +310,7 @@ void QueryResultTestTest::deleteObject_data()
 
 void QueryResultTestTest::deleteObject()
 {
-  try
-  {
+  try {
     QSharedPointer<A> a = session.getById<A>(1);
     session.deleteObject<A>(a);
 
@@ -329,9 +319,7 @@ void QueryResultTestTest::deleteObject()
 
     QVERIFY(!a);
     return;
-  }
-  catch (QtOrm::Exception& e)
-  {
+  } catch (QtOrm::Exception& e) {
     qDebug() << e.getMessage();
   }
   QVERIFY(false);
@@ -352,8 +340,7 @@ void QueryResultTestTest::updateObject_data()
 
 void QueryResultTestTest::updateObject()
 {
-  try
-  {
+  try {
     QSharedPointer<A> a = session.getById<A>(1);
 
     a->setCode("x");
@@ -364,9 +351,7 @@ void QueryResultTestTest::updateObject()
     a = session.getById<A>(1);
 
     QCOMPARE(a->getCode(), QString("x"));
-  }
-  catch (QtOrm::Exception& e)
-  {
+  } catch (QtOrm::Exception& e) {
     qDebug() << e.getMessage();
     QVERIFY(false);
   }
@@ -424,8 +409,7 @@ void QueryResultTestTest::orderBy_data()
 
 void QueryResultTestTest::orderBy()
 {
-  try
-  {
+  try {
     QSharedPointer<A> a = session.getById<A>(1);
 
     auto child = a->getChild();
@@ -436,9 +420,7 @@ void QueryResultTestTest::orderBy()
     } else {
       QVERIFY(false);
     }
-  }
-  catch (QtOrm::Exception& e)
-  {
+  } catch (QtOrm::Exception& e) {
     qDebug() << e.getMessage();
     QVERIFY(false);
   }
@@ -459,21 +441,17 @@ void QueryResultTestTest::refreshObject_data()
 
 void QueryResultTestTest::refreshObject()
 {
-  try
-  {
+  try {
     QSqlQuery query(db);
 
     QSharedPointer<A> a = session.get<A>("code_1", "code2");
-    if (query.exec("update A set code = null where code = 'code2'"))
-    {
+    if (query.exec("update A set code = null where code = 'code2'")) {
       session.refresh(a);
       QCOMPARE(a->getCode(), QString(""));
       return;
     }
     QVERIFY(false);
-  }
-  catch (QtOrm::Exception& e)
-  {
+  } catch (QtOrm::Exception& e) {
     qDebug() << e.getMessage();
     QVERIFY(false);
   }
@@ -507,13 +485,11 @@ void QueryResultTestTest::refreshChildObject_data()
 
 void QueryResultTestTest::refreshChildObject()
 {
-  try
-  {
+  try {
     QSqlQuery query(db);
 
     QSharedPointer<A> a = session.get<A>("code_1", "code2");
-    if (query.exec("update B set code = 'code2.2.1' where code = 'code2.2'"))
-    {
+    if (query.exec("update B set code = 'code2.2.1' where code = 'code2.2'")) {
       session.refresh(a);
 
       std::function<bool(QSharedPointer<B>)> func = [](QSharedPointer<B> item) {
@@ -523,9 +499,7 @@ void QueryResultTestTest::refreshChildObject()
       QVERIFY(updatedB != nullptr);
       return;
     }
-  }
-  catch (QtOrm::Exception& e)
-  {
+  } catch (QtOrm::Exception& e) {
     qDebug() << e.getMessage();
   }
 
@@ -608,8 +582,7 @@ void QueryResultTestTest::childrenOneToOneParent_data()
 
 void QueryResultTestTest::childrenOneToOneParent()
 {
-  try
-  {
+  try {
     QSharedPointer<A> a = session.get<A>("code_1", "code2");
 
     auto child = a->getChild() ;
@@ -619,9 +592,7 @@ void QueryResultTestTest::childrenOneToOneParent()
       QVERIFY(false);
     }
     return;
-  }
-  catch (QtOrm::Exception& e)
-  {
+  } catch (QtOrm::Exception& e) {
     qDebug() << e.getMessage();
   }
   QVERIFY(false);
@@ -644,8 +615,7 @@ void QueryResultTestTest::autoUpdate_data()
 
 void QueryResultTestTest::autoUpdate()
 {
-  try
-  {
+  try {
     QString newCode = "code2.2";
     QString oldCode = "code2";
 
@@ -656,9 +626,7 @@ void QueryResultTestTest::autoUpdate()
     a = session.get<A>("code_1", newCode);
     QCOMPARE(a->getCode(), newCode);
     return;
-  }
-  catch (QtOrm::Exception& e)
-  {
+  } catch (QtOrm::Exception& e) {
     qDebug() << e.getMessage();
   }
   QVERIFY(false);
@@ -681,17 +649,14 @@ void QueryResultTestTest::operationBetween_data()
 
 void QueryResultTestTest::operationBetween()
 {
-  try
-  {
+  try {
     GroupConditions where;
     where.addBetween("id", 2, 3);
     auto listA = session.getList<A>(where);
 
     QCOMPARE(listA.count(), 2);
     return;
-  }
-  catch (QtOrm::Exception& e)
-  {
+  } catch (QtOrm::Exception& e) {
     qDebug() << e.getMessage();
   }
   QVERIFY(false);
@@ -714,17 +679,14 @@ void QueryResultTestTest::operationIn_data()
 
 void QueryResultTestTest::operationIn()
 {
-  try
-  {
+  try {
     GroupConditions where;
     where.addIn("id", {3, 4});
     auto listA = session.getList<A>(where);
 
     QCOMPARE(listA.count(), 2);
     return;
-  }
-  catch (QtOrm::Exception& e)
-  {
+  } catch (QtOrm::Exception& e) {
     qDebug() << e.getMessage();
   }
   QVERIFY(false);
@@ -755,9 +717,7 @@ void QueryResultTestTest::operationGreater()
 
     QCOMPARE(listA.count(), 1);
     return;
-  }
-  catch (QtOrm::Exception& e)
-  {
+  } catch (QtOrm::Exception& e) {
     qDebug() << e.getMessage();
   }
   QVERIFY(false);
@@ -780,17 +740,14 @@ void QueryResultTestTest::operationGreaterOrEqual_data()
 
 void QueryResultTestTest::operationGreaterOrEqual()
 {
-  try
-  {
+  try {
     GroupConditions where;
     where.addGreaterOrEqual("id", 3);
     auto listA = session.getList<A>(where);
 
     QCOMPARE(listA.count(), 2);
     return;
-  }
-  catch (QtOrm::Exception& e)
-  {
+  } catch (QtOrm::Exception& e) {
     qDebug() << e.getMessage();
   }
   QVERIFY(false);
@@ -813,17 +770,14 @@ void QueryResultTestTest::operationLess_data()
 
 void QueryResultTestTest::operationLess()
 {
-  try
-  {
+  try {
     GroupConditions where;
     where.addLess("id", 3);
     auto listA = session.getList<A>(where);
 
     QCOMPARE(listA.count(), 2);
     return;
-  }
-  catch (QtOrm::Exception& e)
-  {
+  } catch (QtOrm::Exception& e) {
     qDebug() << e.getMessage();
   }
   QVERIFY(false);
@@ -846,17 +800,14 @@ void QueryResultTestTest::operationLessOrEqual_data()
 
 void QueryResultTestTest::operationLessOrEqual()
 {
-  try
-  {
+  try {
     GroupConditions where;
     where.addLessOrEqual("id", 3);
     auto listA = session.getList<A>(where);
 
     QCOMPARE(listA.count(), 3);
     return;
-  }
-  catch (QtOrm::Exception& e)
-  {
+  } catch (QtOrm::Exception& e) {
     qDebug() << e.getMessage();
   }
   QVERIFY(false);
@@ -879,17 +830,14 @@ void QueryResultTestTest::operationLike_data()
 
 void QueryResultTestTest::operationLike()
 {
-  try
-  {
+  try {
     GroupConditions where;
     where.addLike("code_1", "code");
     auto listA = session.getList<A>(where);
 
     QCOMPARE(listA.count(), 2);
     return;
-  }
-  catch (QtOrm::Exception& e)
-  {
+  } catch (QtOrm::Exception& e) {
     qDebug() << e.getMessage();
   }
   QVERIFY(false);
@@ -910,14 +858,12 @@ void QueryResultTestTest::nullValueUpdate_data()
 
 void QueryResultTestTest::nullValueUpdate()
 {
-  try
-  {
+  try {
     auto sub = session.getById<SubClassS1>(1);
     sub->setIntVal(0);
     session.saveObject(sub);
     QSqlQuery query(db);
-    if (!query.exec("select int_val from super_class_s where id = 1"))
-    {
+    if (!query.exec("select int_val from super_class_s where id = 1")) {
       qDebug() << query.lastError().text();
       QVERIFY(false);
       return;
@@ -926,9 +872,7 @@ void QueryResultTestTest::nullValueUpdate()
     query.next();
     QCOMPARE(query.value("int_val").isNull(), true);
     return;
-  }
-  catch (QtOrm::Exception& e)
-  {
+  } catch (QtOrm::Exception& e) {
     qDebug() << e.getMessage();
   }
   QVERIFY(false);
@@ -970,35 +914,26 @@ void QueryResultTestTest::SingleTableInheritanceSelect()
   {
     auto supers = session.getList<SuperClassS>();
 
-    for (auto s : supers)
-    {
+    for (auto s : supers) {
       bool result = true;
       QList<long> SubClassS1Ids{1, 2};
       QList<long> SubClassS2Ids{3, 4};
-      if (SubClassS1Ids.contains(s->getId()))
-      {
+      if (SubClassS1Ids.contains(s->getId())) {
         result = qobject_cast<SubClassS1*>(s);
-      }
-      else if (SubClassS2Ids.contains(s->getId()))
-      {
+      } else if (SubClassS2Ids.contains(s->getId())) {
         result = qobject_cast<SubClassS2*>(s);
-      }
-      else
-      {
+      } else {
         result = qobject_cast<SubClassS3*>(s);
       }
 
-      if (!result)
-      {
+      if (!result) {
         QVERIFY(false);
         return;
       }
     }
     QVERIFY(true);
     return;
-  }
-  catch (QtOrm::Exception& e)
-  {
+  } catch (QtOrm::Exception& e) {
     qDebug() << e.getMessage();
   }
   QVERIFY(false);
