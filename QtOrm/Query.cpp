@@ -92,9 +92,11 @@ QList<QSharedPointer<QObject>> Query::getListObject(const QString &className, co
 }
 
 void Query::saveObject(QSharedPointer<QObject> &object) {
-  startTransaction();
-  saveObjectWoStartTransaction(object);
-  commit();
+  if (isIdObjectDefault(object)) {
+    insertObject(object);
+  } else {
+    updateObject(object);
+  }
 }
 
 void Query::insertObject(QSharedPointer<QObject> &object) {
@@ -282,7 +284,6 @@ void Query::executeQuery(QSqlQuery &query) {
   if (!query.exec()) {
     emit executedSql(executedQuery);
     QString errorMsg = QString("Query: %1 \nError: %2").arg(executedQuery).arg(query.lastError().text());
-    rollback();
     throw SqlException(errorMsg);
   }
   int timeElapsed = time.elapsed();
@@ -581,7 +582,7 @@ void Query::saveOneToOne(QSharedPointer<QObject> object, QSharedPointer<OneToOne
   if (propertyObject) {
     Query subQuery(*this);
     connect(&subQuery, &Query::executedSql, this, &Query::executedSql);
-    subQuery.saveObjectWoStartTransaction(propertyObject);
+    subQuery.saveObject(propertyObject);
   }
 }
 
@@ -604,7 +605,7 @@ void Query::saveOneToMany(QSharedPointer<QObject> object, QSharedPointer<OneToMa
   for (auto item : list) {
     Query subQuery(*this);
     connect(&subQuery, &Query::executedSql, this, &Query::executedSql);
-    subQuery.saveObjectWoStartTransaction(item);
+    subQuery.saveObject(item);
   }
 }
 
@@ -644,28 +645,6 @@ Query &Query::operator=(const Query &other) {
   database = other.getDatabase();
 
   return *this;
-}
-
-void Query::saveObjectWoStartTransaction(QSharedPointer<QObject> object) {
-  if (isIdObjectDefault(object)) {
-    insertObject(object);
-  } else {
-    updateObject(object);
-  }
-}
-
-void Query::startTransaction() {
-  if (database.driver()->hasFeature(QSqlDriver::Transactions)) {
-    database.transaction();
-  }
-}
-
-void Query::commit() {
-  database.commit();
-}
-
-void Query::rollback() {
-  database.rollback();
 }
 
 bool Query::isIdObjectDefault(QSharedPointer<QObject> object) {

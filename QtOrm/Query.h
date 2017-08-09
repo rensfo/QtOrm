@@ -109,11 +109,6 @@ protected:
   void deleteAllOneToMany(QSharedPointer<QObject> object);
   void deleteOneToMany(QSharedPointer<QObject> object, const QSharedPointer<OneToMany> &oneToMany);
 
-  void saveObjectWoStartTransaction(QSharedPointer<QObject> object);
-
-  void startTransaction();
-  void commit();
-  void rollback();
   bool isIdObjectDefault(QSharedPointer<QObject> object);
   bool isIdOneToOneDefault(QSharedPointer<QObject> object, QSharedPointer<OneToOne> oneToOne);
   QString getQueryColumn(QSharedPointer<QueryTableModel> queryTableModel, QSharedPointer<PropertyMap> property);
