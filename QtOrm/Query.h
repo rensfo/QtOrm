@@ -34,8 +34,7 @@ public:
                                                        const QList<OrderColumn> &orderBy = QList<OrderColumn>());
   virtual void saveObject(QSharedPointer<QObject> &object);
   virtual void deleteObject(QSharedPointer<QObject> &object);
-  void deleteObjectMain(QSharedPointer<QObject> &object, QSharedPointer<ClassMapBase> &classBase);
-  void deleteObjectCti(QSharedPointer<QObject> &object, QSharedPointer<ClassMapBase> &classBase);
+
   virtual void refresh(QSharedPointer<QObject> &object);
   virtual void saveOneField(QSharedPointer<QObject> &object, const QString &propertyName);
 
@@ -57,19 +56,25 @@ signals:
 
 protected:
   void insertObject(QSharedPointer<QObject> &object);
-  void insertObjectMain(QSharedPointer<QObject>&object, QSharedPointer<ClassMapBase> classBase);
+  QSqlQuery insertBase(QSharedPointer<QObject>&object, QSharedPointer<ClassMapBase>& classBase);
+  void insertObjectMain(QSharedPointer<QObject>&object, QSharedPointer<ClassMapBase>&classBase);
   void insertObjectCti(QSharedPointer<QObject>&object, QSharedPointer<ClassMapBase>&classBase);
 
   void updateObject(QSharedPointer<QObject> &object);
   void updateObjectMain(QSharedPointer<QObject> &object, QSharedPointer<ClassMapBase>&classBase);
   void updateObjectCti(QSharedPointer<QObject> &object, QSharedPointer<ClassMapBase>&classBase);
 
+  void deleteObjectBase(QSharedPointer<QObject>&object, QSharedPointer<ClassMapBase> &classBase);
+  void deleteObjectMain(QSharedPointer<QObject> &object, QSharedPointer<ClassMapBase> &classBase);
+  void deleteObjectCti(QSharedPointer<QObject> &object, QSharedPointer<ClassMapBase> &classBase);
+
   virtual void executeQuery(QSqlQuery &query);
   QList<QSharedPointer<QObject>> getList(QSqlQuery &query, const QSharedPointer<QueryModel> &queryModel);
 
-  void fillObject(QSharedPointer<QObject> &object, const QSharedPointer<ClassMapBase>&classBase, QSharedPointer<QueryTableModel> &queryTableModel,
+  void fillObject(QSharedPointer<QObject> &object, const QSharedPointer<ClassMapBase>& baseMap, QSharedPointer<QueryTableModel>& tableModel, const QSqlRecord &record);
+  void fillBaseFields(QSharedPointer<QObject> &object, const QSharedPointer<ClassMapBase>&classBase, QSharedPointer<QueryTableModel> &queryTableModel,
                   const QSqlRecord &record);
-  void ctiFillObject(QSharedPointer<QObject> &object, const QSharedPointer<ClassMapBase>& base, const QSharedPointer<ClassMapBase>& current);
+  void fillCtiPart(QSharedPointer<QObject> &object, const QSharedPointer<ClassMapBase>& base, const QSharedPointer<ClassMapBase>& current);
   void fillOneToMany(QSharedPointer<QObject> object, const QList<QSharedPointer<OneToMany>> &relations,
                      const QString &idProperty);
   void fillOneToOne(QSharedPointer<QObject> object, QSharedPointer<QueryTableModel> queryTableModel,
