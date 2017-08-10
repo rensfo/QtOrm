@@ -124,6 +124,7 @@ void QueryModelsTestTest::oneColumnTwoTimes() {
   QSharedPointer<ClassMapBase> classBase = configuration->getMappedClass("A");
   SelectQueryModel query;
   query.setClassBase(classBase);
+  query.setConfiguration(configuration);
   query.buildModel();
 
   GroupConditions group;
@@ -140,6 +141,7 @@ void QueryModelsTestTest::updateSql() {
   QSharedPointer<ClassMapBase> classBase = configuration->getMappedClass("A");
   UpdateQueryModel query;
   query.setClassBase(classBase);
+  query.setConfiguration(configuration);
   query.buildModel();
 
   QCOMPARE(query.getSqlText(), expectedUpdateText);
@@ -149,6 +151,7 @@ void QueryModelsTestTest::insertSql() {
   QSharedPointer<ClassMapBase> classBase = configuration->getMappedClass("A");
   InsertQueryModel query;
   query.setClassBase(classBase);
+  query.setConfiguration(configuration);
   query.buildModel();
 
   QCOMPARE(query.getSqlText(), expectedInsertText);
@@ -158,6 +161,7 @@ void QueryModelsTestTest::deleteSql() {
   QSharedPointer<ClassMapBase> classBase = configuration->getMappedClass("A");
   DeleteQueryModel query;
   query.setClassBase(classBase);
+  query.setConfiguration(configuration);
   query.buildModel();
 
   QCOMPARE(query.getSqlText(), expectedDeleteText);
@@ -167,6 +171,7 @@ void QueryModelsTestTest::hardWhere() {
   QSharedPointer<ClassMapBase> classBase = configuration->getMappedClass("A");
   SelectQueryModel query;
   query.setClassBase(classBase);
+  query.setConfiguration(configuration);
   query.buildModel();
 
   GroupConditions group =
@@ -179,6 +184,7 @@ void QueryModelsTestTest::hardWhere() {
 }
 
 void QueryModelsTestTest::registerClasses() {
+  configuration = QSharedPointer<Config::ConfigurationMap>::create();
   configuration->addMappings<AMap, KindAMap, TypeAMap, BMap>();
 }
 
