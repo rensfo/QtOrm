@@ -2,7 +2,7 @@
 #define AMAP_H
 
 #include "A.h"
-#include "ClassMap.h"
+#include "Mappings/ClassMap.h"
 
 class AMap : public QtOrm::Mapping::ClassMap<A> {
 public:

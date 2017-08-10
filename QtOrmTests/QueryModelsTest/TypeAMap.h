@@ -1,7 +1,7 @@
 #ifndef TYPEAMAP_H
 #define TYPEAMAP_H
 
-#include "ClassMap.h"
+#include "Mappings/ClassMap.h"
 #include "TypeA.h"
 
 class TypeAMap : public QtOrm::Mapping::ClassMap<TypeA> {

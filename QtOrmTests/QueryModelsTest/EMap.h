@@ -1,7 +1,7 @@
 #ifndef EMAP_H
 #define EMAP_H
 
-#include "ClassMap.h"
+#include "Mappings/ClassMap.h"
 #include "E.h"
 
 class EMap : public QtOrm::Mapping::ClassMap<E> {

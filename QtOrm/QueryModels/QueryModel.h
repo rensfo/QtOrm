@@ -1,10 +1,10 @@
 #ifndef QUERYMODEL_H
 #define QUERYMODEL_H
 
-#include "ClassMapBase.h"
+#include "Mappings/ClassMapBase.h"
 #include "GroupConditions.h"
 #include "QueryTableModel.h"
-#include "ConfigurationMap.h"
+#include "Mappings/ConfigurationMap.h"
 
 namespace QtOrm {
 namespace Sql {

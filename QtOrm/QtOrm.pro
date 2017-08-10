@@ -16,11 +16,7 @@ TEMPLATE = lib
 DEFINES += QTORM_LIBRARY
 CONFIG += c++11
 
-HEADERS += PropertyMap.h \
-    ClassMap.h \
-    ConfigurationMap.h \
-    ClassMapBase.h \
-    Exception.h \
+HEADERS += Exception.h \
     Session.h \
     SimpleSqlBuilder.h \
     SqlBuilderBase.h \
@@ -29,6 +25,15 @@ HEADERS += PropertyMap.h \
     AutoUpdater.h \
     QueryTableModel.h \
     QueryJoin.h \
+    Registry.h \
+    Mappings/PropertyMap.h \
+    Mappings/ClassMap.h \
+    Mappings/ConfigurationMap.h \
+    Mappings/ClassMapBase.h \
+    Mappings/SubClassMap.h \
+    Mappings/ClassMapBaseExt.h \
+    Mappings/SingleTableInheritanceMap.h \
+    Mappings/ClassTableInheritanceMap.h \
     Relations/Relation.h \
     Relations/OneToMany.h \
     Relations/OneToOne.h \
@@ -38,19 +43,11 @@ HEADERS += PropertyMap.h \
     QueryModels/DeleteQueryModel.h \
     QueryModels/UpdateQueryModel.h \
     QueryModels/UpdateFieldQueryModel.h \
-    Conditions/Operation.h \
-    Conditions/Condition.h \
-    Registry.h \
     QueryModels/OrderColumn.h \
-    SingleTableInheritanceMap.h \
-    ClassTableInheritanceMap.h \
-    SubClassMap.h \
-    ClassMapBaseExt.h
+    Conditions/Operation.h \
+    Conditions/Condition.h
 
-SOURCES += PropertyMap.cpp \
-    ConfigurationMap.cpp \
-    ClassMapBase.cpp \
-    Exception.cpp \
+SOURCES += Exception.cpp \
     Session.cpp \
     SimpleSqlBuilder.cpp \
     SqlBuilderBase.cpp \
@@ -59,6 +56,11 @@ SOURCES += PropertyMap.cpp \
     AutoUpdater.cpp \
     QueryTableModel.cpp \
     QueryJoin.cpp \
+    Registry.cpp \
+    Mappings/PropertyMap.cpp \
+    Mappings/ConfigurationMap.cpp \
+    Mappings/ClassMapBase.cpp \
+    Mappings/SubClassMap.cpp \
     Relations/Relation.cpp \
     Relations/OneToMany.cpp \
     Relations/OneToOne.cpp \
@@ -68,9 +70,7 @@ SOURCES += PropertyMap.cpp \
     QueryModels/DeleteQueryModel.cpp \
     QueryModels/UpdateQueryModel.cpp \
     QueryModels/UpdateFieldQueryModel.cpp \
-    Conditions/Condition.cpp \
-    Registry.cpp \
-    SubClassMap.cpp
+    Conditions/Condition.cpp
 
 OTHER_FILES += QtOrmInclude.pri
 

@@ -1,11 +1,11 @@
 #ifndef REGISTRY_H
 #define REGISTRY_H
 
-#include "ConfigurationMap.h"
-
 #include <QHash>
 #include <QObject>
 #include <QSharedPointer>
+
+#include "Mappings/ConfigurationMap.h"
 
 namespace QtOrm {
 

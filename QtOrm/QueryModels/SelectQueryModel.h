@@ -4,7 +4,7 @@
 #include <QMap>
 
 #include "QueryModel.h"
-#include "SubClassMap.h"
+#include "Mappings/SubClassMap.h"
 
 namespace QtOrm {
 namespace Sql {

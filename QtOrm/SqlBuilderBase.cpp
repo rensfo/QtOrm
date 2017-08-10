@@ -5,8 +5,8 @@
 #include <QString>
 #include <QSqlDriver>
 
-#include "ClassMapBase.h"
-#include "ConfigurationMap.h"
+#include "Mappings/ClassMapBase.h"
+#include "Mappings/ConfigurationMap.h"
 #include "QueryModels/DeleteQueryModel.h"
 #include "QueryModels/InsertQueryModel.h"
 #include "QueryModels/SelectQueryModel.h"

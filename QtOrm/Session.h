@@ -10,8 +10,7 @@
 #include <QVariant>
 
 #include "AutoUpdater.h"
-#include "ConfigurationMap.h"
-#include "ConfigurationMap.h"
+#include "Mappings/ConfigurationMap.h"
 #include "Exception.h"
 #include "GroupConditions.h"
 #include "Query.h"

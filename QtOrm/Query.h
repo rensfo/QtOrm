@@ -9,7 +9,7 @@
 #include <QSqlDatabase>
 
 #include "AutoUpdater.h"
-#include "ClassMapBase.h"
+#include "Mappings/ClassMapBase.h"
 #include "GroupConditions.h"
 #include "QueryModels/QueryModel.h"
 #include "Registry.h"

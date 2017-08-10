@@ -1,7 +1,7 @@
 #ifndef SUPERCLASSSMAP_H
 #define SUPERCLASSSMAP_H
 
-#include "ClassMap.h"
+#include "Mappings/ClassMap.h"
 #include "SuperClassS.h"
 
 class SuperClassSMap : public QtOrm::Mapping::ClassMap<SuperClassS>

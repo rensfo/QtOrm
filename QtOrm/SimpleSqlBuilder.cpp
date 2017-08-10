@@ -5,7 +5,7 @@
 #include <QSqlRecord>
 #include <QStringList>
 
-#include "ConfigurationMap.h"
+#include "Mappings/ConfigurationMap.h"
 #include "QueryModels/DeleteQueryModel.h"
 #include "QueryModels/InsertQueryModel.h"
 #include "QueryModels/UpdateFieldQueryModel.h"

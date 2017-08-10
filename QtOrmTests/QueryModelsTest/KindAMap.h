@@ -1,7 +1,7 @@
 #ifndef KINDAMAP_H
 #define KINDAMAP_H
 
-#include "ClassMap.h"
+#include "Mappings/ClassMap.h"
 #include "KindA.h"
 
 class KindAMap : public QtOrm::Mapping::ClassMap<KindA> {

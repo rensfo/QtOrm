@@ -10,7 +10,7 @@
 #include <QSqlRecord>
 #include <QTime>
 
-#include "ConfigurationMap.h"
+#include "Mappings/ConfigurationMap.h"
 #include "SimpleSqlBuilder.h"
 
 #include "Conditions/Condition.h"

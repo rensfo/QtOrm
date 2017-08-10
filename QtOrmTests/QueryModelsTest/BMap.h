@@ -2,7 +2,7 @@
 #define BMAP_H
 
 #include "B.h"
-#include "ClassMap.h"
+#include "Mappings/ClassMap.h"
 
 class BMap : public QtOrm::Mapping::ClassMap<B> {
 public:

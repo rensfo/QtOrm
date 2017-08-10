@@ -1,8 +1,9 @@
 #include "Registry.h"
 
 #include <QMetaObject>
-#include "ConfigurationMap.h"
-#include "SubClassMap.h"
+
+#include "Mappings/ConfigurationMap.h"
+#include "Mappings/SubClassMap.h"
 
 namespace QtOrm {
 

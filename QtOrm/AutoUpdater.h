@@ -5,7 +5,7 @@
 #include <QObject>
 #include <QSqlDatabase>
 
-#include "ConfigurationMap.h"
+#include "Mappings/ConfigurationMap.h"
 #include "Registry.h"
 
 namespace QtOrm {

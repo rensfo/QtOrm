@@ -1,7 +1,7 @@
 #ifndef CMAP_H
 #define CMAP_H
 
-#include "ClassMap.h"
+#include "Mappings/ClassMap.h"
 #include "C.h"
 
 class CMap : public QtOrm::Mapping::ClassMap<C> {

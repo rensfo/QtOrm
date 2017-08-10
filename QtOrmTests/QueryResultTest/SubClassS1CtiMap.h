@@ -2,7 +2,7 @@
 #define SUBCLASSS1CTIMAP_H
 
 #include "SubClassS1.h"
-#include "ClassTableInheritanceMap.h"
+#include "Mappings/ClassTableInheritanceMap.h"
 
 class SubClassS1CtiMap : public QtOrm::Mapping::ClassTableInheritanceMap<SuperClassS, SubClassS1>
 {

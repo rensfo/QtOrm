@@ -9,7 +9,7 @@
 #include <QTextStream>
 #include <QVariant>
 
-#include "ConfigurationMap.h"
+#include "Mappings/ConfigurationMap.h"
 #include "GroupConditions.h"
 #include "QueryModels/QueryModel.h"
 #include "Relations/OneToOne.h"

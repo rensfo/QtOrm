@@ -3,7 +3,7 @@
 #include <QDebug>
 #include <QMetaObject>
 
-#include "ConfigurationMap.h"
+#include "Mappings/ConfigurationMap.h"
 #include "Query.h"
 
 namespace QtOrm {

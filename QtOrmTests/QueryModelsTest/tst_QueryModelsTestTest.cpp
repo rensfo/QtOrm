@@ -4,8 +4,8 @@
 #include "A.h"
 #include "AMap.h"
 #include "BMap.h"
-#include "ClassMapBase.h"
-#include "ConfigurationMap.h"
+#include "Mappings/ClassMapBase.h"
+#include "Mappings/ConfigurationMap.h"
 #include "KindAMap.h"
 #include "TypeAMap.h"
 

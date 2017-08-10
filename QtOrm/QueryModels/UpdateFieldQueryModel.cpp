@@ -1,7 +1,7 @@
 #include "UpdateFieldQueryModel.h"
 
 #include "Relations/OneToOne.h"
-#include "PropertyMap.h"
+#include "Mappings/PropertyMap.h"
 
 namespace QtOrm {
 namespace Sql {

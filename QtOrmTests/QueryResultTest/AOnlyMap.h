@@ -2,7 +2,7 @@
 #define AONLYMAP_H
 
 #include "A.h"
-#include "ClassMap.h"
+#include "Mappings/ClassMap.h"
 
 class AOnlyMap : public QtOrm::Mapping::ClassMap<A> {
 public:

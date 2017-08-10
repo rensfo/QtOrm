@@ -1,7 +1,7 @@
 #ifndef DMAP_H
 #define DMAP_H
 
-#include "ClassMap.h"
+#include "Mappings/ClassMap.h"
 #include "D.h"
 
 class DMap : public QtOrm::Mapping::ClassMap<D> {

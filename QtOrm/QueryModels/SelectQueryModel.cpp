@@ -1,6 +1,6 @@
 #include "SelectQueryModel.h"
 
-#include "ConfigurationMap.h"
+#include "Mappings/ConfigurationMap.h"
 #include "Conditions/Condition.h"
 
 namespace QtOrm {
