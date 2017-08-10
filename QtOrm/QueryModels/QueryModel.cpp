@@ -21,14 +21,24 @@ void QueryModel::setMainTableModel(QSharedPointer<QueryTableModel> &value) {
   mainTableModel = value;
 }
 
+QSharedPointer<Config::ConfigurationMap> QueryModel::getConfiguration() const
+{
+    return configuration;
+}
+
+void QueryModel::setConfiguration(const QSharedPointer<Config::ConfigurationMap>&value)
+{
+    configuration = value;
+}
+
 QSharedPointer<ClassMapBase> QueryModel::getClassBase() const {
-  return classBase;
+    return classBase;
 }
 
 void QueryModel::setClassBase(QSharedPointer<ClassMapBase> &value) {
-  if (classBase != value) {
-    classBase = value;
-  }
+    if (classBase != value) {
+        classBase = value;
+    }
 }
 }
 }

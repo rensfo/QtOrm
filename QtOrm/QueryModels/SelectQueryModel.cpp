@@ -186,7 +186,7 @@ QSharedPointer<QueryTableModel> SelectQueryModel::buildQueryTableModelWoInherita
     QString property = oneToOne->getProperty();
     QString refClass = ClassMapBase::getTypeNameOfProperty(classBase->getMetaObject(), property);
 
-    QSharedPointer<ClassMapBase> refClassBase = ConfigurationMap::getMappedClass(refClass);
+    QSharedPointer<ClassMapBase> refClassBase = configuration->getMappedClass(refClass);
 
     join->setRigthTableColumnName(refClassBase->getIdProperty()->getColumn());
     join->setQueryTableModel(buildQueryTableModelOneToOne(refClassBase));
@@ -246,7 +246,7 @@ QSharedPointer<QueryTableModel> SelectQueryModel::buildQueryTableModelStiBase(QS
           break;
       }
     }
-    QSharedPointer<ClassMapBase> refClassBase = ConfigurationMap::getMappedClass(refClass);
+    QSharedPointer<ClassMapBase> refClassBase = configuration->getMappedClass(refClass);
 
     join->setRigthTableColumnName(refClassBase->getIdProperty()->getColumn());
     join->setQueryTableModel(buildQueryTableModelOneToOne(refClassBase));
@@ -271,7 +271,7 @@ QSharedPointer<QueryTableModel> SelectQueryModel::buildQueryTableModelCtiBase(QS
 
     QString property = oneToOne->getProperty();
     QString refClass = ClassMapBase::getTypeNameOfProperty(classBase->getMetaObject(), property);
-    QSharedPointer<ClassMapBase> refClassBase = ConfigurationMap::getMappedClass(refClass);
+    QSharedPointer<ClassMapBase> refClassBase = configuration->getMappedClass(refClass);
 
     join->setRigthTableColumnName(refClassBase->getIdColumn());
     join->setQueryTableModel(buildQueryTableModelOneToOne(refClassBase));
@@ -315,7 +315,7 @@ QSharedPointer<QueryTableModel> SelectQueryModel::buildQueryTableModelSti(QtOrm:
           break;
       }
     }
-    QSharedPointer<ClassMapBase> refClassBase = ConfigurationMap::getMappedClass(refClass);
+    QSharedPointer<ClassMapBase> refClassBase = configuration->getMappedClass(refClass);
 
     join->setRigthTableColumnName(refClassBase->getIdProperty()->getColumn());
     join->setQueryTableModel(buildQueryTableModelOneToOne(refClassBase));
@@ -394,7 +394,7 @@ QSharedPointer<QueryTableModel> SelectQueryModel::buildQueryTableModel(QSharedPo
           break;
       }
     }
-    QSharedPointer<ClassMapBase> refClassBase = ConfigurationMap::getMappedClass(refClass);
+    QSharedPointer<ClassMapBase> refClassBase = configuration->getMappedClass(refClass);
 
     join->setRigthTableColumnName(refClassBase->getIdProperty()->getColumn());
     join->setQueryTableModel(buildQueryTableModelOneToOne(refClassBase));

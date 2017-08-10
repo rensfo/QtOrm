@@ -5,6 +5,7 @@
 #include <QObject>
 #include <QSqlDatabase>
 
+#include "ConfigurationMap.h"
 #include "Registry.h"
 
 namespace QtOrm {
@@ -19,6 +20,9 @@ public:
 
   QSqlDatabase getDatabase() const;
   void setDatabase(const QSqlDatabase &value);
+
+  QSharedPointer<Config::ConfigurationMap> getConfiguration() const;
+  void setConfiguration(QSharedPointer<Config::ConfigurationMap> value);
 
 protected:
   QString getPropertyName(QSharedPointer<QObject> sender, int senderSignalIndex);
@@ -39,6 +43,7 @@ protected:
   QMetaMethod onObjectPropertyChangedMethod;
   QSharedPointer<Registry> registry;
   QSqlDatabase database;
+  QSharedPointer<Config::ConfigurationMap> configuration;
 };
 }
 

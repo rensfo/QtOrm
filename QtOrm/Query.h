@@ -52,6 +52,9 @@ public:
 
   Query &operator=(const Query &other);
 
+  QSharedPointer<Config::ConfigurationMap> getConfiguration() const;
+  void setConfiguration(QSharedPointer<Config::ConfigurationMap> value);
+
 signals:
   void executedSql(QString sqlText);
 
@@ -130,6 +133,7 @@ protected:
   QSqlDatabase database;
   QList<QSharedPointer<QObject>> refreshedObject;
   QSharedPointer<AutoUpdater> updater;
+  QSharedPointer<Config::ConfigurationMap> configuration;
 };
 }
 }

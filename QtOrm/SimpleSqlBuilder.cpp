@@ -135,7 +135,7 @@ void SimpleSqlBuilder::bindQueryIdParam(QSqlQuery&query, QSharedPointer<Property
 void SimpleSqlBuilder::bindQueryParam(QSqlQuery &query, QSharedPointer<OneToOne> oneToOne) {
   QVariant valFromProp = object->property(oneToOne->getProperty().toStdString().c_str());
   QString refClassName = Mapping::ClassMapBase::getTypeNameOfProperty(object, oneToOne->getProperty());
-  QSharedPointer<ClassMapBase> refClassBase = ConfigurationMap::getMappedClass(refClassName);
+  QSharedPointer<ClassMapBase> refClassBase = configuration->getMappedClass(refClassName);
 
   QObject* objFromProp = valFromProp.value<QObject*>();
   QVariant valToQuery;

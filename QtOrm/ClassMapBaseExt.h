@@ -9,8 +9,6 @@
 namespace QtOrm {
 namespace Mapping {
 
-using QtOrm::Config::ConfigurationMap;
-
 template <typename T, typename BASE>
 class ClassMapBaseExt : public BASE {
 public:

@@ -84,9 +84,11 @@ QSharedPointer<QueryModel> SqlBuilderBase::createModel(QueryModelType queryType)
   case QueryModelType::Select: {
     QSharedPointer<SelectQueryModel> selectModel = QSharedPointer<SelectQueryModel>::create();
     selectModel->setClassBase(classBase);
+    selectModel->setConfiguration(configuration);
     selectModel->buildModel();
     selectModel->setConditions(conditions);
     selectModel->setOrderColumns(orderBy);
+
     result = selectModel;
     break;
   }
@@ -94,6 +96,7 @@ QSharedPointer<QueryModel> SqlBuilderBase::createModel(QueryModelType queryType)
     QSharedPointer<InsertQueryModel> insertModel = QSharedPointer<InsertQueryModel>::create();
     insertModel->setClassBase(classBase);
     insertModel->setHasLastInsertedIdFeature(hasLastInsertedIdFeature());
+    insertModel->setConfiguration(configuration);
     insertModel->buildModel();
     result = insertModel;
     break;
@@ -101,6 +104,7 @@ QSharedPointer<QueryModel> SqlBuilderBase::createModel(QueryModelType queryType)
   case QueryModelType::Update: {
     QSharedPointer<UpdateQueryModel> updateModel = QSharedPointer<UpdateQueryModel>::create();
     updateModel->setClassBase(classBase);
+    updateModel->setConfiguration(configuration);
     updateModel->buildModel();
     result = updateModel;
     break;
@@ -109,6 +113,7 @@ QSharedPointer<QueryModel> SqlBuilderBase::createModel(QueryModelType queryType)
     QSharedPointer<UpdateFieldQueryModel> updateColumnModel = QSharedPointer<UpdateFieldQueryModel>::create();
     updateColumnModel->setClassBase(classBase);
     updateColumnModel->setPropertyName(propertyName);
+    updateColumnModel->setConfiguration(configuration);
     updateColumnModel->buildModel();
     result = updateColumnModel;
     break;
@@ -116,6 +121,7 @@ QSharedPointer<QueryModel> SqlBuilderBase::createModel(QueryModelType queryType)
   case QueryModelType::Delete: {
     QSharedPointer<DeleteQueryModel> deleteModel = QSharedPointer<DeleteQueryModel>::create();
     deleteModel->setClassBase(classBase);
+    deleteModel->setConfiguration(configuration);
     deleteModel->buildModel();
     result = deleteModel;
     break;
@@ -130,12 +136,22 @@ bool SqlBuilderBase::hasLastInsertedIdFeature() {
   return database.driver()->hasFeature(QSqlDriver::LastInsertId) && database.driverName() != "QPSQL";
 }
 
+QSharedPointer<Config::ConfigurationMap> SqlBuilderBase::getConfiguration() const
+{
+    return configuration;
+}
+
+void SqlBuilderBase::setConfiguration(const QSharedPointer<Config::ConfigurationMap>&value)
+{
+    configuration = value;
+}
+
 QList<OrderColumn> SqlBuilderBase::getOrderBy() const {
-  return orderBy;
+    return orderBy;
 }
 
 void SqlBuilderBase::setOrderBy(const QList<OrderColumn> &value) {
-  orderBy = value;
+    orderBy = value;
 }
 
 QSharedPointer<QueryModel> SqlBuilderBase::getQueryModel() const {

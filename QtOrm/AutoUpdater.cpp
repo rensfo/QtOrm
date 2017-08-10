@@ -31,7 +31,7 @@ QString AutoUpdater::getPropertyName(QSharedPointer<QObject> sender, int senderS
 }
 
 void AutoUpdater::connectToAllProperties(QSharedPointer<QObject> object) {
-  QSharedPointer<ClassMapBase> classBase = ConfigurationMap::getMappedClass(object->metaObject()->className());
+  QSharedPointer<ClassMapBase> classBase = configuration->getMappedClass(object->metaObject()->className());
   QStringList properties;
   for (QSharedPointer<OneToOne> oneToOne : classBase->getOneToOneRelations()) {
     properties.append(oneToOne->getProperty());
@@ -68,6 +68,7 @@ void AutoUpdater::onObjectPropertyChanged() {
     Query query;
     query.setDatabase(database);
     query.setRegistry(registry);
+    query.setConfiguration(configuration);
 
     connect(&query, &Query::executedSql, this, &AutoUpdater::executedSql);
     query.saveOneField(sharedSender, senderPropertyName);
@@ -84,6 +85,16 @@ QMetaMethod AutoUpdater::findOnObjectPropertyChangedMethod() {
   }
 
   return result;
+}
+
+QSharedPointer<Config::ConfigurationMap> AutoUpdater::getConfiguration() const
+{
+  return configuration;
+}
+
+void AutoUpdater::setConfiguration(QSharedPointer<ConfigurationMap> value)
+{
+  configuration = value;
 }
 
 QSqlDatabase AutoUpdater::getDatabase() const {

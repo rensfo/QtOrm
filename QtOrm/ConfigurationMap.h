@@ -16,29 +16,29 @@ class ConfigurationMap {
 public:
   ConfigurationMap();
   template <typename T>
-  static void addMapping();
+  void addMapping();
   template <typename... Args>
-  static void addMappings();
+  void addMappings();
   template <typename T>
-  static void removeMapping();
-  static void removeAllMappings();
-  static QSharedPointer<ClassMapBase> getMappedClass(const QString &className);
-  static QSharedPointer<ClassMapBase> getMappedClass(const QSharedPointer<QObject> &object);
-  static bool isRegisterClass(const QString &className);
-  static QStringList getRegistredClasses();
+  void removeMapping();
+  void removeAllMappings();
+  QSharedPointer<ClassMapBase> getMappedClass(const QString &className);
+  QSharedPointer<ClassMapBase> getMappedClass(const QSharedPointer<QObject> &object);
+  bool isRegisterClass(const QString &className);
+  QStringList getRegistredClasses();
   template <typename T>
-  static void checkParent();
+  void checkParent();
 
 protected:
   template <class ... Args>
-  static typename std::enable_if<sizeof...(Args) == 0>::type unpacking();
+  typename std::enable_if<sizeof...(Args) == 0>::type unpacking();
 
   template <typename T, typename... Args>
-  static void unpacking();
+  void unpacking();
 
 protected:
-  static QMap<QString, QSharedPointer<ClassMapBase>> mappedClass;
-  static QMultiMap<QString, QSharedPointer<ClassMapBase>> derrivedClasses;
+  QMap<QString, QSharedPointer<ClassMapBase>> mappedClass;
+  QMultiMap<QString, QSharedPointer<ClassMapBase>> derrivedClasses;
 };
 
 template<typename... Args>

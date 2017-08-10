@@ -5,10 +5,13 @@
 
 namespace QtOrm {
 Session::Session(QObject *parent) : QObject(parent) {
+  configuration = QSharedPointer<Config::ConfigurationMap>::create();
   registry = QSharedPointer<Registry>::create();
+  registry->setConfiguration(configuration);
 
   updater = QSharedPointer<AutoUpdater>::create();
   updater->setRegistry(registry);
+  updater->setConfiguration(configuration);
   connect(updater.data(), &AutoUpdater::executedSql, this, &Session::executedSql);
 }
 
@@ -45,6 +48,7 @@ Query Session::createQuery() {
   Query query;
   query.setDatabase(database);
   query.setRegistry(registry);
+  query.setConfiguration(configuration);
   if (autoUpdate) {
     query.setUpdater(updater);
   }
@@ -52,5 +56,9 @@ Query Session::createQuery() {
   connect(&query, &Query::executedSql, this, &Session::executedSql);
 
   return query;
+}
+
+QSharedPointer<Config::ConfigurationMap> Session::getConfiguration() const {
+    return configuration;
 }
 }

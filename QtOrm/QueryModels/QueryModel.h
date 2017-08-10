@@ -4,6 +4,7 @@
 #include "ClassMapBase.h"
 #include "GroupConditions.h"
 #include "QueryTableModel.h"
+#include "ConfigurationMap.h"
 
 namespace QtOrm {
 namespace Sql {
@@ -24,6 +25,9 @@ public:
   void setClassBase(QSharedPointer<ClassMapBase> &value);
   virtual void buildModel() = 0;
 
+  QSharedPointer<Config::ConfigurationMap> getConfiguration() const;
+  void setConfiguration(const QSharedPointer<Config::ConfigurationMap>&value);
+
 protected:
   void setMainTableModel(QSharedPointer<QueryTableModel> &value);
 
@@ -31,6 +35,7 @@ protected:
   QSharedPointer<QueryTableModel> mainTableModel;
   QString sqlText;
   QSharedPointer<ClassMapBase> classBase;
+  QSharedPointer<Config::ConfigurationMap> configuration;
 };
 }
 }

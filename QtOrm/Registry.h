@@ -1,6 +1,8 @@
 #ifndef REGISTRY_H
 #define REGISTRY_H
 
+#include "ConfigurationMap.h"
+
 #include <QHash>
 #include <QObject>
 #include <QSharedPointer>
@@ -23,8 +25,12 @@ public:
 
   void clear();
 
+  QSharedPointer<Config::ConfigurationMap> getConfiguration() const;
+  void setConfiguration(QSharedPointer<Config::ConfigurationMap> value);
+
 private:
   QHash<QString, RegistryData> data;
+  QSharedPointer<Config::ConfigurationMap> configuration;
 };
 }
 #endif // REGISTRY_H

@@ -58,7 +58,7 @@ QSharedPointer<QObject> Registry::value(const QString &table, const QString &id)
 QSharedPointer<QObject> Registry::value(QObject *object) {
   QString className = object->metaObject()->className();
   QString tableName;
-  auto classBase = Config::ConfigurationMap::getMappedClass(className);
+  auto classBase = configuration->getMappedClass(className);
   if(Mapping::SubClassMap::isClassTableInheritance(classBase)){
     classBase = classBase->toSubclass()->getBaseClass();
   }
@@ -77,5 +77,15 @@ QSharedPointer<QObject> Registry::value(QObject *object) {
 
 void Registry::clear() {
   data.clear();
+}
+
+QSharedPointer<Config::ConfigurationMap> Registry::getConfiguration() const
+{
+  return configuration;
+}
+
+void Registry::setConfiguration(QSharedPointer<Config::ConfigurationMap> value)
+{
+  configuration = value;
 }
 }

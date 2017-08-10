@@ -45,7 +45,6 @@ public:
 template <typename SUPER, typename T>
 SingleTableInheritanceMap<SUPER, T>::SingleTableInheritanceMap() : ClassMapBaseExt<T, QtOrm::Mapping::SubClassMap>() {
   this->setInheritanceType(InheritanceType::SingleTable);
-  this->setSuperClass(ConfigurationMap::getMappedClass(SUPER::staticMetaObject.className()));
 }
 
 template <typename SUPER, typename T>

@@ -9,9 +9,6 @@
 namespace QtOrm {
 namespace Config {
 
-QMap<QString, QSharedPointer<ClassMapBase>> ConfigurationMap::mappedClass;
-QMultiMap<QString, QSharedPointer<ClassMapBase>> ConfigurationMap::derrivedClasses;
-
 ConfigurationMap::ConfigurationMap() {
 }
 

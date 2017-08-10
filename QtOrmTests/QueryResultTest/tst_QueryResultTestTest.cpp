@@ -160,8 +160,8 @@ void QueryResultTestTest::objectFromRegistry_data()
 {
   initDataBase("objectFromRegistry", { "create table A(id integer primary key autoincrement, code text, idKindA integer)" });
   session.clearRegistry();
-  ConfigurationMap::removeAllMappings();
-  ConfigurationMap::addMapping<AOnlyMap>();
+  session.getConfiguration()->removeAllMappings();
+  session.getConfiguration()->addMapping<AOnlyMap>();
   QSharedPointer<A> a = QSharedPointer<A>::create();
   a->setCode("code1");
   session.saveObject(a);
@@ -190,8 +190,8 @@ void QueryResultTestTest::oneTableTwoTimesInQuery_data()
                                             "create table KindA(id integer primary key autoincrement, code text, name text, idTypeA integer, foreign key (idTypeA) references TypeA(id))",
                                             "create table TypeA(id integer primary key autoincrement, code text, name text)"});
   session.clearRegistry();
-  ConfigurationMap::removeAllMappings();
-  ConfigurationMap::addMappings<EMap, CMap, DMap, TypeAMap, KindAMap>();
+  session.getConfiguration()->removeAllMappings();
+  session.getConfiguration()->addMappings<EMap, CMap, DMap, TypeAMap, KindAMap>();
 
   QSharedPointer<TypeA> typeA = QSharedPointer<TypeA>::create();
   typeA->setCode("code1");
@@ -242,8 +242,8 @@ void QueryResultTestTest::oneColumnTwoTimesInWhere_data()
   initDataBase("oneColumnTwoTimesInWhere", { "create table A(id integer primary key autoincrement, code text, idKindA integer)" });
   session.clearRegistry();
   session.setAutoUpdate(false);
-  ConfigurationMap::removeAllMappings();
-  ConfigurationMap::addMapping<AOnlyMap>();
+  session.getConfiguration()->removeAllMappings();
+  session.getConfiguration()->addMapping<AOnlyMap>();
   for(auto c : QStringList{"code1", "code2", "code3", "code11", "code22"}) {
     QSharedPointer<A> a = QSharedPointer<A>::create();
     a->setCode(c);
@@ -274,8 +274,8 @@ void QueryResultTestTest::insertObject_data()
 {
   initDataBase("insertObject", { "create table A(id integer primary key autoincrement, code text, idKindA integer)" });
   session.clearRegistry();
-  ConfigurationMap::removeAllMappings();
-  ConfigurationMap::addMapping<AOnlyMap>();
+  session.getConfiguration()->removeAllMappings();
+  session.getConfiguration()->addMapping<AOnlyMap>();
 }
 
 void QueryResultTestTest::insertObject()
@@ -303,8 +303,8 @@ void QueryResultTestTest::deleteObject_data()
 {
   initDataBase("deleteObject", { "create table A(id integer primary key autoincrement, code text, idKindA integer)" });
   session.clearRegistry();
-  ConfigurationMap::removeAllMappings();
-  ConfigurationMap::addMapping<AOnlyMap>();
+  session.getConfiguration()->removeAllMappings();
+  session.getConfiguration()->addMapping<AOnlyMap>();
   QSharedPointer<A> a = QSharedPointer<A>::create();
   a->setCode("code1");
   session.saveObject(a);
@@ -333,8 +333,8 @@ void QueryResultTestTest::updateObject_data()
   initDataBase("updateObject", { "create table A(id integer primary key autoincrement, code text, idKindA integer)" });
   session.clearRegistry();
   session.setAutoUpdate(false);
-  ConfigurationMap::removeAllMappings();
-  ConfigurationMap::addMapping<AOnlyMap>();
+  session.getConfiguration()->removeAllMappings();
+  session.getConfiguration()->addMapping<AOnlyMap>();
   QSharedPointer<A> a = QSharedPointer<A>::create();
   a->setCode("code1");
   session.saveObject(a);
@@ -365,8 +365,8 @@ void QueryResultTestTest::where_data()
   initDataBase("where", { "create table A(id integer primary key autoincrement, code text, idKindA integer)" });
   session.clearRegistry();
   session.setAutoUpdate(false);
-  ConfigurationMap::removeAllMappings();
-  ConfigurationMap::addMapping<AOnlyMap>();
+  session.getConfiguration()->removeAllMappings();
+  session.getConfiguration()->addMapping<AOnlyMap>();
   for(auto c : QStringList{"code1", "code2", "code3", "code11", "code22"}) {
     QSharedPointer<A> a = QSharedPointer<A>::create();
     a->setCode(c);
@@ -392,8 +392,8 @@ void QueryResultTestTest::orderBy_data()
                                   "create table B(id integer primary key autoincrement, idA integer, code text, foreign key (idA)  references A(id))"});
   session.clearRegistry();
   session.setAutoUpdate(false);
-  ConfigurationMap::removeAllMappings();
-  ConfigurationMap::addMappings<AMap, BMap, KindAMap, TypeAMap>();
+  session.getConfiguration()->removeAllMappings();
+  session.getConfiguration()->addMappings<AMap, BMap, KindAMap, TypeAMap>();
 
   QSharedPointer<A> a = QSharedPointer<A>::create();
   a->setCode("code1");
@@ -434,8 +434,8 @@ void QueryResultTestTest::refreshObject_data()
   initDataBase("refreshObject", { "create table A(id integer primary key autoincrement, code text, idKindA integer)" });
   session.clearRegistry();
   session.setAutoUpdate(false);
-  ConfigurationMap::removeAllMappings();
-  ConfigurationMap::addMapping<AOnlyMap>();
+  session.getConfiguration()->removeAllMappings();
+  session.getConfiguration()->addMapping<AOnlyMap>();
   QSharedPointer<A> a = QSharedPointer<A>::create();
   a->setCode("code2");
   session.saveObject(a);
@@ -468,8 +468,8 @@ void QueryResultTestTest::refreshChildObject_data()
                                   "create table B(id integer primary key autoincrement, idA integer, code text, foreign key (idA)  references A(id))"});
   session.clearRegistry();
   session.setAutoUpdate(false);
-  ConfigurationMap::removeAllMappings();
-  ConfigurationMap::addMappings<AMap, BMap, KindAMap, TypeAMap>();
+  session.getConfiguration()->removeAllMappings();
+  session.getConfiguration()->addMappings<AMap, BMap, KindAMap, TypeAMap>();
 
   QSharedPointer<A> a = QSharedPointer<A>::create();
   a->setCode("code2");
@@ -517,8 +517,8 @@ void QueryResultTestTest::deleteChildAndRefresh_data()
                                   "create table B(id integer primary key autoincrement, idA integer, code text, foreign key (idA)  references A(id))"});
   session.clearRegistry();
   session.setAutoUpdate(false);
-  ConfigurationMap::removeAllMappings();
-  ConfigurationMap::addMappings<AMap, BMap, KindAMap, TypeAMap>();
+  session.getConfiguration()->removeAllMappings();
+  session.getConfiguration()->addMappings<AMap, BMap, KindAMap, TypeAMap>();
 
   QSharedPointer<A> a = QSharedPointer<A>::create();
   a->setCode("code2");
@@ -565,8 +565,8 @@ void QueryResultTestTest::childrenOneToOneParent_data()
                                   "create table B(id integer primary key autoincrement, idA integer, code text, foreign key (idA)  references A(id))"});
   session.clearRegistry();
   session.setAutoUpdate(false);
-  ConfigurationMap::removeAllMappings();
-  ConfigurationMap::addMappings<AMap, BMap, KindAMap, TypeAMap>();
+  session.getConfiguration()->removeAllMappings();
+  session.getConfiguration()->addMappings<AMap, BMap, KindAMap, TypeAMap>();
 
   QSharedPointer<A> a = QSharedPointer<A>::create();
   a->setCode("code2");
@@ -606,8 +606,8 @@ void QueryResultTestTest::autoUpdate_data()
   initDataBase("autoUpdate", { "create table A(id integer primary key autoincrement, code text, idKindA integer)" });
   session.clearRegistry();
   session.setAutoUpdate(true);
-  ConfigurationMap::removeAllMappings();
-  ConfigurationMap::addMapping<AOnlyMap>();
+  session.getConfiguration()->removeAllMappings();
+  session.getConfiguration()->addMapping<AOnlyMap>();
   for(auto c : QStringList{"code1", "code2", "code3", "code11", "code22"}) {
     QSharedPointer<A> a = QSharedPointer<A>::create();
     a->setCode(c);
@@ -640,8 +640,8 @@ void QueryResultTestTest::operationBetween_data()
   initDataBase("operationBetween", { "create table A(id integer primary key autoincrement, code text, idKindA integer)" });
   session.clearRegistry();
   session.setAutoUpdate(false);
-  ConfigurationMap::removeAllMappings();
-  ConfigurationMap::addMapping<AOnlyMap>();
+  session.getConfiguration()->removeAllMappings();
+  session.getConfiguration()->addMapping<AOnlyMap>();
   for(auto c : QStringList{"code1", "code2", "code3", "code11", "code22"}) {
     QSharedPointer<A> a = QSharedPointer<A>::create();
     a->setCode(c);
@@ -670,8 +670,8 @@ void QueryResultTestTest::operationIn_data()
   initDataBase("operationIn", { "create table A(id integer primary key autoincrement, code text, idKindA integer)" });
   session.clearRegistry();
   session.setAutoUpdate(false);
-  ConfigurationMap::removeAllMappings();
-  ConfigurationMap::addMapping<AOnlyMap>();
+  session.getConfiguration()->removeAllMappings();
+  session.getConfiguration()->addMapping<AOnlyMap>();
   for(auto c : QStringList{"code1", "code2", "code3", "code11", "code22"}) {
     QSharedPointer<A> a = QSharedPointer<A>::create();
     a->setCode(c);
@@ -700,8 +700,8 @@ void QueryResultTestTest::operationGreater_data()
   initDataBase("operationGreater", { "create table A(id integer primary key autoincrement, code text, idKindA integer)" });
   session.clearRegistry();
   session.setAutoUpdate(false);
-  ConfigurationMap::removeAllMappings();
-  ConfigurationMap::addMapping<AOnlyMap>();
+  session.getConfiguration()->removeAllMappings();
+  session.getConfiguration()->addMapping<AOnlyMap>();
   for(auto c : QStringList{"code1", "code2", "code3", "code11"}) {
     QSharedPointer<A> a = QSharedPointer<A>::create();
     a->setCode(c);
@@ -731,8 +731,8 @@ void QueryResultTestTest::operationGreaterOrEqual_data()
   initDataBase("operationGreaterOrEqual", { "create table A(id integer primary key autoincrement, code text, idKindA integer)" });
   session.clearRegistry();
   session.setAutoUpdate(false);
-  ConfigurationMap::removeAllMappings();
-  ConfigurationMap::addMapping<AOnlyMap>();
+  session.getConfiguration()->removeAllMappings();
+  session.getConfiguration()->addMapping<AOnlyMap>();
   for(auto c : QStringList{"code1", "code2", "code3", "code11"}) {
     QSharedPointer<A> a = QSharedPointer<A>::create();
     a->setCode(c);
@@ -761,8 +761,8 @@ void QueryResultTestTest::operationLess_data()
   initDataBase("operationLess", { "create table A(id integer primary key autoincrement, code text, idKindA integer)" });
   session.clearRegistry();
   session.setAutoUpdate(false);
-  ConfigurationMap::removeAllMappings();
-  ConfigurationMap::addMapping<AOnlyMap>();
+  session.getConfiguration()->removeAllMappings();
+  session.getConfiguration()->addMapping<AOnlyMap>();
   for(auto c : QStringList{"code1", "code2", "code3", "code11"}) {
     QSharedPointer<A> a = QSharedPointer<A>::create();
     a->setCode(c);
@@ -791,8 +791,8 @@ void QueryResultTestTest::operationLessOrEqual_data()
   initDataBase("operationLessOrEqual", { "create table A(id integer primary key autoincrement, code text, idKindA integer)" });
   session.clearRegistry();
   session.setAutoUpdate(false);
-  ConfigurationMap::removeAllMappings();
-  ConfigurationMap::addMapping<AOnlyMap>();
+  session.getConfiguration()->removeAllMappings();
+  session.getConfiguration()->addMapping<AOnlyMap>();
   for(auto c : QStringList{"code1", "code2", "code3", "code11"}) {
     QSharedPointer<A> a = QSharedPointer<A>::create();
     a->setCode(c);
@@ -821,8 +821,8 @@ void QueryResultTestTest::operationLike_data()
   initDataBase("operationLike", { "create table A(id integer primary key autoincrement, code text, idKindA integer)" });
   session.clearRegistry();
   session.setAutoUpdate(false);
-  ConfigurationMap::removeAllMappings();
-  ConfigurationMap::addMapping<AOnlyMap>();
+  session.getConfiguration()->removeAllMappings();
+  session.getConfiguration()->addMapping<AOnlyMap>();
   for(auto c : QStringList{"code1", "code2", "co1de", "co2de"}) {
     QSharedPointer<A> a = QSharedPointer<A>::create();
     a->setCode(c);
@@ -851,8 +851,8 @@ void QueryResultTestTest::nullValueUpdate_data()
   initDataBase("nullValueUpdate", { "create table super_class_s(id integer primary key autoincrement, type integer not null, code text, int_val integer, str_val text, id_ref integer, foreign key (id_ref)  references super_class_s(id))" });
   session.clearRegistry();
   session.setAutoUpdate(false);
-  ConfigurationMap::removeAllMappings();
-  ConfigurationMap::addMappings<SuperClassSMap, SubClassS1Map>();
+  session.getConfiguration()->removeAllMappings();
+  session.getConfiguration()->addMappings<SuperClassSMap, SubClassS1Map>();
   QSharedPointer<SubClassS1> sub = QSharedPointer<SubClassS1>::create();
   sub->setIntVal(1);
   session.saveObject(sub);
@@ -886,8 +886,8 @@ void QueryResultTestTest::SingleTableInheritanceSelect_data()
   initDataBase("OneTablePerHierarchySelect", { "create table super_class_s(id integer primary key autoincrement, type integer not null, code text, int_val integer, str_val text, id_ref integer, foreign key (id_ref)  references super_class_s(id))" });
   session.clearRegistry();
   session.setAutoUpdate(false);
-  ConfigurationMap::removeAllMappings();
-  ConfigurationMap::addMappings<SuperClassSMap, SubClassS1Map, SubClassS2Map>();
+  session.getConfiguration()->removeAllMappings();
+  session.getConfiguration()->addMappings<SuperClassSMap, SubClassS1Map, SubClassS2Map>();
   QSharedPointer<SubClassS1> sub1 = QSharedPointer<SubClassS1>::create();
   sub1->setCode("one");
   sub1->setIntVal(1);
@@ -947,8 +947,8 @@ void QueryResultTestTest::SingleTableInheritanceConcreteSelect_data()
   initDataBase("OneTablePerHierarchyConcreteSelect", { "create table super_class_s(id integer primary key autoincrement, type integer not null, code text, int_val integer, str_val text, id_ref integer, foreign key (id_ref)  references super_class_s(id))" });
   session.clearRegistry();
   session.setAutoUpdate(false);
-  ConfigurationMap::removeAllMappings();
-  ConfigurationMap::addMappings<SuperClassSMap, SubClassS1Map>();
+  session.getConfiguration()->removeAllMappings();
+  session.getConfiguration()->addMappings<SuperClassSMap, SubClassS1Map>();
   QSharedPointer<SubClassS1> sub1 = QSharedPointer<SubClassS1>::create();
   sub1->setCode("one");
   sub1->setIntVal(1);
@@ -998,8 +998,8 @@ void QueryResultTestTest::SingleTableInheritanceSelectWithReference_data()
   initDataBase("TablePerHierarchySelectWithReference", { "create table super_class_s(id integer primary key autoincrement, type integer not null, code text, int_val integer, str_val text, id_ref integer, foreign key (id_ref)  references super_class_s(id))" });
   session.clearRegistry();
   session.setAutoUpdate(false);
-  ConfigurationMap::removeAllMappings();
-  ConfigurationMap::addMappings<SuperClassSMap, SubClassS1Map, SubClassS3Map>();
+  session.getConfiguration()->removeAllMappings();
+  session.getConfiguration()->addMappings<SuperClassSMap, SubClassS1Map, SubClassS3Map>();
   QSharedPointer<SubClassS1> sub1 = QSharedPointer<SubClassS1>::create();
   sub1->setCode("one");
   sub1->setIntVal(1);
@@ -1038,8 +1038,8 @@ void QueryResultTestTest::ClassTableInheritanceInsert_data()
                "create table sub_class_s3(idS3 integer primary key, id_ref integer, foreign key (id_ref)  references super_class_s(id))"});
   session.clearRegistry();
   session.setAutoUpdate(false);
-  ConfigurationMap::removeAllMappings();
-  ConfigurationMap::addMappings<SuperClassSMap, SubClassS1CtiMap, SubClassS2CtiMap, SubClassS3CtiMap>();
+  session.getConfiguration()->removeAllMappings();
+  session.getConfiguration()->addMappings<SuperClassSMap, SubClassS1CtiMap, SubClassS2CtiMap, SubClassS3CtiMap>();
 }
 
 void QueryResultTestTest::ClassTableInheritanceInsert()
@@ -1075,8 +1075,8 @@ void QueryResultTestTest::ClassTableInheritanceDelete_data()
                "create table sub_class_s2(idS2 integer primary key, str_val text)"});
   session.clearRegistry();
   session.setAutoUpdate(false);
-  ConfigurationMap::removeAllMappings();
-  ConfigurationMap::addMappings<SuperClassSMap, SubClassS1CtiMap, SubClassS2CtiMap>();
+  session.getConfiguration()->removeAllMappings();
+  session.getConfiguration()->addMappings<SuperClassSMap, SubClassS1CtiMap, SubClassS2CtiMap>();
   QSharedPointer<SubClassS1> sub1 = QSharedPointer<SubClassS1>::create();
   sub1->setCode("one");
   sub1->setIntVal(1);
@@ -1130,8 +1130,8 @@ void QueryResultTestTest::ClassTableInheritanceUpdate_data()
                "create table sub_class_s2(idS2 integer primary key, str_val text)"});
   session.clearRegistry();
   session.setAutoUpdate(false);
-  ConfigurationMap::removeAllMappings();
-  ConfigurationMap::addMappings<SuperClassSMap, SubClassS1CtiMap, SubClassS2CtiMap>();
+  session.getConfiguration()->removeAllMappings();
+  session.getConfiguration()->addMappings<SuperClassSMap, SubClassS1CtiMap, SubClassS2CtiMap>();
   QSharedPointer<SubClassS1> sub1 = QSharedPointer<SubClassS1>::create();
   sub1->setCode("one");
   sub1->setIntVal(1);
@@ -1168,8 +1168,8 @@ void QueryResultTestTest::ClassTableInheritanceAutoUpdate_data() {
                "create table sub_class_s2(idS2 integer primary key, str_val text)"});
   session.clearRegistry();
   session.setAutoUpdate(true);
-  ConfigurationMap::removeAllMappings();
-  ConfigurationMap::addMappings<SuperClassSMap, SubClassS1CtiMap, SubClassS2CtiMap>();
+  session.getConfiguration()->removeAllMappings();
+  session.getConfiguration()->addMappings<SuperClassSMap, SubClassS1CtiMap, SubClassS2CtiMap>();
   QSharedPointer<SubClassS1> sub1 = QSharedPointer<SubClassS1>::create();
   sub1->setCode("one");
   sub1->setIntVal(1);
@@ -1219,8 +1219,8 @@ void QueryResultTestTest::ClassTableInheritanceSelect_data()
                "create table sub_class_s3(idS3 integer primary key, id_ref integer, foreign key (id_ref)  references super_class_s(id))"});
   session.clearRegistry();
   session.setAutoUpdate(false);
-  ConfigurationMap::removeAllMappings();
-  ConfigurationMap::addMappings<SuperClassSMap, SubClassS1CtiMap, SubClassS2CtiMap, SubClassS3CtiMap>();
+  session.getConfiguration()->removeAllMappings();
+  session.getConfiguration()->addMappings<SuperClassSMap, SubClassS1CtiMap, SubClassS2CtiMap, SubClassS3CtiMap>();
   QSharedPointer<SubClassS1> sub1 = QSharedPointer<SubClassS1>::create();
   sub1->setCode("one");
   sub1->setIntVal(1);
@@ -1256,8 +1256,8 @@ void QueryResultTestTest::ClassTableInheritanceRefresh_data()
                "create table sub_class_s1(idS1 integer primary key, int_val integer)" });
   session.clearRegistry();
   session.setAutoUpdate(false);
-  ConfigurationMap::removeAllMappings();
-  ConfigurationMap::addMappings<SubClassS1CtiMap, SuperClassSMap>();
+  session.getConfiguration()->removeAllMappings();
+  session.getConfiguration()->addMappings<SubClassS1CtiMap, SuperClassSMap>();
   QSharedPointer<SubClassS1> sub1 = QSharedPointer<SubClassS1>::create();
   sub1->setCode("one");
   sub1->setIntVal(1);

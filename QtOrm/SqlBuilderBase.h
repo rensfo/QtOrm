@@ -47,6 +47,9 @@ public:
   QList<OrderColumn> getOrderBy() const;
   void setOrderBy(const QList<OrderColumn> &value);
 
+  QSharedPointer<Config::ConfigurationMap> getConfiguration() const;
+  void setConfiguration(const QSharedPointer<Config::ConfigurationMap>&value);
+
 protected:
   QString getPlaceHolder(const QString &param);
   void bindValues(QSqlQuery &query, const QSharedPointer<GroupConditions> &conditions,
@@ -65,6 +68,7 @@ protected:
   QString propertyName;
   QList<OrderColumn> orderBy;
   bool idAutoincrement = true;
+  QSharedPointer<Config::ConfigurationMap> configuration;
 };
 }
 }

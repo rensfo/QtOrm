@@ -11,6 +11,7 @@
 
 #include "AutoUpdater.h"
 #include "ConfigurationMap.h"
+#include "ConfigurationMap.h"
 #include "Exception.h"
 #include "GroupConditions.h"
 #include "Query.h"
@@ -63,6 +64,8 @@ public:
 
   void removeFromCache(QSharedPointer<QObject> object);
 
+  QSharedPointer<Config::ConfigurationMap> getConfiguration() const;
+
 protected:
   Query createQuery();
   template <class T>
@@ -76,6 +79,7 @@ protected:
   QSharedPointer<Registry> registry;
   QSharedPointer<AutoUpdater> updater;
   bool autoUpdate = false;
+  QSharedPointer<Config::ConfigurationMap> configuration;
 };
 
 template <class T>

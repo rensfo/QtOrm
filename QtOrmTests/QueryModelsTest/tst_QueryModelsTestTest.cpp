@@ -42,6 +42,9 @@ private Q_SLOTS:
 
 private:
   void registerClasses();
+
+private:
+  QSharedPointer<Config::ConfigurationMap> configuration;
 };
 
 QueryModelsTestTest::QueryModelsTestTest() {
@@ -49,27 +52,30 @@ QueryModelsTestTest::QueryModelsTestTest() {
 }
 
 void QueryModelsTestTest::selectClause() {
-  QSharedPointer<ClassMapBase> classBase = ConfigurationMap::getMappedClass("A");
+  QSharedPointer<ClassMapBase> classBase = configuration->getMappedClass("A");
   SelectQueryModel query;
   query.setClassBase(classBase);
+  query.setConfiguration(configuration);
   query.buildModel();
 
   QCOMPARE(query.getSelect(), expectedSelectClause);
 }
 
 void QueryModelsTestTest::fromClause() {
-  QSharedPointer<ClassMapBase> classBase = ConfigurationMap::getMappedClass("A");
+  QSharedPointer<ClassMapBase> classBase = configuration->getMappedClass("A");
   SelectQueryModel query;
   query.setClassBase(classBase);
+  query.setConfiguration(configuration);
   query.buildModel();
 
   QCOMPARE(query.getFrom(), expectedFromClause);
 }
 
 void QueryModelsTestTest::whereClause() {
-  QSharedPointer<ClassMapBase> classBase = ConfigurationMap::getMappedClass("A");
+  QSharedPointer<ClassMapBase> classBase = configuration->getMappedClass("A");
   SelectQueryModel query;
   query.setClassBase(classBase);
+  query.setConfiguration(configuration);
   query.buildModel();
 
   GroupConditions group;
@@ -83,9 +89,10 @@ void QueryModelsTestTest::whereClause() {
 }
 
 void QueryModelsTestTest::whereClauseUseColumn() {
-  QSharedPointer<ClassMapBase> classBase = ConfigurationMap::getMappedClass("A");
+  QSharedPointer<ClassMapBase> classBase = configuration->getMappedClass("A");
   SelectQueryModel query;
   query.setClassBase(classBase);
+  query.setConfiguration(configuration);
   query.buildModel();
 
   GroupConditions group;
@@ -100,9 +107,10 @@ void QueryModelsTestTest::whereClauseUseColumn() {
 }
 
 void QueryModelsTestTest::emptyWhereClause() {
-  QSharedPointer<ClassMapBase> classBase = ConfigurationMap::getMappedClass("A");
+  QSharedPointer<ClassMapBase> classBase = configuration->getMappedClass("A");
   SelectQueryModel query;
   query.setClassBase(classBase);
+  query.setConfiguration(configuration);
   query.buildModel();
 
   GroupConditions group;
@@ -113,7 +121,7 @@ void QueryModelsTestTest::emptyWhereClause() {
 }
 
 void QueryModelsTestTest::oneColumnTwoTimes() {
-  QSharedPointer<ClassMapBase> classBase = ConfigurationMap::getMappedClass("A");
+  QSharedPointer<ClassMapBase> classBase = configuration->getMappedClass("A");
   SelectQueryModel query;
   query.setClassBase(classBase);
   query.buildModel();
@@ -129,7 +137,7 @@ void QueryModelsTestTest::oneColumnTwoTimes() {
 }
 
 void QueryModelsTestTest::updateSql() {
-  QSharedPointer<ClassMapBase> classBase = ConfigurationMap::getMappedClass("A");
+  QSharedPointer<ClassMapBase> classBase = configuration->getMappedClass("A");
   UpdateQueryModel query;
   query.setClassBase(classBase);
   query.buildModel();
@@ -138,7 +146,7 @@ void QueryModelsTestTest::updateSql() {
 }
 
 void QueryModelsTestTest::insertSql() {
-  QSharedPointer<ClassMapBase> classBase = ConfigurationMap::getMappedClass("A");
+  QSharedPointer<ClassMapBase> classBase = configuration->getMappedClass("A");
   InsertQueryModel query;
   query.setClassBase(classBase);
   query.buildModel();
@@ -147,7 +155,7 @@ void QueryModelsTestTest::insertSql() {
 }
 
 void QueryModelsTestTest::deleteSql() {
-  QSharedPointer<ClassMapBase> classBase = ConfigurationMap::getMappedClass("A");
+  QSharedPointer<ClassMapBase> classBase = configuration->getMappedClass("A");
   DeleteQueryModel query;
   query.setClassBase(classBase);
   query.buildModel();
@@ -156,7 +164,7 @@ void QueryModelsTestTest::deleteSql() {
 }
 
 void QueryModelsTestTest::hardWhere() {
-  QSharedPointer<ClassMapBase> classBase = ConfigurationMap::getMappedClass("A");
+  QSharedPointer<ClassMapBase> classBase = configuration->getMappedClass("A");
   SelectQueryModel query;
   query.setClassBase(classBase);
   query.buildModel();
@@ -171,7 +179,7 @@ void QueryModelsTestTest::hardWhere() {
 }
 
 void QueryModelsTestTest::registerClasses() {
-  ConfigurationMap::addMappings<AMap, KindAMap, TypeAMap, BMap>();
+  configuration->addMappings<AMap, KindAMap, TypeAMap, BMap>();
 }
 
 QTEST_APPLESS_MAIN(QueryModelsTestTest)

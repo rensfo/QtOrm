@@ -10,7 +10,6 @@ namespace QtOrm {
 namespace Sql {
 class SimpleSqlBuilder : public SqlBuilderBase {
   Q_OBJECT
-
 public:
   explicit SimpleSqlBuilder(QObject *parent = nullptr);
   SimpleSqlBuilder(const SimpleSqlBuilder &other);
