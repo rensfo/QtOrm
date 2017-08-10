@@ -267,7 +267,6 @@ void Query::executeQuery(QSqlQuery &query) {
 
   QString executedQuery = getSqlTextWithBindParams(query);
   QTime time;
-  QTime startTime = QTime::currentTime();
   time.start();
   if (!query.exec()) {
     emit executedSql(executedQuery);
@@ -275,7 +274,7 @@ void Query::executeQuery(QSqlQuery &query) {
     throw SqlException(errorMsg);
   }
   int timeElapsed = time.elapsed();
-  QString fullExecutedMessage = QString("[%1](%2ms) %3").arg(startTime.toString("hh:mm:ss:zzzz")).arg(timeElapsed).arg(executedQuery);
+  QString fullExecutedMessage = QString("(%1ms) %2").arg(timeElapsed).arg(executedQuery);
   emit executedSql(fullExecutedMessage);
 }
 
