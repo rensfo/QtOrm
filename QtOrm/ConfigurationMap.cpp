@@ -10,12 +10,12 @@ namespace QtOrm {
 namespace Config {
 
 QMap<QString, QSharedPointer<ClassMapBase>> ConfigurationMap::mappedClass;
+QMultiMap<QString, QSharedPointer<ClassMapBase>> ConfigurationMap::derrivedClasses;
 
 ConfigurationMap::ConfigurationMap() {
 }
 
-void ConfigurationMap::removeAllMappings()
-{
+void ConfigurationMap::removeAllMappings() {
   mappedClass.clear();
 }
 
@@ -38,33 +38,5 @@ QStringList ConfigurationMap::getRegistredClasses() {
   return mappedClass.keys();
 }
 
-QList<QSharedPointer<ClassMapBase>> ConfigurationMap::getDerrivedClasses(const QString& value)
-{
-  QList<QSharedPointer<ClassMapBase>> derrivedClasses;
-  for(auto map : mappedClass.values())
-  {
-    if(map->isSubclass() && qobject_cast<SubClassMap*>(map)->getSuperClassName() == value)
-      derrivedClasses << map;
-  }
-
-  return derrivedClasses;
-}
-
-bool ConfigurationMap::isBaseClass(const QString&value)
-{
-  return !getDerrivedClasses(value).isEmpty();
-}
-
-bool ConfigurationMap::isBaseClass(const QSharedPointer<ClassMapBase>&value)
-{
-  return isBaseClass(value->getClassName());
-}
-
-InheritanceType ConfigurationMap::getInheritanceType(const QSharedPointer<ClassMapBase>& value)
-{
-  QSharedPointer<ClassMapBase> firstDerrivedClass = getDerrivedClasses(value->getClassName()).first();
-  SubClassMap* subClass = qobject_cast<SubClassMap*>(firstDerrivedClass.data());
-  return subClass->getInheritanceType();
-}
 }
 }

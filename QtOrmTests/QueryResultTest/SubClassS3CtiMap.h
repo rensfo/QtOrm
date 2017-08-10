@@ -11,8 +11,8 @@ public:
   {
     setDiscrimanitorValue(3);
     setTable("sub_class_s3");
-    id("id", "idS3").setAutoincrement(false);
-    oneToOne("ref").setTableColumn("id_ref");
+    setId("id", "idS3").setAutoincrement(false);
+    setOneToOne("ref").setTableColumn("id_ref");
   }
 };
 

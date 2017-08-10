@@ -8,9 +8,9 @@ class CMap : public QtOrm::Mapping::ClassMap<C> {
 public:
   CMap() {
     setTable("C");
-    id("id");
+    setId("id");
 
-    oneToOne("kindA").setTableColumn("idKindA");
+    setOneToOne("kindA").setTableColumn("idKindA");
   }
 };
 

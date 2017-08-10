@@ -1257,7 +1257,7 @@ void QueryResultTestTest::ClassTableInheritanceRefresh_data()
   session.clearRegistry();
   session.setAutoUpdate(false);
   ConfigurationMap::removeAllMappings();
-  ConfigurationMap::addMappings<SuperClassSMap, SubClassS1CtiMap>();
+  ConfigurationMap::addMappings<SubClassS1CtiMap, SuperClassSMap>();
   QSharedPointer<SubClassS1> sub1 = QSharedPointer<SubClassS1>::create();
   sub1->setCode("one");
   sub1->setIntVal(1);

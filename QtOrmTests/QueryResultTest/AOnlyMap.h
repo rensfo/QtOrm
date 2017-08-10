@@ -8,8 +8,8 @@ class AOnlyMap : public QtOrm::Mapping::ClassMap<A> {
 public:
   AOnlyMap() {
     setTable("A");
-    id("id");
-    map("code_1", "code");
+    setId("id");
+    setMap("code_1", "code");
   }
 };
 

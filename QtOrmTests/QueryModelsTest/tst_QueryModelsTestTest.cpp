@@ -171,10 +171,7 @@ void QueryModelsTestTest::hardWhere() {
 }
 
 void QueryModelsTestTest::registerClasses() {
-  ConfigurationMap::addMapping<AMap>();
-  ConfigurationMap::addMapping<KindAMap>();
-  ConfigurationMap::addMapping<TypeAMap>();
-  ConfigurationMap::addMapping<BMap>();
+  ConfigurationMap::addMappings<AMap, KindAMap, TypeAMap, BMap>();
 }
 
 QTEST_APPLESS_MAIN(QueryModelsTestTest)

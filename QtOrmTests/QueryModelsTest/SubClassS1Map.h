@@ -9,7 +9,7 @@ class SubClassS1Map : public QtOrm::Mapping::SingleTableInheritanceMap<SuperClas
 public:
   SubClassS1Map()
   {
-    map("intVal", "int_val").setNull(0);
+    setMap("intVal", "int_val").setNull(0);
     setDiscrimanitorValue(1);
   }
 };

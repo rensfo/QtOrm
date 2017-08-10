@@ -19,7 +19,18 @@ namespace Mapping {
 
 class SubClassMap;
 
-enum class TypeKind { Pointer, SharedPointer, WeakPointer, Other };
+enum class TypeKind {
+  Pointer,
+  SharedPointer,
+  WeakPointer,
+  Other
+};
+
+enum class InheritanceType {
+  None,
+  SingleTable,
+  ClassTable
+};
 
 class ClassMapBase : public QObject {
   Q_OBJECT
@@ -33,12 +44,12 @@ public:
 
   virtual QMap<QString, QSharedPointer<PropertyMap>> getProperties();
 
-  PropertyMap &id(QString propertyName);
-  PropertyMap &id(const QString &propertyName, const QString &columnName);
-  PropertyMap &discriminator(const QString &propertyName);
-  PropertyMap &discriminator(const QString &propertyName, const QString &columnName);
-  PropertyMap &map(QString propertyName);
-  PropertyMap &map(QString propertyName, QString columnName);
+  PropertyMap &setId(QString propertyName);
+  PropertyMap &setId(const QString &propertyName, const QString &columnName);
+  PropertyMap &setDiscriminator(const QString &propertyName);
+  PropertyMap &setDiscriminator(const QString &propertyName, const QString &columnName);
+  PropertyMap &setMap(QString propertyName);
+  PropertyMap &setMap(QString propertyName, QString columnName);
 
   QMetaObject getMetaObject() const;
   void setMetaObject(const QMetaObject &classMetaObject);
@@ -50,8 +61,8 @@ public:
   virtual QSharedPointer<PropertyMap> getProperty(const QString &property);
   virtual QString getPropertyColumn(const QString &property);
 
-  OneToMany &oneToMany(const QString &property);
-  OneToOne &oneToOne(const QString &property);
+  OneToMany &setOneToMany(const QString &property);
+  OneToOne &setOneToOne(const QString &property);
 
   virtual QList<QSharedPointer<OneToMany>> getOneToManyRelations() const;
   virtual QList<QSharedPointer<OneToOne>> getOneToOneRelations() const;
@@ -102,6 +113,15 @@ public:
   QMetaObject getClassMetaObject() const;
   void setClassMetaObject(const QMetaObject&value);
 
+  QList<QSharedPointer<ClassMapBase> > getDerrivedClasses() const;
+  void setDerrivedClasses(const QList<QSharedPointer<ClassMapBase>>&value);
+  void appendDerrivedClass(QSharedPointer<ClassMapBase> value);
+  void appendDerrivedClass(QList<QSharedPointer<ClassMapBase>>& values);
+  void removeDerrivedClass(QSharedPointer<ClassMapBase> value);
+
+  bool isBaseClass();
+  InheritanceType getInheritanceType();
+
 protected:
   static QString getPropertyType(const QMetaObject &meta, const QString &prop);
   virtual void checkProperty(const QString &propertyName) = 0;
@@ -118,6 +138,7 @@ private:
   QMap<QString, QSharedPointer<PropertyMap>> properties;
   QList<QSharedPointer<OneToMany>> oneToManyRelations;
   QList<QSharedPointer<OneToOne>> oneToOneRelations;
+  QList<QSharedPointer<ClassMapBase>> derrivedClasses;
 
   QString idProperty;
   QString discriminatorProperty;

@@ -28,10 +28,6 @@ public:
   static QStringList getRegistredClasses();
   template <typename T>
   static void checkParent();
-  static QList<QSharedPointer<ClassMapBase> > getDerrivedClasses(const QString& value);
-  static bool isBaseClass(const QString& value);
-  static bool isBaseClass(const QSharedPointer<ClassMapBase>& value);
-  static InheritanceType getInheritanceType(const QSharedPointer<ClassMapBase>& value);
 
 protected:
   template <class ... Args>
@@ -42,6 +38,7 @@ protected:
 
 protected:
   static QMap<QString, QSharedPointer<ClassMapBase>> mappedClass;
+  static QMultiMap<QString, QSharedPointer<ClassMapBase>> derrivedClasses;
 };
 
 template<typename... Args>
@@ -69,7 +66,27 @@ void ConfigurationMap::addMapping() {
   checkParent<T>();
 
   QSharedPointer<T> classMap = QSharedPointer<T>::create();
-  mappedClass.insert(classMap->getClassName(), classMap);
+  QString className = classMap->getClassName();
+  mappedClass.insert(className, classMap);
+  if(derrivedClasses.contains(className)) {
+    auto classes = derrivedClasses.values(className);
+    classMap->appendDerrivedClass(classes);
+    for(auto c : classes){
+      c->toSubclass()->setSuperClass(classMap);
+    }
+    derrivedClasses.remove(className);
+  }
+  if(classMap->isSubclass()) {
+    auto subClass = classMap->toSubclass();
+    auto superClassName = subClass->getSuperClassName();
+    if(mappedClass.contains(superClassName)){
+      auto super = mappedClass.value(superClassName);
+      super->appendDerrivedClass(classMap.template objectCast<ClassMapBase>());
+      subClass->setSuperClass(super);
+    } else {
+      derrivedClasses.insert(superClassName, classMap);
+    }
+  }
 }
 
 template <typename T>

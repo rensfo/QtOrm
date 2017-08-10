@@ -25,7 +25,7 @@ QString ClassMapBase::getClassName() const {
   return classMetaObject.className();
 }
 
-PropertyMap &ClassMapBase::id(QString propertyName) {
+PropertyMap &ClassMapBase::setId(QString propertyName) {
   if (!idProperty.isEmpty()) {
     QString errorText = QString::fromUtf8("Field id registred (%1.%2)").arg(getClassName()).arg(idProperty);
     throw IdPropertyAlreadyRegistredException(errorText);
@@ -35,11 +35,11 @@ PropertyMap &ClassMapBase::id(QString propertyName) {
   return createProperty(propertyName).setColumn(propertyName).setIsId(true).setNull(0);
 }
 
-PropertyMap &ClassMapBase::id(const QString &propertyName, const QString &columnName) {
-  return id(propertyName).setColumn(columnName);
+PropertyMap &ClassMapBase::setId(const QString &propertyName, const QString &columnName) {
+  return setId(propertyName).setColumn(columnName);
 }
 
-PropertyMap &ClassMapBase::discriminator(const QString &propertyName) {
+PropertyMap &ClassMapBase::setDiscriminator(const QString &propertyName) {
   if (!discriminatorProperty.isEmpty()) {
     QString errorText = QString::fromUtf8("Discriminator field registred (%1.%2)").arg(getClassName()).arg(idProperty);
     throw DiscriminatorPropertyAlreadyRegistredException(errorText);
@@ -49,15 +49,15 @@ PropertyMap &ClassMapBase::discriminator(const QString &propertyName) {
   return createProperty(propertyName).setColumn(propertyName).setIsDiscriminator(true);
 }
 
-PropertyMap &ClassMapBase::discriminator(const QString &propertyName, const QString &columnName) {
-  return discriminator(propertyName).setColumn(columnName);
+PropertyMap &ClassMapBase::setDiscriminator(const QString &propertyName, const QString &columnName) {
+  return setDiscriminator(propertyName).setColumn(columnName);
 }
 
-PropertyMap &ClassMapBase::map(QString propertyName) {
+PropertyMap &ClassMapBase::setMap(QString propertyName) {
   return createProperty(propertyName).setColumn(propertyName);
 }
 
-PropertyMap &ClassMapBase::map(QString propertyName, QString columnName) {
+PropertyMap &ClassMapBase::setMap(QString propertyName, QString columnName) {
   return createProperty(propertyName).setColumn(columnName);
 }
 
@@ -70,12 +70,44 @@ PropertyMap &ClassMapBase::createProperty(QString propertyName) {
   return *propertyMap;
 }
 
+QList<QSharedPointer<ClassMapBase> > ClassMapBase::getDerrivedClasses() const {
+    return derrivedClasses;
+}
+
+void ClassMapBase::setDerrivedClasses(const QList<QSharedPointer<ClassMapBase> >&value) {
+  derrivedClasses = value;
+}
+
+void ClassMapBase::appendDerrivedClass(QSharedPointer<ClassMapBase> value) {
+  derrivedClasses.append(value);
+}
+
+void ClassMapBase::appendDerrivedClass(QList<QSharedPointer<ClassMapBase>>&values) {
+  derrivedClasses.append(values);
+}
+
+void ClassMapBase::removeDerrivedClass(QSharedPointer<ClassMapBase> value) {
+  derrivedClasses.removeAll(value);
+}
+
+bool ClassMapBase::isBaseClass() {
+  return derrivedClasses.count();
+}
+
+InheritanceType ClassMapBase::getInheritanceType() {
+  if(!derrivedClasses.count())
+    return InheritanceType::None;
+
+  SubClassMap* subClass = qobject_cast<SubClassMap*>(derrivedClasses.first().data());
+  return subClass->getInheritanceType();
+}
+
 QMetaObject ClassMapBase::getClassMetaObject() const {
-  return classMetaObject;
+    return classMetaObject;
 }
 
 void ClassMapBase::setClassMetaObject(const QMetaObject&value) {
-  classMetaObject = value;
+    classMetaObject = value;
 }
 
 QMetaObject ClassMapBase::getMetaObject() const {
@@ -109,7 +141,7 @@ QString ClassMapBase::getPropertyColumn(const QString &property) {
   return getProperty(property)->getColumn();
 }
 
-OneToMany &ClassMapBase::oneToMany(const QString &property) {
+OneToMany &ClassMapBase::setOneToMany(const QString &property) {
   checkRelationProperty(property);
 
   QSharedPointer<OneToMany> relation = QSharedPointer<OneToMany>::create();
@@ -119,7 +151,7 @@ OneToMany &ClassMapBase::oneToMany(const QString &property) {
   return *relation;
 }
 
-OneToOne &ClassMapBase::oneToOne(const QString &property) {
+OneToOne &ClassMapBase::setOneToOne(const QString &property) {
   checkRelationProperty(property);
 
   QSharedPointer<OneToOne> relation = QSharedPointer<OneToOne>::create();

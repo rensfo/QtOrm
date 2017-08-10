@@ -12,16 +12,22 @@ class ClassTableInheritanceMap : public ClassMapBaseExt<T, QtOrm::Mapping::SubCl
 public:
   ClassTableInheritanceMap();
   ~ClassTableInheritanceMap();
+
+  virtual QString getSuperClassName() override;
 };
 
 template<typename SUPER, typename T>
 ClassTableInheritanceMap<SUPER, T>::ClassTableInheritanceMap() : ClassMapBaseExt<T, QtOrm::Mapping::SubClassMap>(){
   this->setInheritanceType(InheritanceType::ClassTable);
-  this->setSuperClass(ConfigurationMap::getMappedClass(SUPER::staticMetaObject.className()));
 }
 
 template<typename SUPER, typename T>
 ClassTableInheritanceMap<SUPER, T>::~ClassTableInheritanceMap(){
+}
+
+template<typename SUPER, typename T>
+QString ClassTableInheritanceMap<SUPER, T>::getSuperClassName() {
+  return SUPER::staticMetaObject.className();
 }
 
 }

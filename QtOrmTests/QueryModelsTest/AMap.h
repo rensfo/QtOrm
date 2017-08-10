@@ -8,12 +8,12 @@ class AMap : public QtOrm::Mapping::ClassMap<A> {
 public:
   AMap() {
   setTable("A");
-  id("id");
-  map("code_1").setColumn("code");
+  setId("id");
+  setMap("code_1").setColumn("code");
 
-  oneToOne("kindA").setTableColumn("idKindA");
+  setOneToOne("kindA").setTableColumn("idKindA");
 
-  oneToMany("child").setColumn("idA").setSaveCascade(true).setOrderBy("code", Sort::DESC);
+  setOneToMany("child").setColumn("idA").setSaveCascade(true).setOrderBy("code", Sort::DESC);
   }
 };
 

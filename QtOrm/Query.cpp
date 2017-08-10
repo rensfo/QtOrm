@@ -369,7 +369,7 @@ void Query::fillOneToOne(QSharedPointer<QObject> object, QSharedPointer<QueryTab
     QString idColumn = getQueryColumn(join->getQueryTableModel(), refClassBase->getIdProperty());
     QVariant idValue = record.value(idColumn);
     if (!idValue.isNull()) {
-      bool isBase = ConfigurationMap::isBaseClass(refClass);
+      bool isBase = refClassBase->isBaseClass();
       QSharedPointer<QObject> newObject;
       if (isBase) {
         newObject = getById(refClass, idValue);
@@ -426,13 +426,12 @@ void Query::setObjectProperty(QSharedPointer<QObject> object, const QString &pro
 QSharedPointer<QObject> Query::createNewInstance(QSharedPointer<ClassMapBase> classBase, const QSqlRecord &record,
                                                  const QSharedPointer<QueryTableModel> &model) {
   QSharedPointer<QObject> newObject;
-  auto derrivedClasses = ConfigurationMap::getDerrivedClasses(classBase->getClassName());
-  if (derrivedClasses.isEmpty()) {
+  if (!classBase->isBaseClass()) {
     newObject = QSharedPointer<QObject>(classBase->getMetaObject().newInstance());
   } else {
     QString discrimanatorColumn = getQueryColumn(model, classBase->getDiscriminatorProperty());
     QVariant recordValue = record.value(discrimanatorColumn);
-    for (auto dc : derrivedClasses) {
+    for (auto dc : classBase->getDerrivedClasses()) {
       QVariant discrimanatorValue = dc->getDiscriminatorValue();
       if (recordValue == discrimanatorValue) {
         newObject = QSharedPointer<QObject>(dc->getMetaObject().newInstance());

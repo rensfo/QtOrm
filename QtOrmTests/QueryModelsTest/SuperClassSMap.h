@@ -10,9 +10,9 @@ public:
   SuperClassSMap()
   {
     setTable("super_class_s");
-    id("id");
-    map("code");
-    discriminator("discriminator", "type");
+    setId("id");
+    setMap("code");
+    setDiscriminator("discriminator", "type");
   }
 };
 

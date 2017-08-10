@@ -207,7 +207,7 @@ QSharedPointer<QueryTableModel> SelectQueryModel::buildQueryTableModelWInheritan
 }
 
 QSharedPointer<QueryTableModel> SelectQueryModel::buildQueryTableModelBase(QSharedPointer<ClassMapBase> classBase) {
-  if(ConfigurationMap::getInheritanceType(classBase) == QtOrm::Mapping::InheritanceType::SingleTable) {
+  if(classBase->getInheritanceType() == QtOrm::Mapping::InheritanceType::SingleTable) {
     return buildQueryTableModelStiBase(classBase);
   }
 
@@ -220,7 +220,7 @@ QSharedPointer<QueryTableModel> SelectQueryModel::buildQueryTableModelStiBase(QS
 
   queryTableModel->addColumns(classBase->getColumns());
   QList<QSharedPointer<Mapping::OneToOne>> oneToOneRelations = classBase->getOneToOneRelations();
-  QList<QSharedPointer<ClassMapBase>> derrivedClasses = ConfigurationMap::getDerrivedClasses(classBase->getClassName());
+  QList<QSharedPointer<ClassMapBase>> derrivedClasses = classBase->getDerrivedClasses();
   if (!derrivedClasses.isEmpty()) {
     for (auto classMapBase : derrivedClasses) {
       queryTableModel->addColumns(classMapBase->getColumns());
@@ -289,7 +289,7 @@ QSharedPointer<QueryTableModel> SelectQueryModel::buildQueryTableModelSti(QtOrm:
 
   queryTableModel->addColumns(subClass->getColumns());
   QList<QSharedPointer<Mapping::OneToOne>> oneToOneRelations = subClass->getOneToOneRelations();
-  QList<QSharedPointer<ClassMapBase>> derrivedClasses = ConfigurationMap::getDerrivedClasses(subClass->getClassName());
+  QList<QSharedPointer<ClassMapBase>> derrivedClasses = subClass->getDerrivedClasses();
   if (!derrivedClasses.isEmpty()) {
     for (auto classMapBase : derrivedClasses) {
       queryTableModel->addColumns(classMapBase->getColumns());
@@ -326,10 +326,6 @@ QSharedPointer<QueryTableModel> SelectQueryModel::buildQueryTableModelSti(QtOrm:
   return queryTableModel;
 }
 
-QSharedPointer<QueryTableModel> SelectQueryModel::buildQueryTableModelCti(QtOrm::Mapping::SubClassMap* subClass) {
-
-}
-
 QList<OrderColumn> SelectQueryModel::getOrderColumns() const {
   return orderColumns;
 }
@@ -357,7 +353,7 @@ void SelectQueryModel::buildModel() {
 }
 
 QSharedPointer<QueryTableModel> SelectQueryModel::buildQueryTableModel(QSharedPointer<ClassMapBase> classBase) {
-  if(ConfigurationMap::isBaseClass(classBase)){
+  if(classBase->isBaseClass()){
     return buildQueryTableModelBase(classBase);
   }
 
@@ -372,7 +368,7 @@ QSharedPointer<QueryTableModel> SelectQueryModel::buildQueryTableModel(QSharedPo
 
   queryTableModel->addColumns(classBase->getColumns());
   QList<QSharedPointer<Mapping::OneToOne>> oneToOneRelations = classBase->getOneToOneRelations();
-  QList<QSharedPointer<ClassMapBase>> derrivedClasses = ConfigurationMap::getDerrivedClasses(classBase->getClassName());
+  QList<QSharedPointer<ClassMapBase>> derrivedClasses = classBase->getDerrivedClasses();
   if (!derrivedClasses.isEmpty()) {
     for (auto classMapBase : derrivedClasses) {
       queryTableModel->addColumns(classMapBase->getColumns());
@@ -411,8 +407,7 @@ QSharedPointer<QueryTableModel> SelectQueryModel::buildQueryTableModel(QSharedPo
 
 QSharedPointer<QueryTableModel> SelectQueryModel::buildQueryTableModelOneToOne(QSharedPointer<ClassMapBase> classBase)
 {
-  bool isBase = ConfigurationMap::isBaseClass(classBase->getClassName());
-  if (isBase)
+  if (classBase->isBaseClass())
   {
     QSharedPointer<QueryTableModel> queryTableModel = QSharedPointer<QueryTableModel>::create();
     queryTableModel->setName(classBase->getTable());

@@ -8,10 +8,10 @@ class KindAMap : public QtOrm::Mapping::ClassMap<KindA> {
 public:
   KindAMap() {
     setTable("KindA");
-    id("id");
-    map("code");
-    map("name");
-    oneToOne("typeA").setTableColumn("idTypeA");
+    setId("id");
+    setMap("code");
+    setMap("name");
+    setOneToOne("typeA").setTableColumn("idTypeA");
   }
 };
 

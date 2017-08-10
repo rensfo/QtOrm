@@ -38,6 +38,8 @@ public:
 
   virtual bool containsProperty(const QString &propertyName) const override;
   virtual QMap<QString, QSharedPointer<PropertyMap>> getProperties() override;
+
+  virtual QString getSuperClassName() override;
 };
 
 template <typename SUPER, typename T>
@@ -147,6 +149,11 @@ QMap<QString, QSharedPointer<PropertyMap>> SingleTableInheritanceMap<SUPER, T>::
     properties[key] = superProperties.value(key);
 
   return properties;
+}
+
+template<typename SUPER, typename T>
+QString SingleTableInheritanceMap<SUPER, T>::getSuperClassName() {
+  return SUPER::staticMetaObject.className();
 }
 }
 }

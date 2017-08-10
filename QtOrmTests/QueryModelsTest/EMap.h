@@ -8,10 +8,10 @@ class EMap : public QtOrm::Mapping::ClassMap<E> {
 public:
   EMap() {
     setTable("E");
-    id("id");
+    setId("id");
 
-    oneToOne("c").setTableColumn("idC");
-    oneToOne("d").setTableColumn("idD");
+    setOneToOne("c").setTableColumn("idC");
+    setOneToOne("d").setTableColumn("idD");
   }
 };
 

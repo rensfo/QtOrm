@@ -6,12 +6,6 @@
 namespace QtOrm {
 namespace Mapping {
 
-enum class InheritanceType {
-  None,
-  SingleTable,
-  ClassTable
-};
-
 class SubClassMap : public ClassMapBase {
   Q_OBJECT
 public:
@@ -31,6 +25,8 @@ public:
   QMap<QString, QSharedPointer<PropertyMap>> getAllProperties();
 
   QString getClassNameByProperty(const QString &property);
+
+  virtual QString getSuperClassName() = 0;
 
 protected:
   void setInheritanceType(const InheritanceType&value);
