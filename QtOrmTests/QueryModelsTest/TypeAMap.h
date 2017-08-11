@@ -9,8 +9,8 @@ public:
   TypeAMap() {
     setTable("TypeA");
     setId("id");
-    setMap("code");
-    setMap("name");
+    map("code");
+    map("name");
   }
 };
 

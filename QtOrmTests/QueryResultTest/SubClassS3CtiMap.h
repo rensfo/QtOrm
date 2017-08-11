@@ -12,7 +12,7 @@ public:
     setDiscrimanitorValue(3);
     setTable("sub_class_s3");
     setId("id", "idS3").setAutoincrement(false);
-    setOneToOne("ref").setTableColumn("id_ref");
+    addOneToOne("ref").setTableColumn("id_ref");
   }
 };
 

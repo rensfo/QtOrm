@@ -9,7 +9,7 @@ public:
   AOnlyMap() {
     setTable("A");
     setId("id");
-    setMap("code_1", "code");
+    map("code_1", "code");
   }
 };
 

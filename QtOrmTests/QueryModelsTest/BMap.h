@@ -9,9 +9,9 @@ public:
   BMap() {
     setTable("B");
     setId("id");
-    setMap("code");
+    map("code");
 
-    setOneToOne("a").setTableColumn("idA");
+    addOneToOne("a").setTableColumn("idA");
   }
 };
 

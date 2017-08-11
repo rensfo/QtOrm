@@ -11,7 +11,7 @@ public:
   {
     setTable("super_class_s");
     setId("id");
-    setMap("code");
+    map("code");
     setDiscriminator("discriminator", "type");
   }
 };

@@ -12,7 +12,7 @@ public:
     setDiscrimanitorValue(1);
     setTable("sub_class_s1");
     setId("id", "idS1").setAutoincrement(false);
-    setMap("intVal", "int_val").setNull(0);
+    map("intVal", "int_val").setNull(0);
   }
 };
 

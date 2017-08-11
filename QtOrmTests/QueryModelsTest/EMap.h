@@ -10,8 +10,8 @@ public:
     setTable("E");
     setId("id");
 
-    setOneToOne("c").setTableColumn("idC");
-    setOneToOne("d").setTableColumn("idD");
+    addOneToOne("c").setTableColumn("idC");
+    addOneToOne("d").setTableColumn("idD");
   }
 };
 

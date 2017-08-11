@@ -10,7 +10,7 @@ public:
   SubClassS3Map()
   {
     setDiscrimanitorValue(3);
-    setOneToOne("ref").setTableColumn("id_ref");
+    addOneToOne("ref").setTableColumn("id_ref");
   }
 };
 

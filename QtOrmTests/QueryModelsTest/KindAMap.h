@@ -9,9 +9,9 @@ public:
   KindAMap() {
     setTable("KindA");
     setId("id");
-    setMap("code");
-    setMap("name");
-    setOneToOne("typeA").setTableColumn("idTypeA");
+    map("code");
+    map("name");
+    addOneToOne("typeA").setTableColumn("idTypeA");
   }
 };
 

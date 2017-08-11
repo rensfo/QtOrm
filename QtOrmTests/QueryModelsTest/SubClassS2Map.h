@@ -9,7 +9,7 @@ class SubClassS2Map : public QtOrm::Mapping::SingleTableInheritanceMap<SuperClas
 public:
   SubClassS2Map()
   {
-    setMap("strVal", "str_val");
+    map("strVal", "str_val");
     setDiscrimanitorValue(2);
   }
 };

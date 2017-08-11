@@ -9,11 +9,11 @@ public:
   AMap() {
   setTable("A");
   setId("id");
-  setMap("code_1").setColumn("code");
+  map("code_1").setColumn("code");
 
-  setOneToOne("kindA").setTableColumn("idKindA");
+  addOneToOne("kindA").setTableColumn("idKindA");
 
-  setOneToMany("child").setColumn("idA").setSaveCascade(true).setOrderBy("code", Sort::DESC);
+  addOneToMany("child").setColumn("idA").setSaveCascade(true).setOrderBy("code", Sort::DESC);
   }
 };
 

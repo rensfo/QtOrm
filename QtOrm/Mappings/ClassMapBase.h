@@ -48,8 +48,8 @@ public:
   PropertyMap &setId(const QString &propertyName, const QString &columnName);
   PropertyMap &setDiscriminator(const QString &propertyName);
   PropertyMap &setDiscriminator(const QString &propertyName, const QString &columnName);
-  PropertyMap &setMap(QString propertyName);
-  PropertyMap &setMap(QString propertyName, QString columnName);
+  PropertyMap &map(QString propertyName);
+  PropertyMap &map(QString propertyName, QString columnName);
 
   QMetaObject getMetaObject() const;
   void setMetaObject(const QMetaObject &classMetaObject);
@@ -61,8 +61,8 @@ public:
   virtual QSharedPointer<PropertyMap> getProperty(const QString &property);
   virtual QString getPropertyColumn(const QString &property);
 
-  OneToMany &setOneToMany(const QString &property);
-  OneToOne &setOneToOne(const QString &property);
+  OneToMany &addOneToMany(const QString &property);
+  OneToOne &addOneToOne(const QString &property);
 
   virtual QList<QSharedPointer<OneToMany>> getOneToManyRelations() const;
   virtual QList<QSharedPointer<OneToOne>> getOneToOneRelations() const;

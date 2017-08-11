@@ -10,7 +10,7 @@ public:
     setTable("D");
     setId("id");
 
-    setOneToOne("kindA").setTableColumn("idKindA");
+    addOneToOne("kindA").setTableColumn("idKindA");
   }
 };
 

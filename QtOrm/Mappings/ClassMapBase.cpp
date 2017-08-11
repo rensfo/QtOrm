@@ -53,11 +53,11 @@ PropertyMap &ClassMapBase::setDiscriminator(const QString &propertyName, const Q
   return setDiscriminator(propertyName).setColumn(columnName);
 }
 
-PropertyMap &ClassMapBase::setMap(QString propertyName) {
+PropertyMap &ClassMapBase::map(QString propertyName) {
   return createProperty(propertyName).setColumn(propertyName);
 }
 
-PropertyMap &ClassMapBase::setMap(QString propertyName, QString columnName) {
+PropertyMap &ClassMapBase::map(QString propertyName, QString columnName) {
   return createProperty(propertyName).setColumn(columnName);
 }
 
@@ -141,7 +141,7 @@ QString ClassMapBase::getPropertyColumn(const QString &property) {
   return getProperty(property)->getColumn();
 }
 
-OneToMany &ClassMapBase::setOneToMany(const QString &property) {
+OneToMany &ClassMapBase::addOneToMany(const QString &property) {
   checkRelationProperty(property);
 
   QSharedPointer<OneToMany> relation = QSharedPointer<OneToMany>::create();
@@ -151,7 +151,7 @@ OneToMany &ClassMapBase::setOneToMany(const QString &property) {
   return *relation;
 }
 
-OneToOne &ClassMapBase::setOneToOne(const QString &property) {
+OneToOne &ClassMapBase::addOneToOne(const QString &property) {
   checkRelationProperty(property);
 
   QSharedPointer<OneToOne> relation = QSharedPointer<OneToOne>::create();
