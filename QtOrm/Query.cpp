@@ -1,6 +1,7 @@
 #include "Query.h"
 
 #include <QDebug>
+#include <QElapsedTimer>
 #include <QMetaObject>
 #include <QMetaProperty>
 #include <QSharedPointer>
@@ -8,7 +9,6 @@
 #include <QSqlError>
 #include <QSqlField>
 #include <QSqlRecord>
-#include <QTime>
 
 #include "Mappings/ConfigurationMap.h"
 #include "SimpleSqlBuilder.h"
@@ -266,14 +266,14 @@ void Query::executeQuery(QSqlQuery &query) {
   }
 
   QString executedQuery = getSqlTextWithBindParams(query);
-  QTime time;
-  time.start();
+  QElapsedTimer timer;
+  timer.start();
   if (!query.exec()) {
     emit executedSql(executedQuery);
     QString errorMsg = QString("Query: %1 \nError: %2").arg(executedQuery).arg(query.lastError().text());
     throw SqlException(errorMsg);
   }
-  int timeElapsed = time.elapsed();
+  int timeElapsed = timer.elapsed();
   QString fullExecutedMessage = QString("(%1ms) %2").arg(timeElapsed).arg(executedQuery);
   emit executedSql(fullExecutedMessage);
 }
