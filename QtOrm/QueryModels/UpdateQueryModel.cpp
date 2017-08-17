@@ -24,11 +24,9 @@ QSharedPointer<QueryTableModel> UpdateQueryModel::buildQueryTableModel() {
 
   idColumn = classBase->getIdColumn();
   for (auto property : classBase->getProperties()) {
-    if (property->getIsId()) {
-      continue;
+    if (!property->getIsId()) {
+      queryTableModel->addColumn(property->getColumn());
     }
-
-    queryTableModel->addColumn(property->getColumn());
   }
 
   for (QSharedPointer<OneToOne> oneToOne : classBase->getOneToOneRelations()){

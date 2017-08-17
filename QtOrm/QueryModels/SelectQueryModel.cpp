@@ -92,10 +92,9 @@ QString SelectQueryModel::groupConditionToString(const QSharedPointer<GroupCondi
   }
 
   for (QSharedPointer<GroupConditions> &group : groupConditions->getGroups()) {
-    if (group->isEmpty())
-      continue;
-
-    conditionStringList << QString("(%1)").arg(groupConditionToString(group));
+    if (!group->isEmpty()) {
+      conditionStringList << QString("(%1)").arg(groupConditionToString(group));
+    }
   }
 
   QString groupOp = groupOperationStrings[groupConditions->getOperation()];
