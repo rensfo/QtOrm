@@ -11,6 +11,7 @@
 
 #include "Mappings/ConfigurationMap.h"
 #include "GroupConditions.h"
+#include "Registry.h"
 #include "QueryModels/QueryModel.h"
 #include "Relations/OneToOne.h"
 
@@ -50,6 +51,9 @@ public:
   QSharedPointer<Config::ConfigurationMap> getConfiguration() const;
   void setConfiguration(const QSharedPointer<Config::ConfigurationMap>&value);
 
+  QSharedPointer<Registry> getRegistry() const;
+  void setRegistry(const QSharedPointer<Registry>&value);
+
 protected:
   QString getPlaceHolder(const QString &param);
   void bindValues(QSqlQuery &query, const QSharedPointer<GroupConditions> &conditions,
@@ -69,6 +73,7 @@ protected:
   QList<OrderColumn> orderBy;
   bool idAutoincrement = true;
   QSharedPointer<Config::ConfigurationMap> configuration;
+  QSharedPointer<Registry> registry;
 };
 }
 }

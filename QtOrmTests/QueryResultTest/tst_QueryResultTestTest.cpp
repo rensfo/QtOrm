@@ -22,6 +22,7 @@
 #include "SubClassS1CtiMap.h"
 #include "SubClassS2CtiMap.h"
 #include "SubClassS3CtiMap.h"
+#include "AWoIdMap.h"
 
 using namespace QtOrm;
 using namespace Sql;
@@ -130,6 +131,12 @@ private Q_SLOTS:
 
   void ClassTableInheritanceRefresh_data();
   void ClassTableInheritanceRefresh();
+
+  void ClassWoIdSelect_data();
+  void ClassWoIdSelect();
+
+  void ClassWoIdUpdate_data();
+  void ClassWoIdUpdate();
 
 private:
   void enableLogSql();
@@ -1281,6 +1288,75 @@ void QueryResultTestTest::ClassTableInheritanceRefresh()
     session.refresh(s1);
     QVERIFY(s1->getIntVal() == 999);
     QVERIFY(s1->getCode() == "new");
+    return;
+  } catch (QtOrm::Exception& e) {
+    qDebug() << e.getMessage();
+  }
+  QVERIFY(false);
+}
+
+void QueryResultTestTest::ClassWoIdSelect_data() {
+  initDataBase("SelectClassWoId", { "create table A(id integer primary key autoincrement, code text)" });
+  session.clearRegistry();
+  session.setAutoUpdate(false);
+  session.getConfiguration()->removeAllMappings();
+  session.getConfiguration()->addMapping<AWoIdMap>();
+  for(auto c : QStringList{"code1", "code2", "code3", "code11"}) {
+    QSharedPointer<A> a = QSharedPointer<A>::create();
+    a->setCode(c);
+    session.saveObject(a);
+  }
+  session.clearRegistry();
+}
+
+void QueryResultTestTest::ClassWoIdSelect() {
+  try {
+    auto listA = session.getList<A>();
+    for(auto a : listA) {
+      if(a->getId() || a->getCode().isEmpty()){
+        QVERIFY(false);
+        return;
+      }
+    }
+
+    QVERIFY(true);
+    return;
+  } catch (QtOrm::Exception& e) {
+    qDebug() << e.getMessage();
+  }
+  QVERIFY(false);
+}
+
+void QueryResultTestTest::ClassWoIdUpdate_data() {
+  initDataBase("UpdateClassWoId", { "create table A(id integer primary key autoincrement, code text)" });
+  session.clearRegistry();
+  session.setAutoUpdate(false);
+  session.getConfiguration()->removeAllMappings();
+  session.getConfiguration()->addMapping<AWoIdMap>();
+  for(auto c : QStringList{"code1", "code2", "code3", "code11"}) {
+    QSharedPointer<A> a = QSharedPointer<A>::create();
+    a->setCode(c);
+    session.saveObject(a);
+  }
+  session.clearRegistry();
+}
+
+void QueryResultTestTest::ClassWoIdUpdate() {
+  try {
+    auto a = session.get<A>("code", "code1");
+    a->setCode("CodeXXX");
+    session.saveObject(a);
+
+    QSqlQuery query(db);
+    if(!query.exec("select code from A")){
+      QVERIFY2(false, query.lastError().text().toStdString().c_str());
+      return;
+    }
+    query.next();
+    auto variantValue = query.record().value("code");
+    auto code = variantValue.toString();
+    QVERIFY(code == a->getCode());
+
     return;
   } catch (QtOrm::Exception& e) {
     qDebug() << e.getMessage();

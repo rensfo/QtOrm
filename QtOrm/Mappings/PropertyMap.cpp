@@ -60,14 +60,13 @@ PropertyMap &PropertyMap::setNull(const QVariant &value) {
   return *this;
 }
 
-bool PropertyMap::getAutoincrement() const
-{
+bool PropertyMap::getAutoincrement() const {
   return autoincrement;
 }
 
-void PropertyMap::setAutoincrement(bool value)
-{
+PropertyMap &PropertyMap::setAutoincrement(bool value) {
   autoincrement = value;
+  return *this;
 }
 }
 }

@@ -29,8 +29,8 @@ Query::Query(const Query &other) : Query(other.parent()) {
 QSharedPointer<QObject> Query::getById(const QString &className, const QVariant &id) {
   QSharedPointer<ClassMapBase> classBase = configuration->getMappedClass(className);
 
-  if (registry->contains(classBase->getTable(), id.toString()))
-    return registry->value(classBase->getTable(), id.toString());
+  if (registry->contains(classBase->getTable(), id))
+    return registry->value(classBase->getTable(), id);
 
   auto list = getListObject(className, classBase->getIdPropertyName(), id);
 
@@ -124,7 +124,9 @@ void Query::insertObjectMain(QSharedPointer<QObject>&object, QSharedPointer<Clas
     query.first();
     newId = query.record().value(0);
   }
-  setObjectProperty(object, classBase->getIdPropertyName(), newId);
+  if(!classBase->getIdPropertyName().isEmpty()) {
+    setObjectProperty(object, classBase->getIdPropertyName(), newId);
+  }
   insertObjectIntoRegistry(classBase, object, newId);
 
   saveAllOneToMany(object);
@@ -308,7 +310,9 @@ void Query::fillBaseFields(QSharedPointer<QObject> &object, const QSharedPointer
       value = nullValue;
     }
     if (value.isValid()) {
-      setObjectProperty(object, prop->getName(), value);
+      if(!prop->getName().isEmpty()) {
+        setObjectProperty(object, prop->getName(), value);
+      }
     }
   }
 }
@@ -452,14 +456,14 @@ bool Query::registryContainsObject(QSharedPointer<ClassMapBase> classBase, const
                                    const QString &tableAlias) {
   QString tableName = classBase->getTable();
   QVariant idValue = getIdFromRecord(classBase, record, tableAlias);
-  return registry->contains(tableName, idValue.toString());
+  return registry->contains(tableName, idValue);
 }
 
 QSharedPointer<QObject> Query::getObjectFromRegistry(QSharedPointer<ClassMapBase> classBase, const QSqlRecord &record,
                                                      const QString &tableAlias) {
   QString tableName = classBase->getTable();
   QVariant idValue = getIdFromRecord(classBase, record, tableAlias);
-  return registry->value(tableName, idValue.toString());
+  return registry->value(tableName, idValue);
 }
 
 void Query::insertObjectIntoRegistry(QSharedPointer<ClassMapBase> classBase, const QSqlRecord &record,
@@ -471,7 +475,7 @@ void Query::insertObjectIntoRegistry(QSharedPointer<ClassMapBase> classBase, con
 void Query::insertObjectIntoRegistry(QSharedPointer<ClassMapBase> classBase, QSharedPointer<QObject> object,
                                      QVariant idValue) {
   QString tableName = classBase->getTable();
-  registry->insert(tableName, idValue.toString(), object);
+  registry->insert(tableName, idValue, object);
 }
 
 void Query::removeObjectFromRegistry(QSharedPointer<QObject> object) {
@@ -642,9 +646,14 @@ Query &Query::operator=(const Query &other) {
 }
 
 bool Query::isIdObjectDefault(QSharedPointer<QObject> object) {
+  return !registry->contains(object);
+  /*
   QSharedPointer<ClassMapBase> classBase = configuration->getMappedClass(object);
-  QVariant idVal = object->property(classBase->getIdPropertyName().toStdString().data());
+  auto idProperty = classBase->getIdProperty();
+  if()
+  QVariant idVal = registry->getId(idProperty);// object->property(classBase->getIdPropertyName().toStdString().data());
   return idVal == classBase->getIdProperty()->getNull();
+  */
 }
 
 bool Query::isIdOneToOneDefault(QSharedPointer<QObject> object, QSharedPointer<OneToOne> oneToOne) {
@@ -687,6 +696,7 @@ SimpleSqlBuilder Query::createSimpleSqlBuilder(QSharedPointer<ClassMapBase> &cla
   sqlBuilder.setDatabase(database);
   sqlBuilder.setClassBase(classBase);
   sqlBuilder.setConfiguration(configuration);
+  sqlBuilder.setRegistry(registry);
 
   return sqlBuilder;
 }

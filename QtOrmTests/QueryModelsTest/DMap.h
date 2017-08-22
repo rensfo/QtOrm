@@ -8,7 +8,7 @@ class DMap : public QtOrm::Mapping::ClassMap<D> {
 public:
   DMap() {
     setTable("D");
-    setId("id");
+    mapId("id");
 
     addOneToOne("kindA").setTableColumn("idKindA");
   }

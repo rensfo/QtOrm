@@ -44,7 +44,8 @@ HEADERS += \
     AOnlyMap.h \
     SubClassS1CtiMap.h \
     SubClassS2CtiMap.h \
-    SubClassS3CtiMap.h
+    SubClassS3CtiMap.h \
+    AWoIdMap.h
 
 SOURCES += tst_QueryResultTestTest.cpp \
     $$QUERY_MODELS_TEST_PATH/A.cpp \

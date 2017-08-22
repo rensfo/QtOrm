@@ -11,7 +11,7 @@ public:
   {
     setDiscrimanitorValue(2);
     setTable("sub_class_s2");
-    setId("id", "idS2").setAutoincrement(false);
+    mapId("id", "idS2");
     map("strVal", "str_val");
   }
 };

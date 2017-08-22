@@ -29,7 +29,7 @@ public:
   PropertyMap &setNull(const QVariant &value);
 
   bool getAutoincrement() const;
-  void setAutoincrement(bool value);
+  PropertyMap &setAutoincrement(bool value);
 
 private:
   QString name;

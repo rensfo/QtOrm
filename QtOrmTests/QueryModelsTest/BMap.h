@@ -8,7 +8,7 @@ class BMap : public QtOrm::Mapping::ClassMap<B> {
 public:
   BMap() {
     setTable("B");
-    setId("id");
+    mapId("id");
     map("code");
 
     addOneToOne("a").setTableColumn("idA");

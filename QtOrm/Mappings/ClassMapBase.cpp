@@ -21,53 +21,63 @@ QMap<QString, QSharedPointer<PropertyMap>> ClassMapBase::getProperties() {
   return properties;
 }
 
+PropertyMap& ClassMapBase::setId(QString columnName) {
+  return mapIdBase("", false).setColumn(columnName);
+}
+
 QString ClassMapBase::getClassName() const {
   return classMetaObject.className();
 }
 
-PropertyMap &ClassMapBase::setId(QString propertyName) {
-  if (!idProperty.isEmpty()) {
-    QString errorText = QString::fromUtf8("Field id registred (%1.%2)").arg(getClassName()).arg(idProperty);
-    throw IdPropertyAlreadyRegistredException(errorText);
-  }
-
-  idProperty = propertyName;
-  return createProperty(propertyName).setColumn(propertyName).setIsId(true).setNull(0);
+PropertyMap &ClassMapBase::mapId(QString propertyName) {
+  return mapIdBase(propertyName, true);
 }
 
-PropertyMap &ClassMapBase::setId(const QString &propertyName, const QString &columnName) {
-  return setId(propertyName).setColumn(columnName);
+PropertyMap &ClassMapBase::mapId(const QString &propertyName, const QString &columnName) {
+  return mapId(propertyName).setColumn(columnName);
 }
 
-PropertyMap &ClassMapBase::setDiscriminator(const QString &propertyName) {
-  if (!discriminatorProperty.isEmpty()) {
-    QString errorText = QString::fromUtf8("Discriminator field registred (%1.%2)").arg(getClassName()).arg(idProperty);
+PropertyMap &ClassMapBase::mapDiscriminator(const QString &propertyName) {
+  if (discriminatorProperty) {
+    QString errorText = QString::fromUtf8("Discriminator field registred (%1.%2)").arg(getClassName()).arg(discriminatorProperty->getName());
     throw DiscriminatorPropertyAlreadyRegistredException(errorText);
   }
 
-  discriminatorProperty = propertyName;
-  return createProperty(propertyName).setColumn(propertyName).setIsDiscriminator(true);
+  discriminatorProperty = createProperty(propertyName);
+  return discriminatorProperty->setColumn(propertyName).setIsDiscriminator(true);
 }
 
-PropertyMap &ClassMapBase::setDiscriminator(const QString &propertyName, const QString &columnName) {
-  return setDiscriminator(propertyName).setColumn(columnName);
+PropertyMap &ClassMapBase::mapDiscriminator(const QString &propertyName, const QString &columnName) {
+  return mapDiscriminator(propertyName).setColumn(columnName);
 }
 
 PropertyMap &ClassMapBase::map(QString propertyName) {
-  return createProperty(propertyName).setColumn(propertyName);
+  return createProperty(propertyName)->setColumn(propertyName);
 }
 
 PropertyMap &ClassMapBase::map(QString propertyName, QString columnName) {
-  return createProperty(propertyName).setColumn(columnName);
+  return createProperty(propertyName)->setColumn(columnName);
 }
 
-PropertyMap &ClassMapBase::createProperty(QString propertyName) {
-  checkProperty(propertyName);
+QSharedPointer<PropertyMap> ClassMapBase::createProperty(QString propertyName, bool needCheckProperty) {
+  if(needCheckProperty) {
+    checkProperty(propertyName);
+  }
 
   QSharedPointer<PropertyMap> propertyMap = QSharedPointer<PropertyMap>::create(propertyName);
   properties.insert(propertyName, propertyMap);
 
-  return *propertyMap;
+  return propertyMap;
+}
+
+PropertyMap&ClassMapBase::mapIdBase(QString propertyName, bool needCheckProperty) {
+  if (idProperty) {
+    QString errorText = QString::fromUtf8("Field id registred (%1.%2)").arg(getClassName()).arg(idProperty->getName());
+    throw IdPropertyAlreadyRegistredException(errorText);
+  }
+
+  idProperty = createProperty(propertyName, needCheckProperty);
+  return idProperty->setColumn(propertyName).setIsId(true).setNull(0);
 }
 
 QList<QSharedPointer<ClassMapBase> > ClassMapBase::getDerrivedClasses() const {
@@ -119,7 +129,7 @@ void ClassMapBase::setMetaObject(const QMetaObject &metaObject) {
 }
 
 QSharedPointer<PropertyMap> ClassMapBase::getIdProperty() const {
-  return properties.value(idProperty);
+  return idProperty;
 }
 
 QString ClassMapBase::getIdColumn() const {
@@ -236,19 +246,15 @@ SubClassMap*ClassMapBase::toSubclass()
 }
 
 QString ClassMapBase::getDiscriminatorPropertyName() const {
-  return discriminatorProperty;
+  return discriminatorProperty->getName();
 }
 
 QString ClassMapBase::getDiscriminatorColumn() const {
-  return properties.value(discriminatorProperty)->getColumn();
-}
-
-void ClassMapBase::setDiscriminatorProperty(const QString &value) {
-  discriminatorProperty = value;
+  return discriminatorProperty->getColumn();
 }
 
 QSharedPointer<PropertyMap> ClassMapBase::getDiscriminatorProperty() const {
-  return properties.value(discriminatorProperty);
+  return discriminatorProperty;
 }
 
 QStringList ClassMapBase::getColumns() {

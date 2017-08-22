@@ -8,7 +8,7 @@ class EMap : public QtOrm::Mapping::ClassMap<E> {
 public:
   EMap() {
     setTable("E");
-    setId("id");
+    mapId("id");
 
     addOneToOne("c").setTableColumn("idC");
     addOneToOne("d").setTableColumn("idD");

@@ -136,6 +136,16 @@ bool SqlBuilderBase::hasLastInsertedIdFeature() {
   return database.driver()->hasFeature(QSqlDriver::LastInsertId) && database.driverName() != "QPSQL";
 }
 
+QSharedPointer<Registry> SqlBuilderBase::getRegistry() const
+{
+    return registry;
+}
+
+void SqlBuilderBase::setRegistry(const QSharedPointer<Registry>&value)
+{
+    registry = value;
+}
+
 QSharedPointer<Config::ConfigurationMap> SqlBuilderBase::getConfiguration() const
 {
     return configuration;

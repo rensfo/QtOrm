@@ -10,7 +10,7 @@ namespace QtOrm {
 Registry::Registry(QObject *parent) : QObject(parent) {
 }
 
-bool Registry::contains(const QString &table, const QString &id) {
+bool Registry::contains(const QString &table, const IdType &id) {
   if (data.contains(table)) {
     return data.value(table).contains(id);
   }
@@ -18,45 +18,51 @@ bool Registry::contains(const QString &table, const QString &id) {
   return false;
 }
 
-void Registry::insert(const QString &table, const QString &id, QSharedPointer<QObject> object) {
+void Registry::insert(const QString &table, const IdType &id, ItemType object) {
   if (data.contains(table)) {
     if (!data.value(table).contains(id)) {
       data[table].insert(id, object);
+      itemsIds.insert(object, id);
     }
   } else {
     RegistryData ids;
     ids.insert(id, object);
     data.insert(table, ids);
+    itemsIds.insert(object, id);
   }
 }
 
-void Registry::remove(const QString &table, const QString &id) {
+void Registry::remove(const QString &table, const IdType &id) {
   if (contains(table, id)) {
+    auto object = value(table, id);
+    itemsIds.remove(object);
     data[table].remove(id);
+
   }
 }
 
-void Registry::remove(QSharedPointer<QObject> object) {
+void Registry::remove(ItemType object) {
   for (RegistryData &ids : data) {
     for (QSharedPointer<QObject> &registryObject : ids) {
       if (registryObject == object) {
-        QString key = ids.key(object);
+        IdType key = ids.key(object);
         ids.remove(key);
+        itemsIds.remove(object);
         return;
       }
     }
   }
 }
 
-QSharedPointer<QObject> Registry::value(const QString &table, const QString &id) {
+Registry::ItemType Registry::value(const QString &table, const IdType &id) {
   if (contains(table, id)) {
     return data[table][id];
   }
 
-  return QSharedPointer<QObject>();
+  return ItemType();
 }
 
-QSharedPointer<QObject> Registry::value(QObject *object) {
+Registry::ItemType Registry::value(QObject *object) {
   QString className = object->metaObject()->className();
   QString tableName;
   auto classBase = configuration->getMappedClass(className);
@@ -76,6 +82,14 @@ QSharedPointer<QObject> Registry::value(QObject *object) {
   return QSharedPointer<QObject>();
 }
 
+bool Registry::contains(Registry::ItemType object) {
+  return itemsIds.contains(object);
+}
+
+Registry::IdType Registry::getId(ItemType object) {
+  return itemsIds.value(object);
+}
+
 void Registry::clear() {
   data.clear();
 }
@@ -89,4 +103,9 @@ void Registry::setConfiguration(QSharedPointer<Config::ConfigurationMap> value)
 {
   configuration = value;
 }
+}
+
+uint qHash(const QVariant&var)
+{
+  return qHash(var.toString());
 }

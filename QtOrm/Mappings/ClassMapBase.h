@@ -44,10 +44,11 @@ public:
 
   virtual QMap<QString, QSharedPointer<PropertyMap>> getProperties();
 
-  PropertyMap &setId(QString propertyName);
-  PropertyMap &setId(const QString &propertyName, const QString &columnName);
-  PropertyMap &setDiscriminator(const QString &propertyName);
-  PropertyMap &setDiscriminator(const QString &propertyName, const QString &columnName);
+  virtual PropertyMap &setId(QString columnName);
+  virtual PropertyMap &mapId(QString propertyName);
+  virtual PropertyMap &mapId(const QString &propertyName, const QString &columnName);
+  PropertyMap &mapDiscriminator(const QString &propertyName);
+  PropertyMap &mapDiscriminator(const QString &propertyName, const QString &columnName);
   PropertyMap &map(QString propertyName);
   PropertyMap &map(QString propertyName, QString columnName);
 
@@ -102,7 +103,6 @@ public:
 
   virtual QString getDiscriminatorPropertyName() const;
   virtual QString getDiscriminatorColumn() const;
-  void setDiscriminatorProperty(const QString &value);
   virtual QSharedPointer<PropertyMap> getDiscriminatorProperty() const;
 
   QStringList getColumns();
@@ -128,7 +128,8 @@ protected:
   virtual void checkRelationProperty(const QString &propertyName) = 0;
 
 private:
-  PropertyMap &createProperty(QString propertyName);
+  QSharedPointer<PropertyMap> createProperty(QString propertyName, bool needCheckProperty = true);
+  PropertyMap &mapIdBase(QString propertyName, bool needCheckProperty);
 
 protected:
   QVariant discrimanatorValue;
@@ -140,8 +141,8 @@ private:
   QList<QSharedPointer<OneToOne>> oneToOneRelations;
   QList<QSharedPointer<ClassMapBase>> derrivedClasses;
 
-  QString idProperty;
-  QString discriminatorProperty;
+  QSharedPointer<PropertyMap> idProperty;
+  QSharedPointer<PropertyMap> discriminatorProperty;
 
   QMetaObject classMetaObject;
 };

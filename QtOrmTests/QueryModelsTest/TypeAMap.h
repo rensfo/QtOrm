@@ -8,7 +8,7 @@ class TypeAMap : public QtOrm::Mapping::ClassMap<TypeA> {
 public:
   TypeAMap() {
     setTable("TypeA");
-    setId("id");
+    mapId("id");
     map("code");
     map("name");
   }
