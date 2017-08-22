@@ -25,6 +25,8 @@ class SqlBuilderBase : public QObject {
 
 public:
   explicit SqlBuilderBase(QObject *parent = nullptr);
+  SqlBuilderBase(const SqlBuilderBase& other);
+
   virtual QSqlQuery selectQuery();
   virtual QSqlQuery insertQuery() = 0;
   virtual QSqlQuery updateQuery() = 0;
@@ -53,6 +55,8 @@ public:
 
   QSharedPointer<Registry> getRegistry() const;
   void setRegistry(const QSharedPointer<Registry>&value);
+
+  SqlBuilderBase &operator=(const SqlBuilderBase &other);
 
 protected:
   QString getPlaceHolder(const QString &param);

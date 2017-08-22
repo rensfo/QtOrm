@@ -19,8 +19,7 @@ using namespace QtOrm::Config;
 SimpleSqlBuilder::SimpleSqlBuilder(QObject *parent) : SqlBuilderBase(parent) {
 }
 
-SimpleSqlBuilder::SimpleSqlBuilder(const SimpleSqlBuilder &other) : SimpleSqlBuilder(other.parent()) {
-  this->operator=(other);
+SimpleSqlBuilder::SimpleSqlBuilder(const SimpleSqlBuilder &other) : SqlBuilderBase(other) {
 }
 
 QSqlQuery SimpleSqlBuilder::insertQuery() {
@@ -55,15 +54,6 @@ QSqlQuery SimpleSqlBuilder::deleteQuery() {
   bindDelete(query);
 
   return query;
-}
-
-SimpleSqlBuilder &SimpleSqlBuilder::operator=(const SimpleSqlBuilder &other) {
-  database = other.getDatabase();
-  classBase = other.getClassBase();
-  queryModel = other.getQueryModel();
-  registry = other.getRegistry();
-
-  return *this;
 }
 
 void SimpleSqlBuilder::bindInsert(QSqlQuery &query) {

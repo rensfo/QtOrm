@@ -21,6 +21,11 @@ using namespace Config;
 SqlBuilderBase::SqlBuilderBase(QObject *parent) : QObject(parent) {
 }
 
+SqlBuilderBase::SqlBuilderBase(const SqlBuilderBase& other) :
+  SqlBuilderBase(other.parent()) {
+  this->operator=(other);
+}
+
 QSqlQuery SqlBuilderBase::selectQuery() {
   queryModel = getQueryModel(QueryModelType::Select);
 
@@ -143,7 +148,22 @@ QSharedPointer<Registry> SqlBuilderBase::getRegistry() const
 
 void SqlBuilderBase::setRegistry(const QSharedPointer<Registry>&value)
 {
-    registry = value;
+  registry = value;
+}
+
+SqlBuilderBase& SqlBuilderBase::operator=(const SqlBuilderBase&other) {
+  database = other.database;
+  classBase = other.classBase;
+  conditions = other.conditions;
+  object = other.object;
+  queryModel = other.queryModel;
+  propertyName = other.propertyName;
+  orderBy = other.orderBy;
+  idAutoincrement = other.idAutoincrement;
+  configuration = other.configuration;
+  registry = other.registry;
+
+  return *this;
 }
 
 QSharedPointer<Config::ConfigurationMap> SqlBuilderBase::getConfiguration() const
